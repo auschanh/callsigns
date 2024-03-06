@@ -1,22 +1,32 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const http = require('http');
-const cors = require('cors');
-const { Server } = require('socket.io');
 
-app.use(cors());
+const http = require("http");
 const server = http.createServer(app);
+
+const io = require("socket.io")(server, {
+    cors: { 
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+const cors = require("cors");
+app.use(cors());
+
+app.use(express.json());
 
 server.listen(3001, () => {
     console.log("SERVER RUNNING");
 }); 
 
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-    }
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
+
+
+
 
 io.on("connection", (socket) => { // every connection has a unique socket id
     console.log(`User Connecetd: ${socket.id}`); // prints socket id of connection
