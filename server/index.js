@@ -25,9 +25,6 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
-
-
-
 io.on("connection", (socket) => { // every connection has a unique socket id
     console.log(`User Connecetd: ${socket.id}`); // prints socket id of connection
 
