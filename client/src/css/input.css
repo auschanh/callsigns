@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 
-@layer base {
+/* @layer base {
     body {
         background-color: orange;
     }
-}
+} */

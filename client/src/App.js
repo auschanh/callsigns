@@ -19,31 +19,13 @@ function App() {
 
 	const [socket, setSocket] = useState(mainSocket);
 
+	console.log(styles);
+
 	return (
 
 		<div className="App">
 
 			<SocketContext.Provider value={[socket, setSocket]}>
-				<div className="mt-4 ml-4">
-				<Link to="/">
-
-					<Button btnClass={styles.redButton} btnID="red-btn" label="Home" />
-
-					</Link>
-
-					<Link to="game">
-
-					<Button btnClass={styles.blueButton} btnID="blue-btn" label="Game" />
-
-					</Link>
-
-					<Link to="howToPlay">
-
-					<Button btnClass={styles.greenButton} btnID="green-btn" label="How To Play" />
-
-					</Link>
-				</div>
-				
 
 				<Routes>
 					<Route path="/" exact element={ <Home /> } />
