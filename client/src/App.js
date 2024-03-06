@@ -6,6 +6,7 @@ import Game from './pages/Game';
 import HowToPlay from './pages/HowToPlay';
 import Button from './components/Button';
 import SocketContext from './contexts/SocketContext';
+import styles from './css/tailwindStylesLiterals';
 
 import io from "socket.io-client";
 
@@ -23,24 +24,26 @@ function App() {
 		<div className="App">
 
 			<SocketContext.Provider value={[socket, setSocket]}>
-
+				<div className="mt-4 ml-4">
 				<Link to="/">
 
-					<Button btnID="red-btn" label="Home" />
+					<Button btnClass={styles.redButton} btnID="red-btn" label="Home" />
 
-				</Link>
+					</Link>
 
-				<Link to="game">
+					<Link to="game">
 
-					<Button btnID="blue-btn" label="Game" />
+					<Button btnClass={styles.blueButton} btnID="blue-btn" label="Game" />
 
-				</Link>
+					</Link>
 
-				<Link to="howToPlay">
+					<Link to="howToPlay">
 
-					<Button btnID="green-btn" label="How To Play" />
+					<Button btnClass={styles.greenButton} btnID="green-btn" label="How To Play" />
 
-				</Link>
+					</Link>
+				</div>
+				
 
 				<Routes>
 					<Route path="/" exact element={ <Home /> } />
