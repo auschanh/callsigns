@@ -16,8 +16,6 @@ const HowToPlay = function(props) {
 
             if (event.key === 'Escape') {
 
-                console.log("Active");
-
                 navigate(state.previousLocation.pathname);
 
             }
