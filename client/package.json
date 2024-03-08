@@ -7,6 +7,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.7",
+    "body-scroll-lock": "^4.0.0-beta.0",
+    "concurrently": "^8.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.2",
@@ -15,11 +17,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently --names 'REACT,TAILWIND' --prefix-colors 'gray,cyan' --kill-others 'react-scripts start' 'npx tailwindcss -i ./src/css/input.css -o ./src/css/styles.css --watch'",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "compilecss": "npx tailwindcss -i ./src/css/input.css -o ./src/css/styles.css --watch"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

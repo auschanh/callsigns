@@ -15,11 +15,12 @@ const mainSocket = io.connect("http://localhost:3001");
 function App() {
 
 	const navigate = useNavigate();
+
 	const location = useLocation();
 
-	const [socket, setSocket] = useState(mainSocket);
+	const previousLocation = location.state?.previousLocation;
 
-	console.log(styles);
+	const [socket, setSocket] = useState(mainSocket);
 
 	return (
 
@@ -27,11 +28,23 @@ function App() {
 
 			<SocketContext.Provider value={[socket, setSocket]}>
 
-				<Routes>
+				<Routes location={ previousLocation || location } >
+
 					<Route path="/" exact element={ <Home /> } />
+
 					<Route path="game" exact element={ <Game /> } />
-					<Route path="howToPlay" exact element={ <HowToPlay /> } />
+
 				</Routes>
+
+				{previousLocation && (
+
+					<Routes>
+
+						<Route path="howToPlay" exact element={ <HowToPlay /> } />
+
+					</Routes>
+
+				)}
 
 			</SocketContext.Provider>
 

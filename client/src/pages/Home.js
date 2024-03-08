@@ -1,27 +1,33 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styles from '../css/tailwindStylesLiterals';
 import Button from '../components/Button';
 
 const Home = function(props) {
 
+    const location = useLocation();
+
     return (
 
-        <div className="mt-4 ml-4">
+        <div className="h-screen w-screen bg-blue-950 flex flex-col items-center">
 
-            <h1>Just One</h1>
+            <h1 className="text-white font-semibold text-7xl p-8 text-center mt-72">Just One</h1>
 
-            <Link to="game">
+            <div className="flex flex-row w-[35vw] justify-evenly">
 
-                <Button btnClass={styles.greenButton} btnID="play-btn" label="Play" />
+                <Link to="game">
 
-            </Link>
+                    <Button btnClass={styles.greenButton} btnID="play-btn" label="Play" />
 
-            <Link to="howToPlay">
+                </Link>
 
-                <Button btnClass={styles.redButton} btnID="htp-btn" label="How To Play" />
+                <Link to="howToPlay" state={ { previousLocation: location } } >
 
-            </Link>
+                    <Button btnClass={styles.redButton} btnID="htp-btn" label="How To Play" />
+
+                </Link>
+
+            </div>
 
         </div>
         
