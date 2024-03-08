@@ -12,7 +12,7 @@ const HowToPlay = function(props) {
 
     useEffect(() => {
 
-        const listenForEnterKey = (event) => {
+        const listenForEscKey = (event) => {
 
             if (event.key === 'Escape') {
 
@@ -24,7 +24,7 @@ const HowToPlay = function(props) {
 
         }
 
-        document.addEventListener("keydown", listenForEnterKey);
+        document.addEventListener("keydown", listenForEscKey);
 
         const observerRefValue = modalRef.current;
 
@@ -32,7 +32,7 @@ const HowToPlay = function(props) {
 
         return () => {
 
-            document.removeEventListener("keydown", listenForEnterKey);
+            document.removeEventListener("keydown", listenForEscKey);
 
             if (observerRefValue) {
 
