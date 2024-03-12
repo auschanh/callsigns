@@ -8,12 +8,17 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.7",
     "body-scroll-lock": "^4.0.0-beta.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
     "concurrently": "^8.2.2",
+    "lucide-react": "^0.352.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.2",
     "react-scripts": "5.0.1",
     "socket.io-client": "^4.7.4",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
