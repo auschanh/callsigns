@@ -28,23 +28,15 @@ function App() {
 
 			<SocketContext.Provider value={[socket, setSocket]}>
 
-				<Routes location={ previousLocation || location } >
+				<Routes>
 
 					<Route path="/" exact element={ <Home /> } />
 
 					<Route path="game" exact element={ <Game /> } />
 
+					<Route path="howToPlay" exact element={ <HowToPlay /> } />
+
 				</Routes>
-
-				{previousLocation && (
-
-					<Routes>
-
-						<Route path="howToPlay" exact element={ <HowToPlay /> } />
-
-					</Routes>
-
-				)}
 
 			</SocketContext.Provider>
 
