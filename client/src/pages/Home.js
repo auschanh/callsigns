@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from '../css/tailwindStylesLiterals';
-import Button from '../components/Button';
+
+import { Button } from "../components/ui/button";
 
 const Home = function(props) {
 
@@ -17,13 +18,13 @@ const Home = function(props) {
 
                 <Link to="game">
 
-                    <Button btnClass={styles.greenButton} btnID="play-btn" label="Play" />
+                    <Button>Play</Button>
 
                 </Link>
 
-                <Link to="howToPlay" state={ { previousLocation: location } } >
+                <Link to="howToPlay">
 
-                    <Button btnClass={styles.redButton} btnID="htp-btn" label="How To Play" />
+                    <Button>How To Play</Button>
 
                 </Link>
 

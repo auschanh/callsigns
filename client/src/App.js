@@ -4,7 +4,6 @@ import './css/styles.css';
 import Home from './pages/Home';
 import Game from './pages/Game';
 import HowToPlay from './pages/HowToPlay';
-import Button from './components/Button';
 import SocketContext from './contexts/SocketContext';
 import styles from './css/tailwindStylesLiterals';
 
