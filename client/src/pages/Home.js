@@ -1,49 +1,70 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "../css/tailwindStylesLiterals";
-// import Button from "../components/Button";
 import { Button } from "../components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../components/ui/dialog";
-// import { ProfileForm } from "../components/FormPlay";
-import { Form } from "../components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 
-const Home = function (props) {
-  const location = useLocation();
+import CreateGameForm from "../components/CreateGameForm";
 
-  return (
-    <div className="h-screen w-screen bg-blue-950 flex flex-col items-center">
-      <h1 className="text-white font-semibold text-7xl p-8 text-center mt-72">
-        Just One
-      </h1>
+const Home = function () {
+	
+	const [gameInfo, setGameInfo] = useState();
 
-      <div className="flex flex-row w-[35vw] justify-evenly">
-        <Dialog>
-          <DialogTrigger>
-            <Button className={styles.greenButton}>Open</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create A Room</DialogTitle>
-              <DialogDescription>
-                <Form></Form>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+	return (
+		<div className="h-screen w-screen bg-blue-950 flex flex-col items-center">
+			<h1 className="text-white font-semibold text-7xl p-8 text-center mt-72">
+				Just One
+			</h1>
 
-        <Link to="howToPlay" state={{ previousLocation: location }}>
-          <Button className={styles.redButton}>How To Play</Button>
-        </Link>
-      </div>
-    </div>
-  );
+			<div className="flex flex-row w-[30vw] justify-evenly">
+				<Dialog>
+					<DialogTrigger className="px-16 py-1 text-xl bg-green-600 text-slate-50 shadow-[7px_8px_rgb(0,0,0)] hover:bg-green-700/90 duration-300 dark:bg-green-900 dark:text-slate-50 dark:hover:bg-green-900/90 inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300">
+						Play
+					</DialogTrigger>
+					<DialogContent className="h-75vh] w-[60vw] p-8">
+
+						{!gameInfo && (
+
+							<DialogHeader>
+								<DialogTitle className="mb-4">Create A Room</DialogTitle>
+								<DialogDescription>
+
+									<CreateGameForm setGameInfo={setGameInfo} />
+
+								</DialogDescription>
+							</DialogHeader>
+
+						) || (
+
+							<p>
+
+								{
+								
+									Object.keys(gameInfo).map((value, index) => {
+
+										return (
+
+											`${value}: ${gameInfo[value]} `
+
+										)
+
+									})
+								
+								}
+
+							</p>
+
+						)}
+
+					</DialogContent>
+				</Dialog>
+
+				<Link to="howToPlay">
+					<Button className="px-8 py-7 text-xl" variant="red">How To Play</Button>
+				</Link>
+			</div>
+		</div>
+	);
 };
 
 export default Home;
