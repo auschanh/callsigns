@@ -4,6 +4,32 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    useEffect(() => {
+
+        const listenForKeydown = (event) => {
+
+            if (event.key === "ArrowLeft") {
+
+                event.preventDefault();
+
+                previousSlide();
+
+            } else if (event.key === "ArrowRight" || event.key === " " || event.key === "Enter") {
+
+                event.preventDefault();
+
+                nextSlide();
+
+            }
+
+        }
+
+        document.addEventListener("keydown", listenForKeydown);
+
+        return () => document.removeEventListener("keydown", listenForKeydown);
+
+    }, [currentSlide]);
+
     const previousSlide = () => setCurrentSlide(curr => curr === 0 ? slides.length - 1 : currentSlide - 1);
     const nextSlide = () => setCurrentSlide(curr => curr === slides.length - 1 ? 0 : currentSlide + 1);
 
@@ -11,7 +37,7 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
         <div className="flex h-full items-center">
 
-            <button onClick={previousSlide} className="mr-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 hover:bg-white">
+            <button onClick={previousSlide} className="mr-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 outline-none hover:bg-white">
                 <div className="flex items-center justify-center h-6 w-6">
                     {'<'}
                 </div>
@@ -41,7 +67,7 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
             </div>
 
-            <button onClick={nextSlide} className="ml-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 hover:bg-white">
+            <button onClick={nextSlide} className="ml-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 outline-none hover:bg-white">
                 <div className="flex items-center justify-center h-6 w-6">
                     {'>'}
                 </div>
