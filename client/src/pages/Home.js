@@ -2,16 +2,15 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from '../css/tailwindStylesLiterals';
 import Carousel from '../components/Carousel';
-
 import { Button } from "../components/ui/button";
-
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
-
+import { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "../components/ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 
 const Home = function(props) {
 
     const location = useLocation();
+
+    const spaceBetweenSlides = 5;
 
     return (
 
@@ -22,14 +21,16 @@ const Home = function(props) {
             <div className="flex flex-row w-[35vw] justify-evenly">
 
                 <Dialog>
-                    <DialogTrigger>
+                    <DialogTrigger asChild>
                         <Button variant="secondary">How To Play</Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="flex flex-col h-[80vh] w-[60vw] p-10 justify-between">
                         <DialogHeader>
-                        <DialogTitle>How To Play</DialogTitle>
-                        <DialogDescription>
-                            {/* <p className="text-teal-500 font-extrabold">Guesser: </p>
+                            <DialogTitle>How To Play</DialogTitle>
+                            <DialogDescription />
+                        </DialogHeader>
+
+                        {/* <p className="text-teal-500 font-extrabold">Guesser: </p>
                             1. A card is selected with a selection of 5 words <br></br>
                             2. A die is rolled to determine which word is selected
                             <br></br>
@@ -46,84 +47,46 @@ const Home = function(props) {
                             <br></br>
                             <p className="text-teal-500 font-extrabold">Guesser: </p>
                             Guesser uses the words given by the other players to guess the
-                            word. */}
-                            <Carousel className="overflow-hidden relative">
+                            word. */
+                        }
 
-                                <div className="w-96 h-96 bg-slate-50"></div>
-                                <div className="w-96 h-96 bg-slate-100"></div>
-                                <div className="w-96 h-96 bg-slate-200"></div>
-                                <div className="w-96 h-96 bg-slate-300"></div>
-                                <div className="w-96 h-96 bg-slate-400"></div>
+                        <div className="max-w-full h-[80%]">
 
-                                {/* <Card>
-                                    <CardHeader>
-                                        <CardTitle>Card 1</CardTitle>
-                                        <CardDescription>Card Description</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>Card Content</p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <p>Card Footer</p>
-                                    </CardFooter>
-                                </Card>
+                            <Carousel spaceBetweenSlides={spaceBetweenSlides}>
 
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Card 2</CardTitle>
-                                        <CardDescription>Card Description</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>Card Content</p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <p>Card Footer</p>
-                                    </CardFooter>
-                                </Card>
+                                {Array.from({ length: 5 }).map((_, index) => {
 
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Card 3</CardTitle>
-                                        <CardDescription>Card Description</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>Card Content</p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <p>Card Footer</p>
-                                    </CardFooter>
-                                </Card>
+                                    return (
 
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Card 4</CardTitle>
-                                        <CardDescription>Card Description</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>Card Content</p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <p>Card Footer</p>
-                                    </CardFooter>
-                                </Card>
+                                        <Card key={index} className="flex-none w-full h-full bg-slate-200 border-slate-400" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
+                                            <CardHeader>
+                                                <CardTitle>Card { index + 1 }</CardTitle>
+                                                <CardDescription>Card Description</CardDescription>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <p>Card Content</p>
+                                            </CardContent>
+                                            <CardFooter>
+                                                <p>Card Footer</p>
+                                            </CardFooter>
+                                        </Card>
 
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Card 5</CardTitle>
-                                        <CardDescription>Card Description</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>Card Content</p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <p>Card Footer</p>
-                                    </CardFooter>
-                                </Card> */}
+                                    )
 
+                                })}
+                            
                             </Carousel>
-                        </DialogDescription>
-                        </DialogHeader>
+
+                        </div>
+
+                        <DialogFooter>
+                            <Link to="game">
+                                <Button>Let's Play!</Button>
+                            </Link>
+                        </DialogFooter>
+
                     </DialogContent>
+
                 </Dialog>
 
             </div>
