@@ -3,7 +3,6 @@ import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-r
 import './css/styles.css';
 import Home from './pages/Home';
 import Game from './pages/Game';
-import HowToPlay from './pages/HowToPlay';
 import SocketContext from './contexts/SocketContext';
 import styles from './css/tailwindStylesLiterals';
 
@@ -32,8 +31,6 @@ function App() {
 					<Route path="/" exact element={ <Home /> } />
 
 					<Route path="game" exact element={ <Game /> } />
-
-					<Route path="howToPlay" exact element={ <HowToPlay /> } />
 
 				</Routes>
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 function Carousel({ children: slides, spaceBetweenSlides }) {
 
@@ -39,7 +40,7 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
             <button onClick={previousSlide} className="mr-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 outline-none hover:bg-white">
                 <div className="flex items-center justify-center h-6 w-6">
-                    {'<'}
+                    <ChevronLeft className="h-4 w-4" />
                 </div>
             </button>
 
@@ -69,7 +70,7 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
             <button onClick={nextSlide} className="ml-6 p-1 border border-slate-400 rounded-full shadow bg-white/80 text-gray-800 outline-none hover:bg-white">
                 <div className="flex items-center justify-center h-6 w-6">
-                    {'>'}
+                    <ChevronRight className="h-4 w-4" />
                 </div>
             </button>
             
