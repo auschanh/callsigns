@@ -46,7 +46,7 @@ export default function CreateGameForm({ setGameInfo }) {
   // });
 
   const form = useForm();
-  //   const { setValue } = useForm();
+  // const { register, watch } = useForm();
 
   // 2. Define a submit handler.
   function onSubmit(values) {
@@ -59,12 +59,14 @@ export default function CreateGameForm({ setGameInfo }) {
   }
 
   function handleInputChange(event) {
-    const { id, value } = event.target;
+    const { id, name, value } = event.target;
     // Update both input fields based on the changed input
-    if (id === "userName") {
+    if (name === "username") {
       form.setValue("roomName", value + "'s Room"); // Set the value of input2 to match input1
+      form.setValue("username", value);
     }
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
