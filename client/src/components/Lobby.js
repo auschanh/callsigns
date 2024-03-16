@@ -17,16 +17,23 @@ const Lobby = function ({ gameInfo }) {
             </div>
           </div>
         </div>
-
-        {Object.keys(gameInfo).map((value) => {
-          return (
-            <div>
-              <div className="flex">
-                <span className="font-bold"> {value}: </span> {gameInfo[value]}
-              </div>
-            </div>
-          );
-        })}
+        <div className="block">
+          <p>
+            <span className="font-bold">Username: </span> {gameInfo.username}
+          </p>
+          <p>
+            <span className="font-bold">Room Name: </span> {gameInfo.roomName}
+          </p>
+          <p>
+            {" "}
+            <span className="font-bold">Number of Players: </span>
+            {gameInfo.numPlayers}
+          </p>
+          <p>
+            {" "}
+            <span className="font-bold">AI Players: </span> {gameInfo.aiPlayers}
+          </p>
+        </div>
       </div>
       <div className="mt-4 flex gap-x-1">
         <div>
@@ -46,9 +53,7 @@ const Lobby = function ({ gameInfo }) {
       <div className="border border-black mt-2 max-h-full flex-1 h-auto max-w-screen"></div>
 
       <Link to="Game">
-        <Button variant={"green"} className="mt-4">
-          Start Game
-        </Button>
+        <Button className="mt-4">Start Game</Button>
       </Link>
     </div>
   );
