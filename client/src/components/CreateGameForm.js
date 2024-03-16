@@ -122,12 +122,23 @@ export default function CreateGameForm({ setGameInfo }) {
                     return (
                       <FormItem
                         key={index + 1}
-                        className="flex items-center space-x-3 space-y-0"
+                        className="flex items-center space-x-3 space-y-0 hover:scale-125"
                       >
-                        <FormControl>
-                          <RadioGroupItem value={index + 1} />
-                        </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel
+                          className={`text-2xl pr-4 ${
+                            field.value === index + 1
+                              ? "bg-green-400 outline"
+                              : "bg-transparent"
+                          }`}
+                          style={{ transition: "background-color 0.3s" }}
+                        >
+                          <FormControl>
+                            <RadioGroupItem
+                              value={index + 1}
+                              className="radiobutton-input focus:outline"
+                            />
+                          </FormControl>
+
                           {index + 1}
                         </FormLabel>
                       </FormItem>
@@ -157,12 +168,23 @@ export default function CreateGameForm({ setGameInfo }) {
                     return (
                       <FormItem
                         key={index + 1}
-                        className="flex items-center space-x-3 space-y-0"
+                        className="flex items-center space-x-3 space-y-0 hover:scale-125"
                       >
-                        <FormControl>
-                          <RadioGroupItem value={index + 1} />
-                        </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel
+                          className={`text-2xl pr-4 ${
+                            field.value === index + 1
+                              ? "bg-green-400 outline"
+                              : "bg-transparent"
+                          }`}
+                          style={{ transition: "background-color 0.3s" }}
+                        >
+                          <FormControl>
+                            <RadioGroupItem
+                              value={index + 1}
+                              className="radiobutton-input"
+                            />
+                          </FormControl>
+
                           {index + 1}
                         </FormLabel>
                       </FormItem>
