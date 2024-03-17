@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Trash2 } from "lucide-react";
 
 function DialogHTP() {
 
@@ -15,6 +15,42 @@ function DialogHTP() {
     const spaceBetweenSlides = 5;
 
     const [example, setExample] = useState("macchiato");
+
+    const submissions = [
+
+        {
+
+            playerName: "Dave",
+            hint: "macchiato"
+
+        }, {
+
+            playerName: "Amanda",
+            hint: "warm"
+
+        }, {
+
+            playerName: "Stephanie",
+            hint: "warm"
+
+        }, {
+
+            playerName: "Frank",
+            hint: "coffee"
+
+        }
+
+    ];
+
+    const [isRed, setRed] = useState(
+
+        submissions.map((value) => {
+
+            return ({...value, toRemove: false});
+
+        })
+
+    );
 
     const handleChange = (event) => {
 
@@ -27,6 +63,33 @@ function DialogHTP() {
         event.preventDefault();
 
         console.log(example);
+
+    }
+
+    const changeToRed = (event) => {
+
+        const playerGuess = isRed.find((hint) => { return (hint.playerName === event.target.parentNode.querySelector('label').innerText)});
+
+        console.log(playerGuess);
+
+        // DID NOT USE SETSTATE (SETISRED) TO MUTATE STATE
+        playerGuess.toRemove = !playerGuess.toRemove;
+
+        console.log(isRed);
+
+        if (playerGuess.toRemove) {
+
+            event.target.className = '';
+            event.target.className = "flex mt-2 p-2 w-full max-w-sm justify-center bg-red-600 text-slate-50 hover:bg-red-600/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300";
+            console.log(event.target.variant);
+
+        } else {
+
+            event.target.className = '';
+            event.target.className = "flex mt-2 p-2 w-full max-w-sm justify-center inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90";
+            console.log(event.target.variant);
+
+        }
 
     }
 
@@ -106,46 +169,35 @@ function DialogHTP() {
                     </div>
                 </div>
 
-                <div className="flex flex-col w-full items-center mb-1">
+                <div className="flex flex-col w-full items-center mb-10">
 
                     <Label className="mb-4 text-lg">Here's what you all came up with:</Label>
 
                     <div className="flex flex-row w-full justify-between">
 
-                        <div className="flex flex-col w-36 items-center mb-8">
-                            <Label className="text-sm">Dave</Label>
-                            <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                                <p className="flex text-xl text-center">macchiato</p>
-                            </div>
-                        </div>
+                        {submissions.map((submission, index) => {
 
-                        <div className="flex flex-col w-36 items-center mb-8">
-                            <Label className="text-sm">Amanda</Label>
-                            <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                                <p className="flex text-xl text-center">mug</p>
-                            </div>
-                        </div>
+                            return (
 
-                        <div className="flex flex-col w-36 items-center mb-8">
-                            <Label className="text-sm">Stephanie</Label>
-                            <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                                <p className="flex text-xl text-center">warm</p>
-                            </div>
-                        </div>
+                                <div key={index} className="flex flex-col w-36 items-center">
+                                    <Label className="text-sm">{submission.playerName}</Label>
+                                    <Button onClick={changeToRed} variant="default" className="flex mt-2 p-2 w-full max-w-sm justify-center">{submission.hint}</Button>
+                                </div>
 
-                        <div className="flex flex-col w-36 items-center mb-8">
-                            <Label className="text-sm">Frank</Label>
-                            <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                                <p className="flex text-xl text-center">beans</p>
-                            </div>
-                        </div>
+                            );
+
+                        })}
 
                     </div>
 
                 </div>
 
-                <Button type="button">Vote to Remove</Button>
-
+                <div className="flex flex-row justify-center mb-8">
+                    <Button variant="red">
+                        <Trash2 size={16} className="mr-2" />
+                        Vote to Remove
+                    </Button>
+                </div>
 
             </div>,
         footer: 
