@@ -34,6 +34,12 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
     const previousSlide = () => setCurrentSlide(curr => curr === 0 ? slides.length - 1 : currentSlide - 1);
     const nextSlide = () => setCurrentSlide(curr => curr === slides.length - 1 ? 0 : currentSlide + 1);
 
+    const scrollToMarker = (index) => {
+
+        setCurrentSlide(index);
+
+    }
+
     return (
 
         <div className="flex h-full items-center">
@@ -54,8 +60,8 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
                         {slides.map((_, index) => (
 
-                            <div key={index} className={`
-                                transition-all w-1.5 h-1.5 bg-black rounded-full
+                            <div key={index} onClick={() => {scrollToMarker(index)}} className={`
+                                transition-all w-1.5 h-1.5 bg-black rounded-full cursor-pointer
                                 ${currentSlide === index ? "p-1" : "bg-opacity-50"}
                             `} />
 

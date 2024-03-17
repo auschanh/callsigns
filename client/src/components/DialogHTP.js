@@ -42,7 +42,7 @@ function DialogHTP() {
 
     ];
 
-    const [isRed, setRed] = useState(
+    const [willRemove, setWillRemove] = useState(
 
         submissions.map((value) => {
 
@@ -66,62 +66,76 @@ function DialogHTP() {
 
     }
 
-    const changeToRed = (event) => {
+    const changeToRed = (playerName, playerHint, index) => {
 
-        const playerGuess = isRed.find((hint) => { return (hint.playerName === event.target.parentNode.querySelector('label').innerText)});
+        setWillRemove(
 
-        console.log(playerGuess);
+            willRemove.map((hintObj) => {
 
-        // DID NOT USE SETSTATE (SETISRED) TO MUTATE STATE
-        playerGuess.toRemove = !playerGuess.toRemove;
+                if (hintObj.playerName === playerName) {
 
-        console.log(isRed);
+                    return ({
 
-        if (playerGuess.toRemove) {
+                        playerName: playerName,
+                        hint: playerHint,
+                        toRemove: !hintObj.toRemove
 
-            event.target.className = '';
-            event.target.className = "flex mt-2 p-2 w-full max-w-sm justify-center bg-red-600 text-slate-50 hover:bg-red-600/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300";
-            console.log(event.target.variant);
+                    });
 
-        } else {
+                } else {
 
-            event.target.className = '';
-            event.target.className = "flex mt-2 p-2 w-full max-w-sm justify-center inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90";
-            console.log(event.target.variant);
+                    return hintObj;
 
-        }
+                }
 
+            })
+        );
+
+    }
+
+    const handleRemove = () => {
+
+        console.log(willRemove);
+
+        setWillRemove(
+
+            willRemove.map((hintObj) => {
+
+                return ({
+
+                    ...hintObj, toRemove: false
+
+                });
+
+            })
+        );
     }
 
     const rules = [{
 
-        title: undefined,
-        description: undefined,
         content: 
-            <div className="flex flex-col w-full items-center space-x-2 mb-8">
+            <div className="flex flex-col w-full items-center mt-40">
                 <Label>Mystery Word</Label>
                 <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                    <p className="flex text-xl text-center">coffee</p>
+                    <p>coffee</p>
                 </div>
             </div>,
         footer: "A new mystery word is generated each round."
 
     }, {
 
-        title: undefined,
-        description: undefined,
         content:
-            <div className="flex h-10 w-full max-w-sm justify-center self-center rounded-md border border-slate-600 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                <p className="flex">Alex is the guesser</p>
+            <div className="flex flex-col w-full items-center mt-[11.5rem]">
+                <div className="flex p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+                    <p>Alex is the guesser</p>
+                </div>
             </div>,
         footer: "Each round will have a new guesser."
 
     }, {
 
-        title: undefined,
-        description: undefined,
         content:
-            <div>
+            <div className="mt-24">
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
@@ -154,15 +168,16 @@ function DialogHTP() {
                     </form>
                 </div>
             </div>,
-        footer: "Players must submit just one word to help the guesser determine what the mystery word is."
+        footer:
+            <div className="text-center">
+                Players must submit just one word to help the guesser determine what the mystery word is.
+            </div>
 
     }, {
 
-        title: undefined,
-        description: undefined,
         content:
-            <div className="w-full">
-                <div className="flex flex-col items-center mb-12">
+            <div className="w-full mt-4">
+                <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">coffee</p>
@@ -171,9 +186,9 @@ function DialogHTP() {
 
                 <div className="flex flex-col w-full items-center mb-10">
 
-                    <Label className="mb-4 text-lg">Here's what you all came up with:</Label>
+                    <Label className="mb-4 text-lg">Select the hints that are too similar or illegal:</Label>
 
-                    <div className="flex flex-row w-full justify-between">
+                    <div className="flex flex-row w-[95%] justify-between">
 
                         {submissions.map((submission, index) => {
 
@@ -181,7 +196,7 @@ function DialogHTP() {
 
                                 <div key={index} className="flex flex-col w-36 items-center">
                                     <Label className="text-sm">{submission.playerName}</Label>
-                                    <Button onClick={changeToRed} variant="default" className="flex mt-2 p-2 w-full max-w-sm justify-center">{submission.hint}</Button>
+                                    <Button onClick={() => changeToRed(submission.playerName, submission.hint, index)} variant={willRemove[index].toRemove ? "red" : "default"} className="flex mt-2 p-2 w-full max-w-sm justify-center">{submission.hint}</Button>
                                 </div>
 
                             );
@@ -192,8 +207,8 @@ function DialogHTP() {
 
                 </div>
 
-                <div className="flex flex-row justify-center mb-8">
-                    <Button variant="red">
+                <div className="flex flex-row justify-center">
+                    <Button onClick={handleRemove} variant="red">
                         <Trash2 size={16} className="mr-2" />
                         Vote to Remove
                     </Button>
@@ -201,34 +216,39 @@ function DialogHTP() {
 
             </div>,
         footer: 
-            <div className="flex flex-col">
+            <div className="flex flex-col text-center">
                 <p>
-                    Once all players have submitted their one-word hints, players must then determine if any of their hints are too similar to one another or to the mystery word itself.
+                    Once all players have submitted their one-word hints, they must then determine if any of their hints are too similar to one another or to the mystery word itself.
                     Hints that are found to be either too similar or illegal will then be removed.
                 </p>
-
-                <Accordion className="mt-4" type="single" collapsible>
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger>Hints cannot:</AccordionTrigger>
-                        <AccordionContent>
-                            <ul className="list-disc ml-4">
-                                <li>Be an alternate spelling of the mystery word</li>
-                                <li>Be in a different language than the mystery word</li>
-                                <li>Be a word that sounds the same</li>
-                                <li>Contain any part of the mystery word</li>
-                                <li>Contain any hyphens</li>
-                            </ul>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
             </div>
 
     }, {
 
-        title: undefined,
-        description: undefined,
         content: "",
-        footer: "Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the current round's mystery word."
+        footer:
+            <Accordion className="flex flex-none flex-row w-full" type="single" collapsible>
+                <AccordionItem className="w-full" value="item-1">
+                    <AccordionTrigger>Hints cannot:</AccordionTrigger>
+                    <AccordionContent>
+                        <ul className="list-disc ml-4">
+                            <li>Be an alternate spelling of the mystery word</li>
+                            <li>Be in a different language than the mystery word</li>
+                            <li>Be a word that sounds the same</li>
+                            <li>Contain any part of the mystery word</li>
+                            <li>Contain any hyphens</li>
+                        </ul>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+
+    }, {
+
+        content: "",
+        footer:
+            <div className="text-center">
+                Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the current round's mystery word.
+            </div>
 
     }];
 
@@ -272,17 +292,15 @@ function DialogHTP() {
 
                             return (
 
-                                <Card key={index} className="flex-none w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
-                                    <CardHeader>
-                                        <CardTitle>{card.title}</CardTitle>
-                                        <CardDescription>{card.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-row justify-center">
-                                        {card.content}
-                                    </CardContent>
-                                    <CardFooter>
-                                        {card.footer}
-                                    </CardFooter>
+                                <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
+                                    <div className="grid grid-flow-row  grid-rows-12 h-full">
+                                        <CardContent className="row-span-8 justify-center mt-8">
+                                            {card.content}
+                                        </CardContent>
+                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-8 ml-8 mr-8">
+                                            {card.footer}
+                                        </CardFooter>
+                                    </div>
                                 </Card>
 
                             )
