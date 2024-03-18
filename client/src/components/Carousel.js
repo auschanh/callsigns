@@ -1,9 +1,9 @@
 import React, { useEffect, useState, forwardRef } from 'react';
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
-const Carousel = forwardRef(function({ children: slides, spaceBetweenSlides, handleSubmit, example, handleRemove }, ref) {
+const Carousel = forwardRef(function({ children: slides, slideState, spaceBetweenSlides, handleSubmit, example, handleRemove }, ref) {
 
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const [currentSlide, setCurrentSlide] = slideState;
 
     useEffect(() => {
 

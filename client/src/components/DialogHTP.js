@@ -7,21 +7,28 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
 
 function DialogHTP() {
+
+    const username = undefined;
+
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     // Gap in rem between individual caarousel slides
     const spaceBetweenSlides = 5;
 
     const [example, setExample] = useState(["macchiato", false]);
 
+    const [submittedHint, setSubmittedHint] = useState("macchiato");
+
     const submissions = [
 
         {
 
-            playerName: "Dave",
-            hint: "macchiato"
+            playerName: username || "Dave",
+            hint: submittedHint
 
         }, {
 
@@ -56,6 +63,16 @@ function DialogHTP() {
 
     const [voted, setVoted] = useState(false);
 
+    const [results, setResults] = useState(
+
+        submissions.map(({toRemove, beenRemoved, ...result}) => {
+
+            return result.hint === submittedHint ? {...result, visible: true} : {...result, visible: false}
+
+        })
+
+    );
+
     const handleChange = (event) => {
 
         setExample([event.target.value, example[1]]);
@@ -74,6 +91,18 @@ function DialogHTP() {
 
         setExample([example[0], true]);
 
+        setSubmittedHint(example[0]);
+
+        setResults(
+
+            results.map((result, index) => {
+
+                return index === 0 ? {...result, hint: example[0]} : result;
+
+            })
+
+        );
+
         console.log(example);
 
     }
@@ -84,7 +113,7 @@ function DialogHTP() {
 
             willRemove.map((hintObj) => {
 
-                return hintObj.playerName === playerName ? ({...hintObj, toRemove: !hintObj.toRemove}) : hintObj;
+                return hintObj.playerName === playerName ? {...hintObj, toRemove: !hintObj.toRemove} : hintObj;
 
             })
         );
@@ -103,9 +132,23 @@ function DialogHTP() {
 
         setWillRemove(
 
-            willRemove.map((hintObj) => {
+            willRemove.map((hintObj, index) => {
 
-                return hintObj.toRemove ? ({...hintObj, beenRemoved: true}) : hintObj;
+                if (index === 0 && hintObj.toRemove) {
+
+                    setResults(
+
+                        results.map((result, i) => {
+
+                            return i === 0 ? {...result, visible: false} : result;
+
+                        })
+
+                    );
+
+                }
+
+                return hintObj.toRemove ? {...hintObj, beenRemoved: true} : hintObj;
 
             })
 
@@ -123,13 +166,19 @@ function DialogHTP() {
 
             willRemove.map((hintObj) => {
 
-                return ({
-
-                    ...hintObj, toRemove: false, beenRemoved: false
-
-                });
+                return {...hintObj, toRemove: false, beenRemoved: false};
 
             })
+        );
+
+        setResults(
+
+            results.map((result, index) => {
+
+                return index === 0 ? {...result, visible: true} : result;
+
+            })
+
         );
 
         setVoted(false);
@@ -145,7 +194,11 @@ function DialogHTP() {
                     <p>coffee</p>
                 </div>
             </div>,
-        footer: "A new mystery word is generated each round."
+
+        footer: 
+            <div className="text-center">
+                A new mystery word is generated each round.
+            </div>
 
     }, {
 
@@ -155,7 +208,11 @@ function DialogHTP() {
                     <p>Alex is the guesser</p>
                 </div>
             </div>,
-        footer: "Each round will have a new guesser."
+
+        footer: 
+            <div className="text-center">
+                Each round will have a new guesser who will not be able to see the mystery word.
+            </div>
 
     }, {
 
@@ -184,6 +241,7 @@ function DialogHTP() {
                                 placeholder="Username" 
                                 value={example[0]}
                                 onChange={handleChange}
+                                disabled={example[1] ? true : false}
                             />
 
                             <Button className="ml-2 w-24" variant={example[1] ? "green" : "default"} type="submit">
@@ -209,6 +267,7 @@ function DialogHTP() {
                     </form>
                 </div>
             </div>,
+
         footer:
             <div className="text-center">
                 Players must submit just one word to help the guesser determine what the mystery word is.
@@ -218,6 +277,7 @@ function DialogHTP() {
 
         content:
             <div className="w-full mt-6">
+
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
@@ -237,7 +297,14 @@ function DialogHTP() {
 
                                 <div key={index} className="flex flex-col w-36 items-center">
                                     <Label className="text-sm">{submission.playerName}</Label>
-                                    <Button onClick={voted ? () => {} : () => changeToRed(submission.playerName)} variant={willRemove[index].toRemove ? "red" : "default"} className={`flex mt-2 p-2 w-full max-w-sm justify-center ${willRemove[index].beenRemoved ? "line-through" : ""}`} disabled={voted ? true : false}>{submission.hint}</Button>
+                                    <Button 
+                                        onClick={voted ? () => {} : () => changeToRed(submission.playerName)} 
+                                        variant={!willRemove[index].toRemove ? "grey" : voted ? "red" : "amber"} 
+                                        className={`flex mt-2 p-2 w-full max-w-sm justify-center ${willRemove[index].beenRemoved ? "line-through" : ""}`} 
+                                        disabled={voted ? true : false}
+                                    >
+                                        {submission.hint}
+                                    </Button>
                                 </div>
 
                             );
@@ -275,6 +342,7 @@ function DialogHTP() {
                 </div>
 
             </div>,
+
         footer: 
             <div className="flex flex-col text-center">
                 <p>
@@ -285,27 +353,108 @@ function DialogHTP() {
 
     }, {
 
-        content: "",
-        footer:
-            <Accordion className="flex flex-none flex-row w-full" type="single" collapsible>
-                <AccordionItem className="w-full" value="item-1">
+        content:
+            // defaultValue={["item-1", "item-2"]}
+            <Accordion className="flex flex-none flex-col mx-12" type="multiple">
+                <AccordionItem className="w-full border-slate-400" value="item-1">
+                    <AccordionTrigger>Good hints are usually:</AccordionTrigger>
+                    <AccordionContent>
+                        <ul className="list-disc ml-4">
+                            <li>Not too closely related to the mystery word because other players might have the same idea</li>
+                            <li>Not too obscure unless you're sure the guesser can figure it out</li>
+                            <li>References that the guesser can pick up on</li>
+                        </ul>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem className="w-full border-slate-400" value="item-2">
                     <AccordionTrigger>Hints cannot:</AccordionTrigger>
                     <AccordionContent>
                         <ul className="list-disc ml-4">
                             <li>Be an alternate spelling of the mystery word</li>
                             <li>Be in a different language than the mystery word</li>
-                            <li>Be a word that sounds the same</li>
+                            <li>Be a different word that sounds the same as the mystery word</li>
                             <li>Contain any part of the mystery word</li>
-                            <li>Contain any hyphens</li>
+                            <li>Contain any special characters, including hyphens</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
-            </Accordion>
+            </Accordion>,
+
+        footer:
+            <div className="text-center">
+                Check out these tips if you need any help coming up with good hints.
+            </div>
 
     }, {
 
-        content: "",
-        footer:
+        content:
+            <div className="w-full mt-6">
+
+                <div className="flex flex-col items-center mb-10">
+                    <Label className="text-[0.7rem]">Mystery Word</Label>
+                    <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+                        <p className="text-sm text-center">coffee</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col w-full items-center mb-10">
+
+                    <Label className="mb-4 text-lg">Your hints have been revealed!</Label>
+
+                    <div className="flex flex-row w-[95%] justify-center gap-4">
+
+                        <TooltipProvider>                      
+
+                            {results.map((result, index) => {
+
+                                return (
+
+                                    <div key={index} className="flex flex-col w-36 items-center">
+                                        <Label className="text-sm">{result.playerName}</Label>
+
+                                        {result.visible && (
+                                        
+                                            <Button 
+                                                variant="greenNoHover" 
+                                                className="flex mt-2 p-2 w-full max-w-sm justify-center" 
+                                            >
+                                                {result.hint}
+
+                                            </Button>
+                                        
+                                        
+                                        ) || (
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button className="flex mt-2 p-2 w-full max-w-sm justify-center" variant="redNoHover">
+                                                        <X size={16} />                                                        
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{result.hint}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+
+                                        )}
+
+                                    </div>
+
+                                );
+
+                            })}
+
+                        </TooltipProvider>
+
+                    </div>
+
+                </div>
+
+                <h1 className="mb-4 text-lg text-center font-medium">Now it's up to the guesser to find the mystery word...</h1>
+
+            </div>,
+
+        footer: 
             <div className="text-center">
                 Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the current round's mystery word.
             </div>
@@ -346,7 +495,7 @@ function DialogHTP() {
 
                 <div className="max-w-full h-[80%]">
 
-                    <Carousel spaceBetweenSlides={spaceBetweenSlides} handleSubmit={handleSubmit} example={example} handleRemove={handleRemove}>
+                    <Carousel slideState={[currentSlide, setCurrentSlide]} spaceBetweenSlides={spaceBetweenSlides} handleSubmit={handleSubmit} example={example} handleRemove={handleRemove}>
 
                         {rules.map((card, index) => {
 
