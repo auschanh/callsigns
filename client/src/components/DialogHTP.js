@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { CircleCheck, Trash2 } from "lucide-react";
+import { Check, X, Trash2 } from "lucide-react";
 
 function DialogHTP() {
 
@@ -46,11 +46,13 @@ function DialogHTP() {
 
         submissions.map((value) => {
 
-            return ({...value, toRemove: false});
+            return ({...value, toRemove: false, beenRemoved: false});
 
         })
 
     );
+
+    const [voted, setVoted] = useState(false);
 
     const handleChange = (event) => {
 
@@ -66,27 +68,13 @@ function DialogHTP() {
 
     }
 
-    const changeToRed = (playerName, playerHint, index) => {
+    const changeToRed = (playerName) => {
 
         setWillRemove(
 
             willRemove.map((hintObj) => {
 
-                if (hintObj.playerName === playerName) {
-
-                    return ({
-
-                        playerName: playerName,
-                        hint: playerHint,
-                        toRemove: !hintObj.toRemove
-
-                    });
-
-                } else {
-
-                    return hintObj;
-
-                }
+                return hintObj.playerName === playerName ? ({...hintObj, toRemove: !hintObj.toRemove}) : hintObj;
 
             })
         );
@@ -94,6 +82,30 @@ function DialogHTP() {
     }
 
     const handleRemove = () => {
+
+        if (voted) {
+
+            return;
+
+        }
+
+        console.log(willRemove);
+
+        setWillRemove(
+
+            willRemove.map((hintObj) => {
+
+                return hintObj.toRemove ? ({...hintObj, beenRemoved: true}) : hintObj;
+
+            })
+
+        );
+
+        setVoted(true);
+
+    }
+
+    const handleCancel = () => {
 
         console.log(willRemove);
 
@@ -103,12 +115,15 @@ function DialogHTP() {
 
                 return ({
 
-                    ...hintObj, toRemove: false
+                    ...hintObj, toRemove: false, beenRemoved: false
 
                 });
 
             })
         );
+
+        setVoted(false);
+
     }
 
     const rules = [{
@@ -176,7 +191,7 @@ function DialogHTP() {
     }, {
 
         content:
-            <div className="w-full mt-4">
+            <div className="w-full mt-6">
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
@@ -188,7 +203,7 @@ function DialogHTP() {
 
                     <Label className="mb-4 text-lg">Select the hints that are too similar or illegal:</Label>
 
-                    <div className="flex flex-row w-[95%] justify-between">
+                    <div className="flex flex-row w-[95%] justify-center gap-4">
 
                         {submissions.map((submission, index) => {
 
@@ -196,7 +211,7 @@ function DialogHTP() {
 
                                 <div key={index} className="flex flex-col w-36 items-center">
                                     <Label className="text-sm">{submission.playerName}</Label>
-                                    <Button onClick={() => changeToRed(submission.playerName, submission.hint, index)} variant={willRemove[index].toRemove ? "red" : "default"} className="flex mt-2 p-2 w-full max-w-sm justify-center">{submission.hint}</Button>
+                                    <Button onClick={voted ? () => {} : () => changeToRed(submission.playerName)} variant={willRemove[index].toRemove ? "red" : "default"} className={`flex mt-2 p-2 w-full max-w-sm justify-center ${willRemove[index].beenRemoved ? "line-through" : ""}`} disabled={voted ? true : false}>{submission.hint}</Button>
                                 </div>
 
                             );
@@ -207,10 +222,29 @@ function DialogHTP() {
 
                 </div>
 
-                <div className="flex flex-row justify-center">
-                    <Button onClick={handleRemove} variant="red">
-                        <Trash2 size={16} className="mr-2" />
-                        Vote to Remove
+                <div className="flex flex-row justify-center gap-2">
+                    <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44">
+
+                        {voted && (
+
+                            <>
+                                <Check size={16} className="mr-2" />
+                                Vote Recorded
+                            </>
+
+                        ) || (
+
+                            <>
+                                <Trash2 size={16} className="mr-2" />
+                                Vote to Remove
+                            </>
+
+                        )}
+
+                    </Button>
+                    <Button onClick={handleCancel} variant="default" className="flex flex-row w-44">
+                        <X size={16} className="mr-2" />
+                        Cancel Selection
                     </Button>
                 </div>
 
@@ -297,7 +331,7 @@ function DialogHTP() {
                                         <CardContent className="row-span-8 justify-center mt-8">
                                             {card.content}
                                         </CardContent>
-                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-8 ml-8 mr-8">
+                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-10 ml-8 mr-8">
                                             {card.footer}
                                         </CardFooter>
                                     </div>
