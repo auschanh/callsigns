@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef } from 'react';
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
-function Carousel({ children: slides, spaceBetweenSlides }) {
+const Carousel = forwardRef(function({ children: slides, spaceBetweenSlides, handleSubmit, example, handleRemove }, ref) {
 
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -14,6 +14,34 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
                 event.preventDefault();
 
                 previousSlide();
+
+            } else if (currentSlide === 2 && event.key === "Enter") {
+
+                if (document.activeElement.name === "username" && !example[1]) {
+
+                    handleSubmit(event);
+
+                } else {
+
+                    event.preventDefault();
+
+                    nextSlide();
+
+                }
+
+            } else if (currentSlide === 3 && event.key === "Enter") {
+
+                if (document.activeElement.innerText.match(`^[a-zA-Z]+$`)) {
+
+                    handleRemove();
+
+                } else {
+
+                    event.preventDefault();
+
+                    nextSlide();
+
+                }
 
             } else if (event.key === "ArrowRight" || event.key === " " || event.key === "Enter") {
 
@@ -29,7 +57,7 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
         return () => document.removeEventListener("keydown", listenForKeydown);
 
-    }, [currentSlide]);
+    }, [currentSlide, document.activeElement, example]);
 
     const previousSlide = () => setCurrentSlide(curr => curr === 0 ? slides.length - 1 : currentSlide - 1);
     const nextSlide = () => setCurrentSlide(curr => curr === slides.length - 1 ? 0 : currentSlide + 1);
@@ -84,6 +112,6 @@ function Carousel({ children: slides, spaceBetweenSlides }) {
 
     );
 
-}
+});
 
 export default Carousel;

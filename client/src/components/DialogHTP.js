@@ -14,7 +14,7 @@ function DialogHTP() {
     // Gap in rem between individual caarousel slides
     const spaceBetweenSlides = 5;
 
-    const [example, setExample] = useState("macchiato");
+    const [example, setExample] = useState(["macchiato", false]);
 
     const submissions = [
 
@@ -46,7 +46,9 @@ function DialogHTP() {
 
         submissions.map((value) => {
 
-            return ({...value, toRemove: false, beenRemoved: false});
+            // return ({...value, toRemove: false, beenRemoved: false});
+
+            return value.hint === "macchiato" ? {...value, toRemove: false, beenRemoved: false} : {...value, toRemove: true, beenRemoved: false};
 
         })
 
@@ -56,13 +58,21 @@ function DialogHTP() {
 
     const handleChange = (event) => {
 
-        setExample(event.target.value);
+        setExample([event.target.value, example[1]]);
 
     }
 
     const handleSubmit = (event) => {
 
         event.preventDefault();
+
+        if (example[1]) {
+
+            return;
+
+        }
+
+        setExample([example[0], true]);
 
         console.log(example);
 
@@ -160,25 +170,41 @@ function DialogHTP() {
 
                 <div className="flex flex-col w-full items-center mb-8">
 
-                    <form name="exampleForm" onSubmit={handleSubmit} className="flex flex-col items-center">
+                    <form name="exampleForm" onSubmit={handleSubmit} className="flex flex-col items-center w-full">
 
                         <Label htmlFor="example" className="mb-2">Enter a one-word hint:</Label>
 
-                            <div className="flex flex-row w-96 justify-center items-end">
+                        <div className="flex flex-row w-full justify-center items-end">
 
-                                <input
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
-                                    type="text" 
-                                    id="example"
-                                    name="username" 
-                                    placeholder="Username" 
-                                    value={example}
-                                    onChange={handleChange}
-                                />
+                            <input
+                                className="flex h-10 w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+                                type="text" 
+                                id="example"
+                                name="username" 
+                                placeholder="Username" 
+                                value={example[0]}
+                                onChange={handleChange}
+                            />
 
-                                <Button className="ml-2" type="submit">Submit</Button>
+                            <Button className="ml-2 w-24" variant={example[1] ? "green" : "default"} type="submit">
 
-                            </div>
+                                {example[1] && (
+
+                                    <>
+                                        Submitted
+                                    </>
+
+                                ) || (
+
+                                    <>
+                                        Submit
+                                    </>
+
+                                )}
+
+                            </Button>
+
+                        </div>
 
                     </form>
                 </div>
@@ -320,7 +346,7 @@ function DialogHTP() {
 
                 <div className="max-w-full h-[80%]">
 
-                    <Carousel spaceBetweenSlides={spaceBetweenSlides}>
+                    <Carousel spaceBetweenSlides={spaceBetweenSlides} handleSubmit={handleSubmit} example={example} handleRemove={handleRemove}>
 
                         {rules.map((card, index) => {
 
