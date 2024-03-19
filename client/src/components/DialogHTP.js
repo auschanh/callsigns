@@ -226,7 +226,6 @@ function DialogHTP() {
                                 type="text" 
                                 id="example"
                                 name="hint" 
-                                placeholder="Hint" 
                                 value={example[0]}
                                 onChange={handleChange}
                                 disabled={example[1] ? true : false}
