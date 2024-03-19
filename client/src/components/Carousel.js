@@ -17,7 +17,7 @@ const Carousel = forwardRef(function({ children: slides, slideState, spaceBetwee
 
             } else if (currentSlide === 2 && event.key === "Enter") {
 
-                if (document.activeElement.name === "username" && !example[1]) {
+                if (document.activeElement.name === "hint" && !example[1]) {
 
                     handleSubmit(event);
 

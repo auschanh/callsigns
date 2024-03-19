@@ -4,8 +4,8 @@ import Carousel from './Carousel';
 import { Button } from "./ui/button";
 import { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
@@ -14,21 +14,25 @@ function DialogHTP() {
 
     const username = undefined;
 
+    const mysteryWord = "coffee";
+
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    // Gap in rem between individual caarousel slides
+    // Gap in rem between individual carousel slides
     const spaceBetweenSlides = 5;
 
     const [example, setExample] = useState(["macchiato", false]);
 
-    const [submittedHint, setSubmittedHint] = useState("macchiato");
+    const hintInputRef = useRef(null);
+
+    const hintValidationRef = useRef(null);
 
     const submissions = [
 
         {
 
             playerName: username || "Dave",
-            hint: submittedHint
+            hint: example[0]
 
         }, {
 
@@ -49,29 +53,17 @@ function DialogHTP() {
 
     ];
 
-    const [willRemove, setWillRemove] = useState(
+    const [results, setResults] = useState(
 
-        submissions.map((value) => {
+        submissions.map((submission, index) => {
 
-            // return ({...value, toRemove: false, beenRemoved: false});
-
-            return value.hint === "macchiato" ? {...value, toRemove: false, beenRemoved: false} : {...value, toRemove: true, beenRemoved: false};
+            return index === 0 ? {...submission, toRemove: false, beenRemoved: false, visible: true} : {...submission, toRemove: true, beenRemoved: false, visible: false};
 
         })
 
     );
 
     const [voted, setVoted] = useState(false);
-
-    const [results, setResults] = useState(
-
-        submissions.map(({toRemove, beenRemoved, ...result}) => {
-
-            return result.hint === submittedHint ? {...result, visible: true} : {...result, visible: false}
-
-        })
-
-    );
 
     const handleChange = (event) => {
 
@@ -89,31 +81,44 @@ function DialogHTP() {
 
         }
 
-        setExample([example[0], true]);
+        if (example[0] === mysteryWord) {
 
-        setSubmittedHint(example[0]);
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-200");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot be the mystery word!"
+            
+        } else {
 
-        setResults(
+            hintInputRef.current.classList.remove("border-2");
+            hintInputRef.current.classList.remove("border-red-500");
+            hintInputRef.current.classList.add("border-slate-200");
+            hintValidationRef.current.innerText = "";
+            
+            setExample([example[0], true]);
 
-            results.map((result, index) => {
+            setResults(
+    
+                results.map((result, index) => {
+    
+                    return index === 0 ? {...result, hint: example[0]} : result;
+    
+                })
+    
+            );
+    
+            console.log(example);
 
-                return index === 0 ? {...result, hint: example[0]} : result;
-
-            })
-
-        );
-
-        console.log(example);
-
+        }
     }
 
     const changeToRed = (playerName) => {
 
-        setWillRemove(
+        setResults(
 
-            willRemove.map((hintObj) => {
+            results.map((result) => {
 
-                return hintObj.playerName === playerName ? {...hintObj, toRemove: !hintObj.toRemove} : hintObj;
+                return result.playerName === playerName ? {...result, toRemove: !result.toRemove} : result;
 
             })
         );
@@ -128,27 +133,13 @@ function DialogHTP() {
 
         }
 
-        console.log(willRemove);
+        console.log(results);
 
-        setWillRemove(
+        setResults(
 
-            willRemove.map((hintObj, index) => {
+            results.map((result, index) => {
 
-                if (index === 0 && hintObj.toRemove) {
-
-                    setResults(
-
-                        results.map((result, i) => {
-
-                            return i === 0 ? {...result, visible: false} : result;
-
-                        })
-
-                    );
-
-                }
-
-                return hintObj.toRemove ? {...hintObj, beenRemoved: true} : hintObj;
+                return !result.toRemove ? result : index === 0 ? {...result, beenRemoved: true, visible: false} : {...result, beenRemoved: true}
 
             })
 
@@ -160,22 +151,19 @@ function DialogHTP() {
 
     const handleCancel = () => {
 
-        console.log(willRemove);
+        if (!voted) {
 
-        setWillRemove(
+            return;
 
-            willRemove.map((hintObj) => {
+        }
 
-                return {...hintObj, toRemove: false, beenRemoved: false};
-
-            })
-        );
+        console.log(results);
 
         setResults(
 
             results.map((result, index) => {
 
-                return index === 0 ? {...result, visible: true} : result;
+                return index === 0 ? {...result, toRemove: false, beenRemoved: false, visible: true} : {...result, toRemove: false, beenRemoved: false};
 
             })
 
@@ -191,7 +179,7 @@ function DialogHTP() {
             <div className="flex flex-col w-full items-center mt-40">
                 <Label>Mystery Word</Label>
                 <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                    <p>coffee</p>
+                    <p>{mysteryWord}</p>
                 </div>
             </div>,
 
@@ -211,7 +199,7 @@ function DialogHTP() {
 
         footer: 
             <div className="text-center">
-                Each round will have a new guesser who will not be able to see the mystery word.
+                Each round will have a new guesser who will not know what the mystery word is.
             </div>
 
     }, {
@@ -221,7 +209,7 @@ function DialogHTP() {
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                        <p className="text-sm text-center">coffee</p>
+                        <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
@@ -233,15 +221,16 @@ function DialogHTP() {
 
                         <div className="flex flex-row w-full justify-center items-end">
 
-                            <input
-                                className="flex h-10 w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+                            <Input
+                                className="flex h-10 w-64"
                                 type="text" 
                                 id="example"
-                                name="username" 
-                                placeholder="Username" 
+                                name="hint" 
+                                placeholder="Hint" 
                                 value={example[0]}
                                 onChange={handleChange}
                                 disabled={example[1] ? true : false}
+                                ref={hintInputRef}
                             />
 
                             <Button className="ml-2 w-24" variant={example[1] ? "green" : "default"} type="submit">
@@ -264,7 +253,10 @@ function DialogHTP() {
 
                         </div>
 
+                        <p className="mt-2 text-xs text-red-500" ref={hintValidationRef}/>
+
                     </form>
+
                 </div>
             </div>,
 
@@ -281,7 +273,7 @@ function DialogHTP() {
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                        <p className="text-sm text-center">coffee</p>
+                        <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
@@ -291,19 +283,19 @@ function DialogHTP() {
 
                     <div className="flex flex-row w-[95%] justify-center gap-4">
 
-                        {submissions.map((submission, index) => {
+                        {results.map((result, index) => {
 
                             return (
 
                                 <div key={index} className="flex flex-col w-36 items-center">
-                                    <Label className="text-sm">{submission.playerName}</Label>
+                                    <Label className="text-sm">{result.playerName}</Label>
                                     <Button 
-                                        onClick={voted ? () => {} : () => changeToRed(submission.playerName)} 
-                                        variant={!willRemove[index].toRemove ? "grey" : voted ? "red" : "amber"} 
-                                        className={`flex mt-2 p-2 w-full max-w-sm justify-center ${willRemove[index].beenRemoved ? "line-through" : ""}`} 
+                                        onClick={voted ? () => {} : () => changeToRed(result.playerName)} 
+                                        variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
+                                        className={`flex mt-2 p-2 w-full max-w-sm justify-center ${result.beenRemoved ? "line-through" : ""}`} 
                                         disabled={voted ? true : false}
                                     >
-                                        {submission.hint}
+                                        {result.hint}
                                     </Button>
                                 </div>
 
@@ -393,7 +385,7 @@ function DialogHTP() {
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                        <p className="text-sm text-center">coffee</p>
+                        <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
@@ -456,7 +448,7 @@ function DialogHTP() {
 
         footer: 
             <div className="text-center">
-                Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the current round's mystery word.
+                Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the mystery word.
             </div>
 
     }];
@@ -506,7 +498,7 @@ function DialogHTP() {
                                         <CardContent className="row-span-8 justify-center mt-8">
                                             {card.content}
                                         </CardContent>
-                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-10 ml-8 mr-8">
+                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-10 mx-8">
                                             {card.footer}
                                         </CardFooter>
                                     </div>
