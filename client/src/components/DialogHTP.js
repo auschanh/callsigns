@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Carousel from './Carousel';
+import DialogPlay from './DialogPlay';
 import { Button } from "./ui/button";
 import { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
@@ -10,7 +11,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
 
-function DialogHTP() {
+function DialogHTP({tailwindStyles, variant, triggerName}) {
+
+    const [open, setOpen] = useState(false);
 
     const username = undefined;
 
@@ -176,7 +179,7 @@ function DialogHTP() {
     const rules = [{
 
         content: 
-            <div className="flex flex-col w-full items-center mt-40">
+            <div className="flex flex-col w-full items-center mt-32">
                 <Label>Mystery Word</Label>
                 <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                     <p>{mysteryWord}</p>
@@ -191,7 +194,7 @@ function DialogHTP() {
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center mt-[11.5rem]">
+            <div className="flex flex-col w-full items-center mt-[150px]">
                 <div className="flex p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                     <p>Alex is the guesser</p>
                 </div>
@@ -205,7 +208,7 @@ function DialogHTP() {
     }, {
 
         content:
-            <div className="mt-24">
+            <div className="mt-14">
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
@@ -267,16 +270,16 @@ function DialogHTP() {
     }, {
 
         content:
-            <div className="w-full mt-6">
+            <div className="w-full">
 
-                <div className="flex flex-col items-center mb-10">
+                <div className="flex flex-col items-center mb-8">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
-                <div className="flex flex-col w-full items-center mb-10">
+                <div className="flex flex-col w-full items-center mb-6">
 
                     <Label className="mb-4 text-lg">Select the hints that are too similar or illegal:</Label>
 
@@ -338,7 +341,6 @@ function DialogHTP() {
             <div className="flex flex-col text-center">
                 <p>
                     Once all players have submitted their one-word hints, they must then determine if any of their hints are too similar to one another or to the mystery word itself.
-                    Hints that are found to be either too similar or illegal will then be removed.
                 </p>
             </div>
 
@@ -346,7 +348,7 @@ function DialogHTP() {
 
         content:
             // defaultValue={["item-1", "item-2"]}
-            <Accordion className="flex flex-none flex-col mx-12" type="multiple">
+            <Accordion className="flex flex-none flex-col mx-12" type="single" collapsible>
                 <AccordionItem className="w-full border-slate-400" value="item-1">
                     <AccordionTrigger>Good hints are usually:</AccordionTrigger>
                     <AccordionContent>
@@ -374,21 +376,22 @@ function DialogHTP() {
         footer:
             <div className="text-center">
                 Check out these tips if you need any help coming up with good hints.
+                Hints that are either too similar to one another or illegal will not be revealed to the guesser.
             </div>
 
     }, {
 
         content:
-            <div className="w-full mt-6">
+            <div className="w-full">
 
-                <div className="flex flex-col items-center mb-10">
+                <div className="flex flex-col items-center mb-8">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
-                <div className="flex flex-col w-full items-center mb-10">
+                <div className="flex flex-col w-full items-center mb-6">
 
                     <Label className="mb-4 text-lg">Your hints have been revealed!</Label>
 
@@ -456,7 +459,7 @@ function DialogHTP() {
 
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="secondary">How To Play</Button>
+                <Button className={tailwindStyles} variant={variant}>How To Play</Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col h-[80vh] w-[60vw] p-10 justify-between">
                 <DialogHeader>
@@ -497,7 +500,7 @@ function DialogHTP() {
                                         <CardContent className="row-span-8 justify-center mt-8">
                                             {card.content}
                                         </CardContent>
-                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-10 mx-8">
+                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-8 mx-8">
                                             {card.footer}
                                         </CardFooter>
                                     </div>
@@ -512,9 +515,9 @@ function DialogHTP() {
                 </div>
 
                 <DialogFooter>
-                    <Link to="game">
-                        <Button>Let's Play!</Button>
-                    </Link>
+
+                    <DialogPlay triggerName={"Let's Play!"} />
+
                 </DialogFooter>
 
             </DialogContent>
