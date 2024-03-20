@@ -5,6 +5,7 @@ import { Badge } from "../components/ui/badge";
 // import { Label } from "../components/ui/label";
 
 const Lobby = function ({ gameInfo }) {
+  
   const [totaPlayers, setTotalPlayers] = useState(0);
 
   return (

@@ -69,22 +69,23 @@ export default function CreateGameForm({ setGameInfo }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="mb-8">
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={"Placeholder1"}
+                  placeholder={"Enter Username"}
                   {...field}
                   onChange={handleInputChange}
                   id="userName"
+                  required
                 />
               </FormControl>
-              <FormDescription>Description1</FormDescription>
+              {/* <FormDescription>Description 1</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -94,12 +95,12 @@ export default function CreateGameForm({ setGameInfo }) {
           control={form.control}
           name="roomName"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="mb-8">
               <FormLabel>Room Name</FormLabel>
               <FormControl>
-                <Input placeholder={"Placeholder2"} {...field} id="roomName" />
+                <Input placeholder={"Enter Room Name"} {...field} id="roomName" required />
               </FormControl>
-              <FormDescription>Description2</FormDescription>
+              {/* <FormDescription>Description2</FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -109,36 +110,39 @@ export default function CreateGameForm({ setGameInfo }) {
           control={form.control}
           name="numPlayers"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="mb-8">
               <FormLabel>Number of Players</FormLabel>
 
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className="flex flex-row space-y-1"
+                  className="flex flex-row gap-6"
                 >
                   {Array.from({ length: 7 }).map((_, index) => {
                     return (
                       <FormItem
                         key={index + 1}
-                        className="flex items-center space-x-3 space-y-0 hover:scale-125"
+                        className="flex items-center"
                       >
                         <FormLabel
-                          className={`text-2xl pr-4 ${
-                            field.value === index + 1
-                              ? "bg-green-400 outline"
-                              : "bg-transparent"
-                          }`}
-                          style={{ transition: "background-color 0.3s" }}
+                          className={`
+                            cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+                            border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+                            duration-300
+                            ${
+                              field.value === index + 1
+                                ? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
+                                : ""
+                            }
+                          `}
                         >
                           <FormControl>
                             <RadioGroupItem
                               value={index + 1}
-                              className="radiobutton-input focus:outline"
+                              className="invisble focus:outline h-0 w-0 border-none"
                             />
                           </FormControl>
-
                           {index + 1}
                         </FormLabel>
                       </FormItem>
@@ -162,29 +166,32 @@ export default function CreateGameForm({ setGameInfo }) {
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className="flex flex-row space-y-1"
+                  className="flex flex-row gap-6"
                 >
                   {Array.from({ length: 6 }).map((_, index) => {
                     return (
                       <FormItem
                         key={index + 1}
-                        className="flex items-center space-x-3 space-y-0 hover:scale-125"
+                        className="flex items-center"
                       >
                         <FormLabel
-                          className={`text-2xl pr-4 ${
-                            field.value === index + 1
-                              ? "bg-green-400 outline"
-                              : "bg-transparent"
-                          }`}
-                          style={{ transition: "background-color 0.3s" }}
+                          className={`
+                            cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+                            border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+                            duration-300
+                            ${
+                              field.value === index + 1
+                                ? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
+                                : ""
+                            }
+                          `}
                         >
                           <FormControl>
                             <RadioGroupItem
                               value={index + 1}
-                              className="radiobutton-input"
+                              className="invisble focus:outline h-0 w-0 border-none"
                             />
                           </FormControl>
-
                           {index + 1}
                         </FormLabel>
                       </FormItem>
@@ -197,7 +204,7 @@ export default function CreateGameForm({ setGameInfo }) {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button className="mt-12" type="submit">Submit</Button>
       </form>
     </Form>
   );
