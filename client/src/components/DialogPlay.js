@@ -14,19 +14,26 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 	return (
 
         <Dialog open={open} onOpenChange={setOpen}>
+
             <DialogTrigger asChild>
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
-            <DialogContent className="h-[80vh] w-[60vw] p-10">
+
+            <DialogContent className="h-[80vh] w-[60vw] p-10 overflow-auto">
+
                 {(!gameInfo && (
-                    <DialogHeader>
-                        <DialogTitle className="mb-4">Create A Room</DialogTitle>
-                        <DialogDescription>
-                            <CreateGameForm setGameInfo={setGameInfo} />
-                        </DialogDescription>
-                    </DialogHeader>
+
+                    <>
+                        <DialogHeader>
+                            <DialogTitle className="mb-4">Create A Room</DialogTitle>
+                        </DialogHeader>
+                        <CreateGameForm setGameInfo={setGameInfo} />
+                    </>
+                
                 )) || <Lobby gameInfo={gameInfo} />}
+
             </DialogContent>
+            
         </Dialog>
 		
 

@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from '../css/tailwindStylesLiterals';
 import DialogPlay from '../components/DialogPlay.js';
 import DialogHTP from '../components/DialogHTP';
+import { useSocketContext } from '../contexts/SocketContext';
 
 const Home = function () {
 
 	const location = useLocation();
 
+	const [socket, setSocket] = useSocketContext();
+
 	const [playOpen, setPlayOpen] = useState(false);
+
+	useEffect(() => {
+
+		socket.on("connectToRoom", (message) => {
+
+			console.log(message);
+
+		});
+
+		return () => { socket.removeAllListeners("connectToRoom"); }
+
+	}, [socket]);
 
 	return (
 
