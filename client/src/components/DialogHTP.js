@@ -11,7 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
 
-function DialogHTP({tailwindStyles, variant, triggerName}) {
+function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
     const [open, setOpen] = useState(false);
 
@@ -29,6 +29,8 @@ function DialogHTP({tailwindStyles, variant, triggerName}) {
     const hintInputRef = useRef(null);
 
     const hintValidationRef = useRef(null);
+
+    const [playOpen, setPlayOpen] = isPlayOpen;
 
     const submissions = [
 
@@ -457,7 +459,7 @@ function DialogHTP({tailwindStyles, variant, triggerName}) {
 
     return (
 
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className={tailwindStyles} variant={variant}>How To Play</Button>
             </DialogTrigger>
@@ -516,7 +518,11 @@ function DialogHTP({tailwindStyles, variant, triggerName}) {
 
                 <DialogFooter>
 
-                    <DialogPlay triggerName={"Let's Play!"} />
+                    <div onClick={() => {setOpen(false); setPlayOpen(true);}}>
+
+                        <DialogPlay triggerName={"Let's Play!"} isOpen={[playOpen, setPlayOpen]} />
+
+                    </div>
 
                 </DialogFooter>
 

@@ -5,14 +5,16 @@ import { Button } from "../components/ui/button";
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({tailwindStyles, variant, triggerName}) {
+const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
 	const [gameInfo, setGameInfo] = useState();
 
+    const [open, setOpen] = isOpen;
+
 	return (
 
-        <Dialog>
-            <DialogTrigger>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
             <DialogContent className="h-[80vh] w-[60vw] p-10">
