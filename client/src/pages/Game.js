@@ -1,5 +1,6 @@
 import { React, useState } from "react";
 import { Button } from "../components/ui/button";
+import axios from "axios";
 
 const Game = function (props) {
   const [word, setWord] = useState("");
@@ -11,9 +12,15 @@ const Game = function (props) {
     "Espresso",
     "Mocha",
   ];
-  const generateWord = () => {
-    const generatedWord = words[Math.floor(Math.random() * words.length)];
-    setWord(generatedWord);
+  const generateWord = async () => {
+    const url = "http://localhost:3001/getMysteryWord";
+    try {
+      const response = await axios.get(url);
+      setWord(response.data);
+      console.log(response.data);
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
