@@ -1,0 +1,38 @@
+    // // list of all rooms (room name => people in this room)
+    // console.log(io.sockets.adapter.rooms);
+
+    // // list of all people (person => rooms they are in)
+    // console.log(io.sockets.adapter.sids);
+
+    // // array of rooms
+    // console.log([...io.sockets.adapter.rooms.keys()]);
+
+    // array of people
+    // console.log([...io.sockets.adapter.sids.keys()]);
+
+    // // full socket information
+    // console.log(io.sockets.sockets.get(socket.id));
+
+    // either works to send a message to the room
+    // io.sockets.in(`room-${roomLookup.length}`).emit('connectToRoom', "You are in room no. " + roomLookup.length);
+    // io.to(`room-${roomLookup.length}`).emit('connectToRoom', "You are in room no. " + roomLookup.length);
+
+    // roomLookup.push({
+
+    //     roomID: `room-${roomLookup.length}`,
+    //     roomName: roomName,
+
+    // });
+
+    // console.log(roomLookup);
+
+    // const socketIDsInRoom = io.sockets.adapter.rooms.get(`room-${roomLookup.length - 1}`);
+
+    // which socketIDs are in this room?
+    // console.log(socketIDsInRoom);
+
+    // how many socketIDs are in this room?
+    // console.log(io.sockets.adapter.rooms.get(`room-${roomLookup.length - 1}`).size);
+
+    // which rooms is this socketID in?
+    // console.log(socket.rooms);
