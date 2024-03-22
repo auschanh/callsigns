@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -44,6 +45,8 @@ export default function CreateGameForm({ setGameInfo }) {
 
 	const [socket, setSocket] = useSocketContext();
 
+	const [changedRoomName, setChangedRoomName] = useState(false);
+
 	// 1. Define your form.
 	const form = useForm({
 
@@ -73,12 +76,26 @@ export default function CreateGameForm({ setGameInfo }) {
 	}
 
 	function handleInputChange(event) {
-		const { id, name, value } = event.target;
+
+		const { name, value } = event.target;
+
 		// Update both input fields based on the changed input
-		if (name === "username") {
-			form.setValue("roomName", value + "'s Room"); // Set the value of input2 to match input1
-			form.setValue("username", value);
+		form.setValue(name, value);
+
+		if (name === "roomName") {
+
+			setChangedRoomName(true);
+
+		} else if (name === "username") {
+
+			if (!changedRoomName) {
+
+				form.setValue("roomName", `${value}'s Room`); // Set the value of input2 to match input1
+
+			}
+
 		}
+
 	}
 
 	return (
@@ -114,7 +131,12 @@ export default function CreateGameForm({ setGameInfo }) {
 						<FormItem className="mb-8">
 							<FormLabel>Room Name</FormLabel>
 							<FormControl>
-								<Input placeholder={"Enter Room Name"} {...field} id="roomName" />
+								<Input 
+									placeholder={"Enter Room Name"} 
+									{...field} 
+									onChange={handleInputChange}
+									id="roomName" 
+								/>
 							</FormControl>
 							{/* <FormDescription>Description2</FormDescription> */}
 							<FormMessage />
