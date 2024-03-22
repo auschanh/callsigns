@@ -19,7 +19,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className="h-[80vh] w-[60vw] p-10 overflow-auto">
+            <DialogContent className="flex flex-none flex-col h-[80vh] w-[60vw] p-10 overflow-auto gap-4">
 
                 {(!gameInfo && (
 
