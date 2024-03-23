@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger,
 import { Button } from "../components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
 import { useSocketContext } from "../contexts/SocketContext";
 
 function JoinRoom() {
@@ -21,9 +22,13 @@ function JoinRoom() {
 
     const [username, setUsername] = useState();
 
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(0);
 
-    const [lobby, setLobby] = useState([]);
+    const [lobby, setLobby] = useState();
+
+    const [sessionUrl, setSessionUrl] = useState();
+
+    const [roomDetails, setRoomDetails] = useState();
 
     const [open, setOpen] = useState(true);
 
@@ -42,7 +47,7 @@ function JoinRoom() {
 
             (async () => {
 
-                await socket.emit("joinRoom", roomName);
+                await socket.emit("joinRoom", roomName, username);
     
             })();
 
@@ -52,17 +57,23 @@ function JoinRoom() {
 
         }
 
-        socket.on("getLobby", (othersInLobby) => {
+        socket.on("getLobby", (othersInLobby, sessionUrl, roomDetails) => {
 
             if (othersInLobby) {
 
-                setSuccess(true);
+                setSuccess(1);
 
                 setLobby(othersInLobby);
+
+                setSessionUrl(sessionUrl);
+
+                setRoomDetails(roomDetails);
 
             } else {
 
                 console.log(`could not join room ${roomName}`);
+
+                setSuccess(2);
 
             }
 
@@ -96,9 +107,9 @@ function JoinRoom() {
 
                 <div className="h-[80vh] w-[60vw] bg-slate-50 border rounded-3xl p-12">
 
-                <h1 className="font-semibold text-2xl">Join A Lobby</h1>
+                <h1 className="font-semibold text-2xl">Join A Game</h1>
 
-                {success && (
+                {success === 1 && (
 
                     <div>
 
@@ -108,18 +119,28 @@ function JoinRoom() {
 
                             return (
 
-                                <p key={index}>{player}</p>
+                                <Badge key={index}>{player}</Badge>
 
                             );
 
                         })}
 
+                        <p>{sessionUrl}</p>
+
+                        <p>{roomDetails.roomID}</p>
+                        <p>{roomDetails.roomName}</p>
+                        <p>{roomDetails.numPlayers}</p>
+                        <p>{roomDetails.aiPlayers}</p>
+
                     </div>
 
-                ) || (
+                ) || success === 2 && (
 
-                    <>
-                    </>
+                    <div>
+
+                        <p>{`Could not join room: ${roomName}`}</p>
+
+                    </div>
 
                 )} 
 

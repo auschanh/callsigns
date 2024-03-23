@@ -33,42 +33,41 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     const getSocketInfo = () => {
 
-        let usernames = [];
+        const activeUsers = [...io.sockets.sockets.values()].map((socketObj) => {
 
-        [...io.sockets.sockets.values()].forEach((socketObj) => {
-
-            let temp = {
+            return {
 
                 username: socketObj.username,
-                socketID: socketObj.id
+                socketID: socketObj.id,
+                rooms: socketObj.rooms
 
-            };
-
-            usernames.push(temp);
+            }
     
         });
 
-        let activeUsers = Array.from(io.sockets.adapter.sids, ([socketID, rooms]) => {
+        console.log(activeUsers);
 
-            for (let i = 0; i < usernames.length; i++) {
+    }
 
-                if (socketID === usernames[i].socketID) {
+    const getPlayersInLobby = (roomName) => {
 
-                    return {
-                        
-                        username: usernames[i].username,
-                        socketID: socketID,
-                        rooms: rooms
-                    
-                    }
+        const lobby = [...io.sockets.adapter.rooms].find((room) => {return room[0] === roomName})[1];
 
-                }
+        return usernameLookup([...lobby]);
 
-            } 
-        
+    }
+
+    const usernameLookup = (lobbyArray) => {
+
+        const usernames = lobbyArray.map((socketID) => {
+
+            let foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {return socketObj.id === socketID});
+
+            return foundSocket.username;
+
         });
 
-        console.log(activeUsers);
+        return usernames;
 
     }
 
@@ -79,15 +78,22 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         socket.username = username;
 
-        roomLookup.push({
-
-            roomID: `room-${roomLookup.length}`
-
-        });
-
         socket.join(`room-${roomLookup.length}`);
 
         getSocketInfo();
+
+        const roomList = getPlayersInLobby(`room-${roomLookup.length}`);
+
+        socket.emit("getRoomInfo", `http://localhost:3000/game/room-${roomLookup.length}`, roomList);
+
+        roomLookup.push({
+
+            roomID: `room-${roomLookup.length}`,
+            roomName: roomName,
+            numPlayers: numPlayers,
+            aiPlayers: aiPlayers
+
+        });
 
     });
 
@@ -107,19 +113,29 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("joinRoom", (roomName) => {
+    socket.on("joinRoom", (roomName, username) => {
 
-        console.log(roomName);
+        socket.username = username;
+
+        console.log(username + " is joining " + roomName);
 
         socket.join(roomName);
 
-        const lobby = [...io.sockets.adapter.rooms].find((room) => {return room[0] === roomName})[1];
+        const roomList = getPlayersInLobby(roomName);
 
-        console.log(lobby);
+        console.log("players in " + roomName + ": " + roomList);
+
+        getSocketInfo();
+
+        const roomDetails = roomLookup.find(({roomID}) => {return roomID === roomName});
+
+        const lobby = io.sockets.adapter.rooms.get(roomName);
 
         if (lobby.has(socket.id)) {
 
-            socket.emit("getLobby", [...lobby]);
+            socket.emit("getLobby", roomList, `http://localhost:3000/game/${roomName}`, roomDetails);
+
+            io.to(roomName).emit("joinedLobby", roomList);
 
         } else {
 
@@ -130,6 +146,14 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     });
 
     socket.on("disconnect", () => {
+
+        const roomList = [...io.sockets.adapter.sids].map(([socketID, rooms]) => {
+
+            return rooms;
+
+        })
+
+        console.log(roomList);
 
         console.log("User Disconnected: ", socket.id);
 

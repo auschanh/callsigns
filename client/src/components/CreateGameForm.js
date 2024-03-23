@@ -33,7 +33,7 @@ const formSchema = z.object({
 
 	}),
 
-	aiPlayers: z.number().gt(0, {
+	aiPlayers: z.number().gte(0, {
 
 		message: "Enter number of AI players."
 
@@ -194,7 +194,6 @@ export default function CreateGameForm({ setGameInfo }) {
 				/>
 
 				<FormField
-					defaultValue={0}
 					control={form.control}
 					name="aiPlayers"
 					render={({ field }) => (
@@ -207,10 +206,10 @@ export default function CreateGameForm({ setGameInfo }) {
 									defaultValue={field.value}
 									className="flex flex-row gap-6"
 								>
-									{Array.from({ length: 6 }).map((_, index) => {
+									{Array.from({ length: 7 }).map((_, index) => {
 										return (
 											<FormItem
-												key={index + 1}
+												key={index}
 												className="flex items-center"
 											>
 												<FormLabel
@@ -218,7 +217,7 @@ export default function CreateGameForm({ setGameInfo }) {
 														cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
 														border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
 														duration-300
-														${field.value === index + 1
+														${field.value === index
 															? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
 															: ""
 														}
@@ -226,11 +225,11 @@ export default function CreateGameForm({ setGameInfo }) {
 												>
 													<FormControl>
 														<RadioGroupItem
-															value={index + 1}
+															value={index}
 															className="invisble focus:outline h-0 w-0 border-none"
 														/>
 													</FormControl>
-													{index + 1}
+													{index}
 												</FormLabel>
 											</FormItem>
 										);

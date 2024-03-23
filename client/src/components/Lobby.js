@@ -3,10 +3,43 @@ import { DialogFooter } from "./ui/dialog";
 import { Button } from "../components/ui/button";
 import { Link } from 'react-router-dom';
 import { Badge } from "../components/ui/badge";
+import { useSocketContext } from "../contexts/SocketContext";
 
-const Lobby = function ({ gameInfo }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby }) {
+
+	const [socket, setSocket] = useSocketContext();
 
 	const [totaPlayers, setTotalPlayers] = useState(0);
+
+	const [playersInLobby, setPlayersInLobby] = useState();
+
+	const username = gameInfo.username;
+
+	const roomName = gameInfo.roomName;
+
+	useEffect(() => {
+
+		if (!playersInLobby) {
+
+			setPlayersInLobby(inLobby);
+
+		}
+
+        socket.on("joinedLobby", (players) => {
+
+            console.log(players);
+
+			setPlayersInLobby(players);
+
+        });
+
+        return () => {
+
+            socket.removeAllListeners("joinedLobby");
+
+        }
+
+    }, [socket, username, roomName, inLobby, playersInLobby]);
 
 	return (
 
@@ -52,15 +85,27 @@ const Lobby = function ({ gameInfo }) {
 
 				<div className="mt-4 flex gap-x-1">
 
-					<Badge>Batman</Badge>
+					{playersInLobby && (
+						
+						playersInLobby.map((player, index) => {
 
-					<Badge>Spiderman</Badge>
+							return (
 
-					<Badge>The Joker</Badge>
+								<Badge key={index}>{player}</Badge>
 
-					<Badge>Green Goblin</Badge>
+							);
+
+						})
+
+					)}
 
 				</div>
+
+				{sessionUrl && (
+
+					<div>{sessionUrl}</div>
+
+				)}
 
 				{/* <div className="border border-black mt-2 max-h-full flex-1 h-auto max-w-screen"></div> */}
 

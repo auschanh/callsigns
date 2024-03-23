@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Button } from "../components/ui/button";
+import { useSocketContext } from "../contexts/SocketContext";
 
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
 const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
+    const [socket, setSocket] = useSocketContext();
+
 	const [gameInfo, setGameInfo] = useState();
 
     const [open, setOpen] = isOpen;
+
+    const [sessionUrl, setSessionUrl] = useState();
+
+    const [inLobby, setInLobby] = useState();
+
+    useEffect(() => {
+
+        socket.on("getRoomInfo", (link, roomList) => {
+
+            setSessionUrl(link);
+
+            setInLobby(roomList);
+
+        });
+
+        return () => {
+
+            socket.removeAllListeners("getLink");
+
+        }
+
+    }, [socket]);
 
 	return (
 
@@ -30,7 +55,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                         <CreateGameForm setGameInfo={setGameInfo} />
                     </>
                 
-                )) || <Lobby gameInfo={gameInfo} />}
+                )) || <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} />}
 
             </DialogContent>
             
