@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate } from 'react-router-dom';
 import './css/styles.css';
 import Home from './pages/Home';
 import Game from './pages/Game';
+import JoinRoom from './pages/JoinRoom';
 import SocketContext from './contexts/SocketContext';
 import styles from './css/tailwindStylesLiterals';
 
@@ -28,9 +29,13 @@ function App() {
 
 				<Routes>
 
-					<Route path="/" exact element={ <Home /> } />
+					<Route exact path="/" element={ <Home /> } />
 
-					<Route path="game" exact element={ <Game /> } />
+					<Route exact path="game" element={ <Game /> } />
+
+					<Route exact path="game/:roomName" element={ <JoinRoom /> } />
+
+					<Route path="*" element={ <Navigate replace to="/" /> } />
 
 				</Routes>
 

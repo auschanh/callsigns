@@ -25,6 +25,8 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
+let roomLookup = [];
+
 io.on("connection", (socket) => { // every connection has a unique socket id
 
     console.log(`User Connected: ${socket.id}`); // prints socket id of connection
@@ -77,9 +79,53 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         socket.username = username;
 
-        socket.join(`${roomName}-${socket.id}`);
+        roomLookup.push({
+
+            roomID: `room-${roomLookup.length}`
+
+        });
+
+        socket.join(`room-${roomLookup.length}`);
 
         getSocketInfo();
+
+    });
+
+    socket.on("roomCheck", (roomName, setRoomExists) => {
+
+        const check = [...io.sockets.adapter.rooms.keys()].find((room) => {return room === roomName});
+
+        if (check) {
+
+            setRoomExists(true);
+
+        } else {
+
+            setRoomExists(false);
+            
+        }
+
+    });
+
+    socket.on("joinRoom", (roomName) => {
+
+        console.log(roomName);
+
+        socket.join(roomName);
+
+        const lobby = [...io.sockets.adapter.rooms].find((room) => {return room[0] === roomName})[1];
+
+        console.log(lobby);
+
+        if (lobby.has(socket.id)) {
+
+            socket.emit("getLobby", [...lobby]);
+
+        } else {
+
+            socket.emit("getLobby");
+
+        }
 
     });
 
