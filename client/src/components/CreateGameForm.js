@@ -9,6 +9,7 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
+import { Switch } from "./ui/switch";
 
 import { useSocketContext } from "../contexts/SocketContext";
 
@@ -41,11 +42,15 @@ const formSchema = z.object({
 
 });
 
-export default function CreateGameForm({ setGameInfo }) {
+export default function CreateGameForm({ setGameInfo, nextSlide }) {
 
 	const [socket, setSocket] = useSocketContext();
 
 	const [changedRoomName, setChangedRoomName] = useState(false);
+
+	const [playerCount, setPlayerCount] = useState();
+
+	const [isAiPlayers, setIsAiPlayers] = useState(false);
 
 	// 1. Define your form.
 	const form = useForm({
@@ -73,6 +78,8 @@ export default function CreateGameForm({ setGameInfo }) {
 
 		socket.emit("gameInfo", values);
 
+		nextSlide();
+
 	}
 
 	function handleInputChange(event) {
@@ -98,15 +105,24 @@ export default function CreateGameForm({ setGameInfo }) {
 
 	}
 
+	const handlePlayerCount = (players) => {
+
+		setPlayerCount(players);
+
+		form.setValue("aiPlayers", 0);
+
+	}
+
 	return (
+
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
 				<FormField
 					defaultValue={''}
 					control={form.control}
 					name="username"
 					render={({ field }) => (
-						<FormItem className="mb-8">
+						<FormItem className="mb-6">
 							<FormLabel>Username</FormLabel>
 							<FormControl>
 								<Input
@@ -117,7 +133,6 @@ export default function CreateGameForm({ setGameInfo }) {
 									id="userName"
 								/>
 							</FormControl>
-							{/* <FormDescription>Description 1</FormDescription> */}
 							<FormMessage />
 						</FormItem>
 					)}
@@ -128,7 +143,7 @@ export default function CreateGameForm({ setGameInfo }) {
 					control={form.control}
 					name="roomName"
 					render={({ field }) => (
-						<FormItem className="mb-8">
+						<FormItem className="mb-6">
 							<FormLabel>Room Name</FormLabel>
 							<FormControl>
 								<Input 
@@ -138,7 +153,6 @@ export default function CreateGameForm({ setGameInfo }) {
 									id="roomName" 
 								/>
 							</FormControl>
-							{/* <FormDescription>Description2</FormDescription> */}
 							<FormMessage />
 						</FormItem>
 					)}
@@ -149,14 +163,13 @@ export default function CreateGameForm({ setGameInfo }) {
 					control={form.control}
 					name="numPlayers"
 					render={({ field }) => (
-						<FormItem className="mb-8">
+						<FormItem className="mb-6">
 							<FormLabel>Number of Players</FormLabel>
-
 							<FormControl>
 								<RadioGroup
 									onValueChange={field.onChange}
 									defaultValue={field.value}
-									className="flex flex-row gap-6"
+									className="flex flex-row gap-4"
 								>
 									{Array.from({ length: 7 }).map((_, index) => {
 										return (
@@ -178,7 +191,8 @@ export default function CreateGameForm({ setGameInfo }) {
 													<FormControl>
 														<RadioGroupItem
 															value={index + 1}
-															className="invisble focus:outline h-0 w-0 border-none"
+															className="invisble h-0 w-0 border-none"
+															onClick={() => {handlePlayerCount(index + 1);}}
 														/>
 													</FormControl>
 													{index + 1}
@@ -194,46 +208,110 @@ export default function CreateGameForm({ setGameInfo }) {
 				/>
 
 				<FormField
+					defaultValue={0}
 					control={form.control}
 					name="aiPlayers"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>AI Players</FormLabel>
+							<FormLabel className="flex flex-row justify-between items-center mb-4">
+								<div>AI Players</div>
+								<Switch 
+										className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
+										checked={isAiPlayers}
+										onCheckedChange={() => {
+											
+											setIsAiPlayers(!isAiPlayers); 
+											
+											if (isAiPlayers) {
 
+												form.setValue("aiPlayers", 0);
+
+											}								
+											
+										}}
+								/>
+							</FormLabel>
 							<FormControl>
 								<RadioGroup
 									onValueChange={field.onChange}
 									defaultValue={field.value}
-									className="flex flex-row gap-6"
+									className="flex flex-row gap-4"
 								>
-									{Array.from({ length: 7 }).map((_, index) => {
-										return (
-											<FormItem
-												key={index}
-												className="flex items-center"
-											>
-												<FormLabel
-													className={`
-														cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
-														border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
-														duration-300
-														${field.value === index
-															? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
-															: ""
-														}
-                          							`}
-												>
-													<FormControl>
-														<RadioGroupItem
-															value={index}
-															className="invisble focus:outline h-0 w-0 border-none"
-														/>
-													</FormControl>
-													{index}
-												</FormLabel>
-											</FormItem>
-										);
-									})}
+
+									{isAiPlayers && 
+
+										Array.from({ length: 6 }).map((_, index) => {
+
+											if (index + 1 <= (7 - playerCount)) {
+
+												return (
+
+													<FormItem
+														key={index + 1}
+														className="flex items-center"
+													>
+														<FormLabel
+															className={`
+																cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+																duration-300
+																${field.value === index + 1
+																	? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
+																	: ""
+																}
+															`}
+														>
+															<FormControl>
+																<RadioGroupItem
+																	value={index + 1}
+																	className="invisble h-0 w-0 border-none"
+																	onClick={() => {
+																		
+																		if (form.getValues("aiPlayers") === 0) {
+
+																			form.setValue("aiPlayers", index + 1);
+												
+																		}
+																	}}
+																/>
+															</FormControl>
+															{index + 1}
+														</FormLabel>
+													</FormItem>
+	
+												);
+
+											} else {
+
+												return (
+
+													<FormItem
+														key={index + 1}
+														className="flex items-center"
+													>
+														<FormLabel
+															className={`
+																h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																border border-slate-200 bg-slate-500/50 text-slate-50/30 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+															`}
+														>
+															<FormControl>
+																<RadioGroupItem
+																	value={index + 1}
+																	className="invisble h-0 w-0 border-none"
+																	disabled
+																/>
+															</FormControl>
+															{index + 1}
+														</FormLabel>
+													</FormItem>
+	
+												);
+
+											}
+										})
+									}
+									
 								</RadioGroup>
 							</FormControl>
 							<FormMessage />
@@ -241,7 +319,8 @@ export default function CreateGameForm({ setGameInfo }) {
 					)}
 				/>
 
-				<Button className="mt-12" type="submit">Submit</Button>
+				<Button className="flex w-48 self-center mt-auto" type="submit">Submit</Button>
+
 			</form>
 		</Form>
 	);
