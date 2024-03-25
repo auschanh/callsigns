@@ -34,9 +34,9 @@ const Home = function () {
 
 			<div className="flex flex-row w-full justify-center gap-12">
 
-				<DialogPlay tailwindStyles={"w-32 bg-green-600 text-white hover:bg-green-600/80"} variant={"secondary"} triggerName={"Play"} isOpen={[playOpen, setPlayOpen]} />
+				<DialogPlay tailwindStyles={"w-32 bg-green-600 text-white hover:bg-green-600/80 active:bg-green-500"} variant={"secondary"} triggerName={"Play"} isOpen={[playOpen, setPlayOpen]} />
 
-				<DialogHTP tailwindStyles={"w-32 bg-red-600 text-white hover:bg-red-600/80"} variant={"secondary"} isPlayOpen={[playOpen, setPlayOpen]} />
+				<DialogHTP tailwindStyles={"w-32 bg-red-600 text-white hover:bg-red-600/80 active:bg-red-500"} variant={"secondary"} isPlayOpen={[playOpen, setPlayOpen]} />
 
 			</div>
 

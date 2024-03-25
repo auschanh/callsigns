@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -18,7 +18,7 @@ const formSchema = z.object({
 
 	username: z.string().min(1, {
 
-		message: "Please enter a username.",
+		message: "Please enter a username.", 
 
 	}),
 
@@ -42,7 +42,7 @@ const formSchema = z.object({
 
 });
 
-export default function CreateGameForm({ setGameInfo, nextSlide }) {
+export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -51,6 +51,8 @@ export default function CreateGameForm({ setGameInfo, nextSlide }) {
 	const [playerCount, setPlayerCount] = useState();
 
 	const [isAiPlayers, setIsAiPlayers] = useState(false);
+
+	const [isRoomCreated, setIsRoomCreated] = roomCreated;
 
 	// 1. Define your form.
 	const form = useForm({
@@ -76,7 +78,9 @@ export default function CreateGameForm({ setGameInfo, nextSlide }) {
 
 		setGameInfo(values);
 
-		socket.emit("gameInfo", values);
+		socket.emit("gameInfo", values, isRoomCreated);
+
+		setIsRoomCreated(true);
 
 		nextSlide();
 
@@ -130,7 +134,7 @@ export default function CreateGameForm({ setGameInfo, nextSlide }) {
 					control={form.control}
 					name="username"
 					render={({ field }) => (
-						<FormItem className="mb-6">
+						<FormItem className="mb-4">
 							<FormLabel>Username</FormLabel>
 							<FormControl>
 								<Input
@@ -151,14 +155,15 @@ export default function CreateGameForm({ setGameInfo, nextSlide }) {
 					control={form.control}
 					name="roomName"
 					render={({ field }) => (
-						<FormItem className="mb-6">
+						<FormItem className="mb-4">
 							<FormLabel>Room Name</FormLabel>
 							<FormControl>
 								<Input 
 									placeholder={"Enter Room Name"} 
 									{...field} 
 									onChange={handleInputChange}
-									id="roomName" 
+									id="roomName"
+									onFocus={(event) => event.target.select()}
 								/>
 							</FormControl>
 							<FormMessage />
@@ -171,7 +176,7 @@ export default function CreateGameForm({ setGameInfo, nextSlide }) {
 					control={form.control}
 					name="numPlayers"
 					render={({ field }) => (
-						<FormItem className="mb-6">
+						<FormItem className="mb-4">
 							<FormLabel>Number of Players</FormLabel>
 							<FormControl>
 								<RadioGroup

@@ -73,27 +73,44 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     getSocketInfo();
     
+    socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated) => {
 
-    socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }) => {
+        if (!isRoomCreated) {
+
+            roomLookup.push({
+
+                roomID: socket.id,
+                roomName: roomName,
+                numPlayers: numPlayers,
+                aiPlayers: aiPlayers
+    
+            });
+
+        } else {
+
+            const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.id});
+
+            findRoom.roomName = roomName;
+            findRoom.numPlayers = numPlayers;
+            findRoom.aiPlayers = aiPlayers;
+
+        }
 
         socket.username = username;
 
-        socket.join(`room-${roomLookup.length}`);
-
         getSocketInfo();
 
-        const roomList = getPlayersInLobby(`room-${roomLookup.length}`);
+        const roomList = getPlayersInLobby(socket.id);
 
-        socket.emit("getRoomInfo", `http://localhost:3000/game/room-${roomLookup.length}`, roomList);
+        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.id}`, roomList);
 
-        roomLookup.push({
+        console.log(roomLookup);
 
-            roomID: `room-${roomLookup.length}`,
-            roomName: roomName,
-            numPlayers: numPlayers,
-            aiPlayers: aiPlayers
+    });
 
-        });
+    socket.on("listLobby", (setPlayersInLobby) => {
+
+        setPlayersInLobby(getPlayersInLobby(socket.id));
 
     });
 
@@ -145,15 +162,33 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
+    socket.on("disconnecting", () => {
+
+        const leavingRooms = [...socket.rooms];
+
+        console.log(leavingRooms);
+
+        leavingRooms.forEach((room) => {
+
+            if (io.sockets.adapter.rooms.get(room).size === 1) {
+
+                roomLookup = roomLookup.filter(({roomID}) => {return roomID !== room});
+
+            } else {
+
+                // ---------------------------------------------------------
+                socket.broadcast.to(room).emit("leftRoom", socket.username);
+                // ---------------------------------------------------------
+
+            }
+
+        });
+
+    });
+
     socket.on("disconnect", () => {
 
-        const roomList = [...io.sockets.adapter.sids].map(([socketID, rooms]) => {
-
-            return rooms;
-
-        })
-
-        console.log(roomList);
+        console.log(roomLookup);
 
         console.log("User Disconnected: ", socket.id);
 

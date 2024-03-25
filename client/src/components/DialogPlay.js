@@ -23,6 +23,8 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     const [inLobby, setInLobby] = useState();
 
+    const [isRoomCreated, setIsRoomCreated] = useState(false);
+
     useEffect(() => {
 
         socket.on("getRoomInfo", (link, roomList) => {
@@ -57,7 +59,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         content:
 
-            <CreateGameForm setGameInfo={setGameInfo} nextSlide={nextSlide} />
+            <CreateGameForm setGameInfo={setGameInfo} nextSlide={nextSlide} roomCreated={[isRoomCreated, setIsRoomCreated]} />
 
     }, {
 
@@ -67,7 +69,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} />
 
                 )}
 
@@ -83,7 +85,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className="flex flex-none flex-col h-[80vh] w-[30vw] p-10 pb-16 overflow-auto gap-8">
+            <DialogContent className="flex flex-none flex-col h-[80vh] w-[35vw] p-10 pb-16 overflow-auto gap-8">
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>

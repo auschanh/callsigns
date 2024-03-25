@@ -12,6 +12,7 @@ import { Button } from "../components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
+import { Copy, Check } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
 function JoinRoom() {
@@ -28,6 +29,8 @@ function JoinRoom() {
 
     const [sessionUrl, setSessionUrl] = useState();
 
+    const [copied, setCopied] = useState(false);
+
     const [roomDetails, setRoomDetails] = useState();
 
     const [open, setOpen] = useState(true);
@@ -39,7 +42,15 @@ function JoinRoom() {
 
         (async () => {
 
-            await socket.emit("roomCheck", roomName, setRoomExists);
+            try {
+
+                await socket.emit("roomCheck", roomName, setRoomExists);
+
+            } catch (error) {
+
+                throw error;
+
+            }
 
         })();
 
@@ -99,6 +110,36 @@ function JoinRoom() {
 
 	}
 
+    const handleCopy = async () => {
+
+		try {
+
+			if ("clipboard" in navigator) {
+
+				await navigator.clipboard.writeText(sessionUrl);
+				
+			} else {
+
+				document.execCommand("copy", true, sessionUrl);
+
+			}
+
+			setCopied(true);
+
+			setTimeout(() => {
+
+				setCopied(false);
+
+			}, 1000);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+	}
+
 	return (
 
         <>
@@ -126,6 +167,7 @@ function JoinRoom() {
                         })}
 
                         <p>{sessionUrl}</p>
+                        <Button className="transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "green" : "default"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
 
                         <p>{roomDetails.roomID}</p>
                         <p>{roomDetails.roomName}</p>
