@@ -82,7 +82,8 @@ io.on("connection", (socket) => { // every connection has a unique socket id
                 roomID: socket.id,
                 roomName: roomName,
                 numPlayers: numPlayers,
-                aiPlayers: aiPlayers
+                aiPlayers: aiPlayers,
+                allowSharing: false
     
             });
 
@@ -105,6 +106,16 @@ io.on("connection", (socket) => { // every connection has a unique socket id
         socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.id}`, roomList);
 
         console.log(roomLookup);
+
+    });
+
+    socket.on("allowSharing", (allowSharing) => {
+
+        const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.id});
+
+        findRoom.allowSharing = allowSharing;
+
+        console.log(findRoom);
 
     });
 
@@ -144,7 +155,15 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         if (lobby.has(socket.id)) {
 
-            socket.emit("getLobby", roomList, `http://localhost:3000/game/${roomName}`, roomDetails);
+            if (roomDetails.allowSharing) {
+
+                socket.emit("getLobby", roomList, `http://localhost:3000/game/${roomName}`, roomDetails);
+
+            } else {
+
+                socket.emit("getLobby", roomList, "", roomDetails);
+
+            }
 
             io.to(roomName).emit("joinedLobby", roomList);
 

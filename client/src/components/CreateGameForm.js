@@ -176,7 +176,7 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 					control={form.control}
 					name="numPlayers"
 					render={({ field }) => (
-						<FormItem className="mb-4">
+						<FormItem className="mb-6">
 							<FormLabel>Number of Players</FormLabel>
 							<FormControl>
 								<RadioGroup
