@@ -15,6 +15,20 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 	const [selectedPlayers, setSelectedPlayers] = useState([]);
 
+	useEffect(() => {
+
+		selectedPlayers.forEach((player) => {
+
+			if (!inLobby.includes(player)) {
+
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player }));
+
+			}
+
+		});
+
+	}, [inLobby]);
+
 	const handleCopy = async () => {
 
 		try {
@@ -94,6 +108,8 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 					</div>
 				</div>
 
+				<h1 className="text-sm font-semibold mb-2">Select players for this round:</h1>
+
 				<div className="flex flex-wrap gap-x-3 gap-y-3">
 
 					{inLobby && inLobby.map((player, index) => {
@@ -151,7 +167,9 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 			{/* <Link to="game"> */}
 			<div className="flex flex-row mt-auto w-full justify-end">
-				<Button className="w-24" onClick={() => {console.log(selectedPlayers)}}>Select</Button>
+				<Button className="w-25" onClick={() => {console.log(selectedPlayers)}}>Start Game</Button>
+
+				{/* disabled={ selectedPlayers.length === gameInfo.numPlayers ? false : true } */}
 			</div>
 			{/* </Link> */}
 
