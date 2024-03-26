@@ -1,52 +1,66 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ChevronUp } from "lucide-react";
 
-function Chat({disabled}) {
+import {
+    Cloud,
+    CreditCard,
+    Github,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    Settings,
+    User,
+    UserPlus,
+    Users,
+  } from "lucide-react"
+
+function Chat() {
 
     return (
 
-        <div className="h-full w-full relative">
+        <div className="flex flex-col h-full w-full bg-white rounded-lg border border-slate-400 overflow-clip">
 
-            {disabled && (
-            
-                <div className="absolute inset-0 bg-slate-900/60 rounded-lg"/>
+            <div className="flex flex-row items-center px-4 py-2 h-[8%] bg-slate-200/70 border-solid border-b border-slate-400">
 
-            )}
+                <div className="h-2 w-2 bg-green-500 rounded mr-3"/>
+                <h2 className="text-sm pr-2">Room Name</h2>
 
-            <Card className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-clip">
-                <div className="h-full">
-                    <CardContent className="px-8 pb-10 pt-6 h-full">
-                        
-                        <div className="h-full w-full pb-8">
-        
-                            <h1 className="text-sm font-medium mb-4">Chat</h1>
+                <DropdownMenu className="relative">
+                    <DropdownMenuTrigger asChild className="aspect-square h-full ml-auto border border-solid border-slate-400">
+                        <Button className="p-0" variant="outline"><Users size={14} /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="absolute -right-4 w-fit border border-solid border-slate-400">
+                        <DropdownMenuLabel>Players</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-slate-300" />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Player</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
-                            <div className="flex flex-col h-full w-full bg-white rounded-lg border border-slate-400 overflow-clip">
+            </div>
 
-                                <div className="flex flex-row items-center py-2 px-3 gap-3 h-[10%] w-full mt-auto bg-slate-300 border-solid border-t border-slate-400">
+            <div className="flex flex-row items-center py-3 px-3 gap-3 h-[10%] w-full mt-auto bg-slate-200 border-solid border-t border-slate-400">
 
-                                    <Input className="h-full w-full bg-slate-50 rounded-full border border-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 pl-[7%]" placeholder="Send a message...">
-                                    
-                                    </Input>
+                <Input className="h-full w-full bg-white rounded-full border border-slate-400 pl-[7%]" placeholder="Send a message..."/>
 
-                                    <Button className="flex aspect-square h-full rounded-full bg-slate-50 items-center justify-center border border-slate-400 p-0 text-slate-900 hover:bg-slate-100 active:bg-slate-200">
+                <Button className="flex aspect-square h-full rounded-full bg-white items-center justify-center border border-slate-400 p-0 text-slate-900 hover:bg-slate-50 active:bg-slate-200">
 
-                                        <ChevronUp size={18} />
+                    <ChevronUp size={18} />
 
-                                    </Button>
+                </Button>
 
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </CardContent>
-                </div>
-            </Card>
+            </div>
 
         </div>
 

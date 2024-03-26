@@ -151,7 +151,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     <div className="w-full h-full">
 
-                        <Chat disabled={!isRoomCreated} />
+                        <Chat />
 
                     </div>
                 
