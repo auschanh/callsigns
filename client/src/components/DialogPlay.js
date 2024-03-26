@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "../components/ui/button";
+import Chat from "./Chat";
 import { useSocketContext } from "../contexts/SocketContext";
 
 import CreateGameForm from "./CreateGameForm";
@@ -103,48 +104,58 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className="flex flex-none flex-col h-[80vh] w-[35vw] p-10 pb-10 overflow-auto gap-8">
+            <DialogContent className="flex flex-none flex-col h-[80vh] w-[50vw] p-10 pb-10 overflow-auto gap-8">
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
 
-                <div className="max-w-full h-full">
+                <div className="flex flex-row h-full gap-6">
 
-                    {/* carousel */}
+                    <div className="flex w-[60%] h-full">
 
-                    <div className="flex h-full w-full items-center">
+                        {/* carousel */}
 
-                        <div className="overflow-hidden relative h-full w-full">
+                        <div className="flex h-full w-full items-center">
 
-                            <div className="flex transition-transform ease-in-out duration-700 h-full" style={{ transform: `translateX(calc(-${currentSlide * 100}% - ${currentSlide * spaceBetweenSlides}rem))`}}>
+                            <div className="overflow-hidden relative h-full w-full">
 
-                                {slides.map((slide, index) => {
+                                <div className="flex transition-transform ease-in-out duration-700 h-full" style={{ transform: `translateX(calc(-${currentSlide * 100}% - ${currentSlide * spaceBetweenSlides}rem))`}}>
 
-                                    return (
+                                    {slides.map((slide, index) => {
 
-                                        <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
-                                            <div className="h-full">
-                                                <CardContent className="px-8 pb-10 pt-6 h-full">
-                                                    {slide.content}
-                                                </CardContent>
-                                            </div>
-                                        </Card>
+                                        return (
 
-                                    )
+                                            <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
+                                                <div className="h-full">
+                                                    <CardContent className="px-8 pb-10 pt-6 h-full">
+                                                        {slide.content}
+                                                    </CardContent>
+                                                </div>
+                                            </Card>
 
-                                })}
+                                        )
+
+                                    })}
+
+                                </div>
 
                             </div>
-
+                            
                         </div>
-                        
+
+                        {/* carousel */}
+
                     </div>
 
-                    {/* carousel */}
+                    <div className="w-full h-full">
 
-                </div>   
+                        <Chat disabled={!isRoomCreated} />
+
+                    </div>
+                
+                </div>
 
             </DialogContent>
             
