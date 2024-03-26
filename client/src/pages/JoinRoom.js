@@ -58,8 +58,16 @@ function JoinRoom() {
 
             (async () => {
 
-                await socket.emit("joinRoom", roomName, username);
-    
+                try {
+
+                    await socket.emit("joinRoom", roomName, username);
+
+                } catch (error) {
+
+                    throw error;
+
+                }
+
             })();
 
         } else {

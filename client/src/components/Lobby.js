@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { DialogFooter } from "./ui/dialog";
-import { Button } from "../components/ui/button";
 import { Link } from 'react-router-dom';
+import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft } from "lucide-react";
@@ -12,45 +11,9 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 	const [totaPlayers, setTotalPlayers] = useState(0);
 
-	const [playersInLobby, setPlayersInLobby] = useState(inLobby);
-
 	const [copied, setCopied] = useState(false);
 
-	const username = gameInfo.username;
-
-	const roomName = gameInfo.roomName;
-
-	useEffect(() => {
-
-        (async () => {
-
-            try {
-
-                await socket.emit("listLobby", setPlayersInLobby);
-
-            } catch (error) {
-
-                throw error;
-
-            }
-
-        })();
-
-        socket.on("joinedLobby", (players) => {
-
-            console.log(players);
-
-			setPlayersInLobby(players);
-
-        });
-
-        return () => {
-
-            socket.removeAllListeners("joinedLobby");
-
-        }
-
-    }, [socket, username, roomName, inLobby]);
+	const [selectedPlayers, setSelectedPlayers] = useState([]);
 
 	const handleCopy = async () => {
 
@@ -82,60 +45,99 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 	}
 
+	const handleSelectPlayer = (player) => {
+
+		if (!selectedPlayers.includes(player)) {
+
+			setSelectedPlayers([...selectedPlayers, player]);
+
+		} else {
+
+			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player }));
+
+		}
+
+	}
+
 	return (
 
-		<>
+		<div className="flex flex-col h-full">
 
 			<div className="flex flex-col bg-slate-200 border-slate-400 rounded-md">
 
-				<div>
+				<div className="flex flex-row justify-between items-center">
 
-					<Button className="px-0 pl-2 pr-4 mb-8" onClick={previousSlide}>
+					<Button className="px-0 pl-2 pr-4 w-fit mb-2" variant="ghost" onClick={previousSlide}>
 						<ChevronLeft size={24} />
 						<p>Edit</p>
 					</Button>
 
-					{/* <div className="justify-center text-center">
-
-						<div className="flex flex-col w-full items-center mb-8">
-
-							<div className="flex p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-								<p className="flex text-xl text-center">{gameInfo.roomName}</p>
-							</div>
-
-						</div>
-
-					</div>
-
-					<div className="block">
-
-						<p>
-							<span className="font-bold">Username: </span> {gameInfo.username}
-						</p>
-
-						<p>
-							<span className="font-bold">Room Name: </span> {gameInfo.roomName}
-						</p>
-
-						<p>
-							<span className="font-bold">Number of Players: </span> {gameInfo.numPlayers}
-						</p>
-
-						<p>
-							<span className="font-bold">AI Players: </span> {gameInfo.aiPlayers}
-						</p>
-
-					</div> */}
+					<h1 className="text-md font-light text-center mb-2">Welcome <span className="text-md font-semibold text-center mb-2">{gameInfo.username}</span>!</h1>
 
 				</div>
 
-				<div className="mt-4 flex gap-x-1">
+				<div className="flex flex-row w-full p-4 mb-6 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950">
 
-					{playersInLobby && playersInLobby.map((player, index) => {
+					<div className="flex flex-col w-full">
+						<p className="font-semibold text-md mb-4">{gameInfo.roomName}</p>
+						<p className="text-sm">Number of Players: {gameInfo.numPlayers}</p>
+						<p className="text-sm">Number of AI Players: {gameInfo.aiPlayers}</p>
+					</div>
+
+				</div>
+
+				<div>
+					<h1 className="text-sm font-semibold mb-2">Link</h1>
+					<div className="flex flex-row items-center w-full p-4 pr-14 mb-6 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
+						<p className="text-sm break-all">{sessionUrl}</p>
+						<Button className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+					</div>
+				</div>
+
+				<div className="flex flex-wrap gap-x-3 gap-y-3">
+
+					{inLobby && inLobby.map((player, index) => {
 
 						return (
 
-							<Badge key={index}>{player}</Badge>
+							<Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" key={index} onClick={() => { handleSelectPlayer(player) }} variant={selectedPlayers.includes(player) ? "greenNoHover" : ""}>
+								<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+									<p className="text-slate-900">{player.charAt(0).toUpperCase()}</p>
+								</div>
+								<p>{player}</p>
+							</Badge>
+
+						);
+
+					})}
+
+					{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
+
+						if (inLobby.length < gameInfo.numPlayers) {
+
+							return (
+
+								<Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="empty" key={index}>
+									<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+									{/* <p>Player {gameInfo.numPlayers - (gameInfo.numPlayers - inLobby.length) + index + 1}</p> */}
+									<p>Player {inLobby.length + index + 1}</p>
+								</Badge>
+	
+							);
+						}
+
+					})}
+
+					{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+
+						return (
+
+							<Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="bot" key={index}>
+								<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+									<p className="text-slate-900">🤖</p>
+								</div>
+								<p>Bot {index + 1}</p>
+							</Badge>
 
 						);
 
@@ -143,29 +145,17 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 				</div>
 
-				{sessionUrl && (
-
-					<>
-						<div>{sessionUrl}</div>
-						<Button className="transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "green" : "default"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
-					</>
-
-				)}
-
-				{/* <div className="border border-black mt-2 max-h-full flex-1 h-auto max-w-screen"></div> */}
-
-
 			</div>
 
-			{/* <DialogFooter>
+			{/* <div className="border border-black mt-2 max-h-full flex-1 h-auto max-w-screen"></div> */}
 
-				<Link to="game">
-					<Button className="mt-4">Start Game</Button>
-				</Link>
+			{/* <Link to="game"> */}
+			<div className="flex flex-row mt-auto w-full justify-end">
+				<Button className="w-24" onClick={() => {console.log(selectedPlayers)}}>Select</Button>
+			</div>
+			{/* </Link> */}
 
-			</DialogFooter> */}
-
-		</>
+		</div>
 
 	);
 };

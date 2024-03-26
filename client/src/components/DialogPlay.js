@@ -35,13 +35,31 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         });
 
+        socket.on("joinedLobby", (players) => {
+
+			setInLobby(players);
+
+        });
+
+		socket.on("leftRoom", (user) => {
+
+			console.log(`${user} has left the lobby`);
+
+            const playersRemaining = inLobby.filter((player) => { return player !== user });
+
+            setInLobby(playersRemaining);
+
+		});
+
         return () => {
 
-            socket.removeAllListeners("getLink");
+            socket.removeAllListeners("getRoomInfo");
+            socket.removeAllListeners("joinedLobby");
+			socket.removeAllListeners("leftRoom");
 
         }
 
-    }, [socket]);
+    }, [socket, inLobby]);
 
     const previousSlide = () => {
         
@@ -85,7 +103,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className="flex flex-none flex-col h-[80vh] w-[35vw] p-10 pb-16 overflow-auto gap-8">
+            <DialogContent className="flex flex-none flex-col h-[80vh] w-[35vw] p-10 pb-10 overflow-auto gap-8">
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>
@@ -126,7 +144,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     {/* carousel */}
 
-                </div>                
+                </div>   
 
             </DialogContent>
             

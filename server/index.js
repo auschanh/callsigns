@@ -108,12 +108,6 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("listLobby", (setPlayersInLobby) => {
-
-        setPlayersInLobby(getPlayersInLobby(socket.id));
-
-    });
-
     socket.on("roomCheck", (roomName, setRoomExists) => {
 
         const check = [...io.sockets.adapter.rooms.keys()].find((room) => {return room === roomName});
@@ -170,9 +164,21 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         leavingRooms.forEach((room) => {
 
+            // if you're the only one left in the room,
             if (io.sockets.adapter.rooms.get(room).size === 1) {
 
-                roomLookup = roomLookup.filter(({roomID}) => {return roomID !== room});
+                // if you're either the host or if you're not then if you joined this room, deregister the room from roomLookup
+                if ((leavingRooms.length === 1 && socket.username !== undefined) || (room !== socket.id)) {
+
+                    roomLookup = roomLookup.filter(({roomID}) => {return roomID !== room});
+
+                    console.log("removed room from roomLookup");
+                    
+                } else {
+
+                    console.log("I was the last one here but this was my own room that no one joined");
+
+                }
 
             } else {
 
