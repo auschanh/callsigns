@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
-function Chat({chatExpanded, gameInfo, inLobby, sessionUrl}) {
+function Chat({ chatExpanded, gameInfo, inLobby, roomID }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -17,7 +17,7 @@ function Chat({chatExpanded, gameInfo, inLobby, sessionUrl}) {
 
     const username = gameInfo?.username;
 
-    const roomName = sessionUrl?.substring(27);
+    const roomName = roomID;
 
     const handleChange = (event) => {
 
@@ -66,6 +66,12 @@ function Chat({chatExpanded, gameInfo, inLobby, sessionUrl}) {
 
     useEffect(() => {
 
+        socket.on("receiveMessage", (messageData) => {
+
+            console.log(messageData);
+
+        });
+
         const listenForKeydown = (event) => {
 
             if (document.activeElement.name === "chat" && event.key === "Enter") {
@@ -78,9 +84,14 @@ function Chat({chatExpanded, gameInfo, inLobby, sessionUrl}) {
 
         document.addEventListener("keydown", listenForKeydown);
 
-        return () => document.removeEventListener("keydown", listenForKeydown);
+        return () => {
 
-    }, [document.activeElement, sendMessage]);
+            socket.removeAllListeners("receiveMessage");
+            document.removeEventListener("keydown", listenForKeydown);
+
+        }
+
+    }, [socket, document.activeElement, sendMessage]);
 
     useEffect(() => {
 

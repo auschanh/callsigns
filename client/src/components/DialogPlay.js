@@ -24,17 +24,21 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     const [inLobby, setInLobby] = useState();
 
+    const [roomID, setRoomID] = useState();
+
     const [isRoomCreated, setIsRoomCreated] = useState(false);
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
     useEffect(() => {
 
-        socket.on("getRoomInfo", (link, roomList) => {
+        socket.on("getRoomInfo", (link, roomList, roomID) => {
 
             setSessionUrl(link);
 
             setInLobby(roomList);
+
+            setRoomID(roomID);
 
         });
 
@@ -151,7 +155,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} gameInfo={gameInfo} inLobby={inLobby} sessionUrl={sessionUrl} />
+                    <Chat chatExpanded={chatExpanded} gameInfo={gameInfo} inLobby={inLobby} roomID={roomID} />
 
                 </div>
 

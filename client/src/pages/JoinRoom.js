@@ -80,12 +80,6 @@ function JoinRoom() {
 
         }
 
-        socket.on("joinedLobby", (players) => {
-
-			console.log("ha it didn't work!");
-
-        });
-
         socket.on("getLobby", (othersInLobby, sessionUrl, roomDetails) => {
 
             if (othersInLobby) {

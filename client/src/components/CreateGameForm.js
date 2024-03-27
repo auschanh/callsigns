@@ -78,7 +78,15 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 
 		setGameInfo(values);
 
-		socket.emit("gameInfo", values, isRoomCreated);
+		try {
+
+			socket.emit("gameInfo", values, isRoomCreated);
+
+		} catch (error) {
+
+			throw error;
+
+		}		
 
 		setIsRoomCreated(true);
 

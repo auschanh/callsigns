@@ -109,7 +109,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         const roomList = getPlayersInLobby(socket.roomID);
 
-        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList);
+        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList, socket.roomID);
 
         console.log(roomLookup);
 
@@ -183,7 +183,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     socket.on("sendMessage", (roomName, messageData) => {
 
-        io.to(roomName).emit("receiveMessage", messageData);
+        socket.to(roomName).emit("receiveMessage", messageData);
 
     })
 

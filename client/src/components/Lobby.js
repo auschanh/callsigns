@@ -133,7 +133,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 					</div>
 				</div>
 
-				<h1 className="text-sm font-semibold mb-2">Select {gameInfo.numPlayers} players for this round:</h1>
+				<h1 className="text-sm font-semibold mb-2">Select {gameInfo.numPlayers} {gameInfo.numPlayers === 1 ? "player" : "players"} for this round:</h1>
 
 				<div className="flex flex-wrap gap-x-3 gap-y-3">
 
