@@ -175,6 +175,12 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
+    socket.on("sendMessage", (roomName, messageData) => {
+
+        io.to(roomName).emit("receiveMessage", messageData);
+
+    })
+
     socket.on("disconnecting", () => {
 
         const leavingRooms = [...socket.rooms];

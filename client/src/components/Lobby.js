@@ -4,9 +4,9 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { SmallSwitch } from "../components/ui/small-switch";
 import { useSocketContext } from "../contexts/SocketContext";
-import { Copy, Check, ChevronLeft } from "lucide-react";
+import { Copy, Check, ChevronLeft, MessageSquare } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatExpanded }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -98,11 +98,17 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide }) {
 
 			<div className="flex flex-col bg-slate-200 border-slate-400 rounded-md">
 
-				<div className="flex flex-row justify-between mb-2">
+				<div className="flex flex-row justify-between mb-2 relative">
 
 					<Button className="px-0 w-fit text-xs" variant="link" onClick={previousSlide}>
 						<ChevronLeft size={20} />
 						<p>Edit</p>
+					</Button>
+
+					<Button className="gap-x-2" variant="border" onClick={() => {setChatExpanded(value => !value)}}>
+						<h2 className="text-xs leading-none m-0 p-0">Chat</h2>
+						<MessageSquare size={14} />
+						<div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-red-500 transition-all duration-1000" ${allowSharing ? "" : "invisible opacity-20"}`}/>
 					</Button>
 
 				</div>

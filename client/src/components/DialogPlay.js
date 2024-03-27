@@ -26,6 +26,8 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     const [isRoomCreated, setIsRoomCreated] = useState(false);
 
+    const [chatExpanded, setChatExpanded] = useState(false);
+
     useEffect(() => {
 
         socket.on("getRoomInfo", (link, roomList) => {
@@ -88,7 +90,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} setChatExpanded={setChatExpanded} />
 
                 )}
 
@@ -104,16 +106,16 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className="flex flex-none flex-col h-[80vh] w-[50vw] p-10 pb-10 overflow-auto gap-8">
+            <DialogContent className={`flex flex-none flex-col h-[80vh] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
 
-                <div className="flex flex-row h-full gap-6">
+                <div className="flex flex-row h-[90%] gap-6">
 
-                    <div className="flex w-[60%] h-full">
+                    <div className={`flex h-full transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60%]" : "w-full"}`}>
 
                         {/* carousel */}
 
@@ -149,12 +151,8 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     </div>
 
-                    <div className="w-full h-full">
+                    <Chat chatExpanded={chatExpanded} gameInfo={gameInfo} inLobby={inLobby} sessionUrl={sessionUrl} />
 
-                        <Chat />
-
-                    </div>
-                
                 </div>
 
             </DialogContent>

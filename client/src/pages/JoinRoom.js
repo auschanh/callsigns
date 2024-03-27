@@ -6,7 +6,6 @@ import { z } from "zod";
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Lobby from "../components/Lobby";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
@@ -98,9 +97,16 @@ function JoinRoom() {
 
         });
 
+        socket.on("receiveMessage", (messageData) => {
+
+            console.log(messageData);
+
+        });
+
         return () => {
 
             socket.removeAllListeners("getLobby");
+            socket.removeAllListeners("receiveMessage");
 
         }
 
