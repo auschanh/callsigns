@@ -33,7 +33,7 @@ function App() {
 
 					<Route exact path="game" element={ <Game /> } />
 
-					<Route exact path="game/:roomName" element={ <JoinRoom /> } />
+					<Route exact path="game/:roomID" element={ <JoinRoom /> } />
 
 					<Route path="*" element={ <Navigate replace to="/" /> } />
 

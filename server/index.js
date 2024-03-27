@@ -125,17 +125,17 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("roomCheck", (roomName, setRoomExists) => {
+    socket.on("roomCheck", (roomID, setRoomName) => {
 
-        const check = [...io.sockets.adapter.rooms.keys()].find((room) => {return room === roomName});
+        const findRoom = roomLookup.find((room) => {return room.roomID === roomID});
 
-        if (check) {
+        if (findRoom) {
 
-            setRoomExists(true);
+            setRoomName(findRoom.roomName);
 
         } else {
 
-            setRoomExists(false);
+            setRoomName(false);
             
         }
 

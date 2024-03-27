@@ -18,7 +18,7 @@ function JoinRoom() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [roomExists, setRoomExists] = useState();
+    const [roomName, setRoomName] = useState();
 
     const [username, setUsername] = useState();
 
@@ -35,11 +35,11 @@ function JoinRoom() {
     const [open, setOpen] = useState(true);
 
     // use %20 in address bar for space
-    let { roomName } = useParams();
+    let { roomID } = useParams();
 
     useEffect(() => {
 
-        if (roomExists === undefined) {
+        if (roomName === undefined) {
 
             console.log("checking room");
 
@@ -47,7 +47,7 @@ function JoinRoom() {
 
                 try {
     
-                    await socket.emit("roomCheck", roomName, setRoomExists);
+                    await socket.emit("roomCheck", roomID, setRoomName);
     
                 } catch (error) {
     
@@ -64,7 +64,7 @@ function JoinRoom() {
 
                 try {
 
-                    await socket.emit("joinRoom", roomName, username);
+                    await socket.emit("joinRoom", roomID, username);
 
                 } catch (error) {
 
@@ -94,7 +94,7 @@ function JoinRoom() {
 
             } else {
 
-                console.log(`could not join room ${roomName}`);
+                console.log(`could not join room ${roomID}`);
 
                 setSuccess(2);
 
@@ -115,7 +115,7 @@ function JoinRoom() {
 
         }
 
-    }, [socket, roomName, username, roomExists]);
+    }, [socket, roomID, username, roomName]);
 
     const form = useForm();
 
@@ -173,7 +173,7 @@ function JoinRoom() {
 
                     <div>
 
-                        <p>{`Joined room ${roomName}`}</p>
+                        <h1>{roomName}</h1>
 
                         {lobby.map((player, index) => {
 
@@ -199,7 +199,7 @@ function JoinRoom() {
 
                     <div>
 
-                        <p>{`Could not join room: ${roomName}`}</p>
+                        <p>{`Could not join room: ${roomID}`}</p>
 
                     </div>
 
@@ -212,14 +212,14 @@ function JoinRoom() {
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent className="gap-0">
 
-                    {roomExists && (
+                    {roomName && (
 
                         <>
 
                             <AlertDialogHeader className="space-y-0 mb-8">
                                 <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    You'll be joining room: {roomName}
+                                    You'll be joining {roomName}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
 
