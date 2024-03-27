@@ -18,7 +18,7 @@ function JoinRoom() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [roomExists, setRoomExists] = useState(false);
+    const [roomExists, setRoomExists] = useState();
 
     const [username, setUsername] = useState();
 
@@ -39,19 +39,24 @@ function JoinRoom() {
 
     useEffect(() => {
 
-        (async () => {
+        if (roomExists === undefined) {
 
-            try {
+            console.log("checking room");
 
-                await socket.emit("roomCheck", roomName, setRoomExists);
+            (async () => {
 
-            } catch (error) {
-
-                throw error;
-
-            }
-
-        })();
+                try {
+    
+                    await socket.emit("roomCheck", roomName, setRoomExists);
+    
+                } catch (error) {
+    
+                    throw error;
+    
+                }
+    
+            })();
+        }
 
         if (username) {
 
@@ -74,6 +79,12 @@ function JoinRoom() {
             console.log("nope");
 
         }
+
+        socket.on("joinedLobby", (players) => {
+
+			console.log("ha it didn't work!");
+
+        });
 
         socket.on("getLobby", (othersInLobby, sessionUrl, roomDetails) => {
 

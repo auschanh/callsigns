@@ -77,9 +77,15 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         if (!isRoomCreated) {
 
+            const roomID = socket.id + Math.floor(Math.random() * 10);
+
+            socket.join(roomID);
+
+            socket.roomID = roomID;
+
             roomLookup.push({
 
-                roomID: socket.id,
+                roomID: roomID,
                 roomName: roomName,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
@@ -89,7 +95,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         } else {
 
-            const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.id});
+            const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.roomID});
 
             findRoom.roomName = roomName;
             findRoom.numPlayers = numPlayers;
@@ -101,9 +107,9 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         getSocketInfo();
 
-        const roomList = getPlayersInLobby(socket.id);
+        const roomList = getPlayersInLobby(socket.roomID);
 
-        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.id}`, roomList);
+        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList);
 
         console.log(roomLookup);
 
@@ -111,7 +117,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     socket.on("allowSharing", (allowSharing) => {
 
-        const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.id});
+        const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.roomID});
 
         findRoom.allowSharing = allowSharing;
 
@@ -165,7 +171,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             }
 
-            io.to(roomName).emit("joinedLobby", roomList);
+            socket.to(roomName).emit("joinedLobby", roomList);
 
         } else {
 
@@ -192,8 +198,8 @@ io.on("connection", (socket) => { // every connection has a unique socket id
             // if you're the only one left in the room,
             if (io.sockets.adapter.rooms.get(room).size === 1) {
 
-                // if you're either the host or if you're not then if you joined this room, deregister the room from roomLookup
-                if ((leavingRooms.length === 1 && socket.username !== undefined) || (room !== socket.id)) {
+                // if you joined this room, deregister the room from roomLookup
+                if (room !== socket.id) {
 
                     roomLookup = roomLookup.filter(({roomID}) => {return roomID !== room});
 
@@ -208,7 +214,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
             } else {
 
                 // ---------------------------------------------------------
-                socket.broadcast.to(room).emit("leftRoom", socket.username);
+                socket.to(room).emit("leftRoom", socket.username);
                 // ---------------------------------------------------------
 
             }
