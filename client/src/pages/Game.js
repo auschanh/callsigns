@@ -8,6 +8,8 @@ const Game = function (props) {
   const [word, setWord] = useState("");
   const [generatedWords, setGeneratedWords] = useState([]);
   const [guess, setGuess] = useState("");
+  const [correctGuess, setCorrectGuess] = useState(false);
+  const [errMsg, setErrMsg] = useState(false);
 
   const generateWord = async () => {
     // get word from word bank in backend
@@ -17,6 +19,8 @@ const Game = function (props) {
       const retrievedWord = response.data;
 
       if (!generatedWords.includes(retrievedWord)) {
+        setCorrectGuess(false);
+        setErrMsg(false);
         setWord(retrievedWord);
         setGeneratedWords([...generatedWords, retrievedWord]);
         // send to backend
@@ -29,16 +33,21 @@ const Game = function (props) {
 
   const handleChange = (e) => {
     setGuess(e.target.value);
+    setCorrectGuess(false);
+    setErrMsg(false);
   };
 
   const checkGuesserWord = () => {
-    const checkGuess = guess.toLowerCase();
-    console.log(checkGuess);
-    const checkWord = word.toLowerCase();
-    console.log(checkWord);
+    const checkGuess = guess.toLowerCase().trim();
+    if (!/^[a-z]+$/.test(checkGuess)) {
+      // should not console log if all lower case, one word and no special chars
+      setErrMsg(true);
+      console.log("Guessed word contains spaces or special characters");
+    }
+    const checkWord = word.toLowerCase().trim();
     if (checkGuess === checkWord) {
       setGuess(checkGuess);
-      console.log("guessed the word!");
+      setCorrectGuess(true);
     }
   };
 
@@ -72,6 +81,14 @@ const Game = function (props) {
             Guess
           </Button>
           {guess && <div>{guess}</div>}
+          {correctGuess && (
+            <div className="text-green-600">{`Guesser got the mystery word: ${guess}`}</div>
+          )}
+        </div>
+      )}
+      {errMsg && (
+        <div className="text-red-600">
+          Guess cannot contain numbers, special characters or spaces.
         </div>
       )}
     </div>
