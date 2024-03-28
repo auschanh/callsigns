@@ -110,7 +110,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className={`flex flex-none flex-col h-[80vh] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
+            <DialogContent className={`flex flex-none flex-col h-[85vh] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>
@@ -155,7 +155,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} gameInfo={gameInfo} inLobby={inLobby} roomID={roomID} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} isHost={true} />
 
                 </div>
 

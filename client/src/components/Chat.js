@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
-function Chat({ chatExpanded, gameInfo, inLobby, roomID }) {
+function Chat({ chatExpanded, username, roomName, inLobby, roomID, isHost }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -14,10 +14,6 @@ function Chat({ chatExpanded, gameInfo, inLobby, roomID }) {
     const [messageList, setMessageList] = useState([]);
 
     const lastMessageRef = useRef(null);
-
-    const username = gameInfo?.username;
-
-    const roomName = roomID;
 
     const handleChange = (event) => {
 
@@ -49,7 +45,7 @@ function Chat({ chatExpanded, gameInfo, inLobby, roomID }) {
 
             try {
 
-                await socket.emit("sendMessage", roomName, messageData);
+                await socket.emit("sendMessage", roomID, messageData);
 
             } catch (error) {
 
@@ -106,7 +102,7 @@ function Chat({ chatExpanded, gameInfo, inLobby, roomID }) {
             <div className={`flex flex-row items-center mb-1 px-4 py-2 h-[10%] bg-slate-200/70 border-solid border-b border-slate-400`}>
 
                 <div className="h-2 w-2 bg-green-500 rounded mr-3"/>
-                <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{gameInfo && gameInfo.roomName}</h2>
+                <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{roomName}</h2>
 
                 <DropdownMenu className="relative">
                     <DropdownMenuTrigger asChild className="aspect-square h-full ml-auto border border-solid border-slate-400">

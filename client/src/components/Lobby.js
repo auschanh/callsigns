@@ -108,12 +108,12 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 					<Button className="gap-x-2" variant="border" onClick={() => {setChatExpanded(value => !value)}}>
 						<h2 className="text-xs leading-none m-0 p-0">Chat</h2>
 						<MessageSquare size={14} />
-						<div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-red-500 transition-all duration-1000" ${allowSharing ? "" : "invisible opacity-20"}`}/>
+						<div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${allowSharing ? "" : "invisible opacity-20"}`}/>
 					</Button>
 
 				</div>
 
-				<p className="font-semibold text-lg mb-6 border border-b-slate-900">{gameInfo.roomName}</p>
+				<h1 className="font-semibold text-lg mb-6 border border-b-slate-900">{gameInfo.roomName}</h1>
 
 				<div className="mb-6">
 					<div className="flex flex-row items-center mb-2">

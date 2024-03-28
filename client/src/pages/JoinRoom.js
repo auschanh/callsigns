@@ -6,12 +6,13 @@ import { z } from "zod";
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import Chat from "../components/Chat";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, MessageSquare } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
 function JoinRoom() {
@@ -26,11 +27,17 @@ function JoinRoom() {
 
     const [lobby, setLobby] = useState();
 
+    const [selectedPlayers, setSelectedPlayers] = useState([]);
+
     const [sessionUrl, setSessionUrl] = useState();
 
     const [copied, setCopied] = useState(false);
 
     const [roomDetails, setRoomDetails] = useState();
+
+    const [isReady, setIsReady] = useState(false);
+
+    const [chatExpanded, setChatExpanded] = useState(false);
 
     const [open, setOpen] = useState(true);
 
@@ -180,51 +187,128 @@ function JoinRoom() {
 
 	}
 
+    const handleReady = () => {
+
+        setIsReady(!isReady);
+
+        // socket.emit("playerIsReady");
+
+    }
+
 	return (
 
         <>
 
             <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
 
-                <div className="h-[80vh] w-[60vw] bg-slate-50 border rounded-3xl p-12">
+                <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-3xl p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
-                <h1 className="font-semibold text-2xl">Join A Game</h1>
+                    {success === 1 && (
 
-                {success === 1 && (
+                        <div className="flex flex-row h-full w-full gap-6">
 
-                    <div>
+                            <div className={`flex flex-col flex-none h-full gap-6 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60%]" : "w-full"}`}>
 
-                        <h1>{roomName}</h1>
+                                <div className="flex flex-row items-end w-full">
 
-                        {lobby.map((player, index) => {
+                                    <h1 className="font-semibold text-xl underline">{roomName}</h1>
 
-                            return (
+                                    <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={() => {setChatExpanded(value => !value)}}>
+                                        <h2 className="text-xs leading-none m-0 p-0">Chat</h2>
+                                        <MessageSquare size={14} />
+                                        <div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${isReady ? "" : "invisible opacity-20"}`}/>
+                                    </Button>
 
-                                <Badge key={index}>{player}</Badge>
+                                </div>
 
-                            );
+                                <div>
 
-                        })}
+                                    <div className="mb-6">
+                                        <div className="flex flex-row items-center mb-2">
+                                            <h1 className="text-sm font-semibold">Link</h1>
+                                        </div>
+                                        <div className="flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
+                                            <p className="text-sm break-all">{sessionUrl}</p>
+                                            <Button className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+                                        </div>
+                                    </div>
 
-                        <p>{sessionUrl}</p>
-                        <Button className="transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "green" : "default"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+                                    <h1 className="text-sm font-semibold mb-2">The host is selecting the players for this round:</h1>
 
-                        <p>{roomDetails.roomID}</p>
-                        <p>{roomDetails.roomName}</p>
-                        <p>{roomDetails.numPlayers}</p>
-                        <p>{roomDetails.aiPlayers}</p>
+                                    <div className="flex flex-wrap gap-x-3 gap-y-3">
 
-                    </div>
+                                        {lobby.map((player, index) => {
 
-                ) || success === 2 && (
+                                            return (
 
-                    <div>
+                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" 
+                                                    key={index} 
+                                                    variant={player === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player) ? "greenNoHover" : ""}
+                                                >
+                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                        <p className="text-slate-900">{player.charAt(0).toUpperCase()}</p>
+                                                    </div>
+                                                    <p>{player}</p>
+                                                </Badge>
 
-                        <p>{`Could not join room: ${roomID}`}</p>
+                                            );
 
-                    </div>
+                                        })}
 
-                )} 
+                                        {lobby && Array.from({ length: roomDetails.numPlayers - lobby.length }, (_, index) => {
+
+                                            if (lobby.length < roomDetails.numPlayers) {
+
+                                                return (
+
+                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="empty" key={index}>
+                                                        <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+                                                        <p>Player {lobby.length + index + 1}</p>
+                                                    </Badge>
+                        
+                                                );
+                                            }
+
+                                        })}
+
+                                        {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+
+                                            return (
+
+                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="bot" key={index}>
+                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                        <p className="text-slate-900">🤖</p>
+                                                    </div>
+                                                    <p>Bot {index + 1}</p>
+                                                </Badge>
+
+                                            );
+
+                                        })}
+
+                                    </div>
+
+                                </div>
+
+                                <div className="flex flex-row mt-auto w-full justify-end">
+                                    <Button className="w-25" onClick={handleReady} variant={ isReady ? "greenNoHover": "default" }>{ isReady ? "Ready!" : "Ready Up" }</Button>
+                                </div>
+
+                            </div>
+
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} isHost={false} />
+
+                        </div>
+
+                    ) || success === 2 && (
+
+                        <div>
+
+                            <p>{`Could not join room: ${roomID}`}</p>
+
+                        </div>
+
+                    )} 
 
                 </div>
 

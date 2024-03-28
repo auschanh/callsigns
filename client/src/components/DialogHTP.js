@@ -209,7 +209,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center mt-20">
+            <div className="flex flex-col w-full items-center mt-12">
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
