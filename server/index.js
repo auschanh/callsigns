@@ -133,9 +133,17 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             setRoomName(findRoom.roomName);
 
+            const roomList = getPlayersInLobby(roomID);
+
+            console.log("players in " + findRoom.roomName + ": " + roomList);
+
+            socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
+
         } else {
 
             setRoomName(false);
+
+            socket.emit("roomExists");
             
         }
 
@@ -149,27 +157,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         socket.join(roomName);
 
-        const roomList = getPlayersInLobby(roomName);
-
-        console.log("players in " + roomName + ": " + roomList);
-
         getSocketInfo();
 
-        const roomDetails = roomLookup.find(({roomID}) => {return roomID === roomName});
+        const roomList = getPlayersInLobby(roomName);
 
-        const lobby = io.sockets.adapter.rooms.get(roomName);
+        if (roomList.includes(username)) {
 
-        if (lobby.has(socket.id)) {
-
-            if (roomDetails.allowSharing) {
-
-                socket.emit("getLobby", roomList, `http://localhost:3000/game/${roomName}`, roomDetails);
-
-            } else {
-
-                socket.emit("getLobby", roomList, "", roomDetails);
-
-            }
+            socket.emit("getLobby", roomList);
 
             socket.to(roomName).emit("joinedLobby", roomList);
 

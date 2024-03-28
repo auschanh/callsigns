@@ -80,7 +80,7 @@ function JoinRoom() {
 
         }
 
-        socket.on("getLobby", (othersInLobby, sessionUrl, roomDetails) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails) => {
 
             if (othersInLobby) {
 
@@ -102,6 +102,22 @@ function JoinRoom() {
 
         });
 
+        socket.on("getLobby", (othersInLobby) => {
+
+            if (othersInLobby) {
+
+                setLobby(othersInLobby);
+
+            } else {
+
+                console.log(`could not join room ${roomID}`);
+
+                setSuccess(2);
+
+            }
+
+        });
+
         socket.on("receiveMessage", (messageData) => {
 
             console.log(messageData);
@@ -110,6 +126,7 @@ function JoinRoom() {
 
         return () => {
 
+            socket.removeAllListeners("roomExists");
             socket.removeAllListeners("getLobby");
             socket.removeAllListeners("receiveMessage");
 
@@ -121,11 +138,15 @@ function JoinRoom() {
 
     function onSubmit(values) {
 
-		console.log(values.username);
+        if (values.username !== "") {
 
-        setUsername(values.username);
+            console.log(values.username);
 
-        setOpen(false);
+            setUsername(values.username);
+
+            setOpen(false);
+
+        }
 
 	}
 
