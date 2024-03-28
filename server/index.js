@@ -17,6 +17,8 @@ app.use(cors());
 
 app.use(express.json());
 
+const { csvJSON } = require("./words/convertCsv");
+
 server.listen(3001, () => {
   console.log("SERVER RUNNING");
 });
@@ -31,15 +33,22 @@ app.get("/getMysteryWord", (req, res) => {
   res.status(200).send(mysteryWord);
 });
 
+app.post("/newJsonFile", (req, res) => {
+  const newList = JSON.parse(csvJSON());
+  const newListWord = newList[Math.floor(Math.random() * newList.length)].word;
+  console.log(newListWord);
+  res.status(200);
+});
+
 const getMysteryWord = () => {
-  console.log(wordFile.length);
   const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
+  console.log(randomWord);
   return randomWord;
 };
 
 io.on("connection", (socket) => {
   // every connection has a unique socket id
-  console.log(`User Connecetd: ${socket.id}`); // prints socket id of connection
+  console.log(`User Connected: ${socket.id}`); // prints socket id of connection
 
   socket.on("disconnect", () => {
     console.log("User Disconnected: ", socket.id);
