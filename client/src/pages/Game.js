@@ -3,6 +3,8 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import axios from "axios";
+import { stemmer } from "stemmer";
+import pluralize from "pluralize";
 
 const Game = function (props) {
   const [word, setWord] = useState("");
@@ -43,12 +45,21 @@ const Game = function (props) {
   const checkGuesserWord = (e) => {
     setClicked(true);
     const checkGuess = guess.toLowerCase().trim();
+    const stemmedGuess = stemmer(checkGuess);
+    let singularGuess = "";
     if (!/^[a-z]+$/.test(checkGuess)) {
       // should not console log if all lower case, one word and no special chars
       setErrMsg(true);
+    } else {
+      singularGuess = pluralize.singular(stemmedGuess);
+      console.log(
+        "Your guessed word after stemming and singulrize: ",
+        singularGuess
+      );
     }
-    const checkWord = word.toLowerCase().trim();
-    if (checkGuess === checkWord) {
+    const checkWord = pluralize.singular(stemmer(word.toLowerCase().trim()));
+    console.log("Word in our dictionary: ", checkWord);
+    if (singularGuess === checkWord) {
       setGuess(checkGuess);
       setCorrectGuess(true);
     } else {
@@ -65,6 +76,7 @@ const Game = function (props) {
         <Button
           className="border-2 border-blue-600 text-white"
           onClick={generateWord}
+          tabIndex="0"
         >
           Generate a Word
         </Button>
@@ -76,28 +88,33 @@ const Game = function (props) {
           <Label htmlFor="guess">Guess the word</Label>
           <Input
             id="guess"
+            tabIndex="0"
             value={guess}
             placeholder="mystery word"
             onChange={(e) => {
               handleChange(e);
             }}
           />
-          <Button variant="green" htmlFor="guess" onClick={checkGuesserWord}>
+          <Button
+            variant="green"
+            htmlFor="guess"
+            onClick={checkGuesserWord}
+            tabIndex="0"
+          >
             Guess
           </Button>
           {guess && <div>{guess}</div>}
-          {correctGuess === true && clicked ? (
-            <div className="text-green-600">{`Guesser got the mystery word: ${guess}`}</div>
-          ) : correctGuess === false && clicked ? (
-            <div className="text-red-600">Guess was incorrect.</div>
-          ) : null}
         </div>
       )}
-      {errMsg && (
+      {correctGuess === true && clicked ? (
+        <div className="text-green-600">{`Guesser got the mystery word: ${guess}`}</div>
+      ) : errMsg === true ? (
         <div className="text-red-600">
           Guess cannot contain numbers, special characters or spaces.
         </div>
-      )}
+      ) : correctGuess === false && clicked ? (
+        <div className="text-red-600">Guess was incorrect.</div>
+      ) : null}
     </div>
   );
 };
