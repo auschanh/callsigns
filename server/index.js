@@ -59,15 +59,18 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     const usernameLookup = (lobbyArray) => {
 
-        const usernames = lobbyArray.map((socketID) => {
+        return usernames = lobbyArray.map((socketID) => {
 
             let foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {return socketObj.id === socketID});
 
-            return foundSocket.username;
+            return {
+
+                playerName: foundSocket.username,
+                isReady: foundSocket.isReady
+
+            }
 
         });
-
-        return usernames;
 
     }
 
@@ -83,10 +86,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             socket.roomID = roomID;
 
+            socket.isReady = true;
+
             roomLookup.push({
 
                 roomID: roomID,
                 roomName: roomName,
+                host: socket.id,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
                 allowSharing: false
@@ -157,11 +163,15 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         socket.join(roomName);
 
+        socket.roomID = roomName;
+
+        socket.isReady = false;
+
         getSocketInfo();
 
         const roomList = getPlayersInLobby(roomName);
 
-        if (roomList.includes(username)) {
+        if (roomList.some(({playerName}) => { return playerName === username})) {      
 
             socket.emit("getLobby", roomList);
 
@@ -175,11 +185,19 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
+    socket.on("sendIsReady", (roomID, username) => {
+
+        socket.isReady = !socket.isReady;
+
+        socket.to(roomID).emit("receiveIsReady", username, socket.isReady);
+
+    });
+
     socket.on("sendMessage", (roomName, messageData) => {
 
         socket.to(roomName).emit("receiveMessage", messageData);
 
-    })
+    });
 
     socket.on("disconnecting", () => {
 

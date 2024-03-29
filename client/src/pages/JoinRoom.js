@@ -125,9 +125,24 @@ function JoinRoom() {
 
         });
 
-        socket.on("receiveMessage", (messageData) => {
+        socket.on("receiveIsReady", (username, isReady) => {
 
-            console.log(messageData);
+            setLobby(
+
+                lobby.map((player) => {
+
+                    if (player.playerName === username) {
+
+                        return {...player, isReady: isReady };
+
+                    } else {
+
+                        return player;
+
+                    }
+
+                })
+            );
 
         });
 
@@ -135,7 +150,7 @@ function JoinRoom() {
 
             socket.removeAllListeners("roomExists");
             socket.removeAllListeners("getLobby");
-            socket.removeAllListeners("receiveMessage");
+            socket.removeAllListeners("receiveIsReady");
 
         }
 
@@ -191,7 +206,15 @@ function JoinRoom() {
 
         setIsReady(!isReady);
 
-        // socket.emit("playerIsReady");
+        try {
+
+            socket.emit("sendIsReady", roomID, username);
+
+        } catch (error) {
+
+            throw error;
+
+        }
 
     }
 
@@ -201,7 +224,7 @@ function JoinRoom() {
 
             <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
 
-                <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-3xl p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
+                <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
                     {success === 1 && (
 
@@ -241,14 +264,19 @@ function JoinRoom() {
 
                                             return (
 
-                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" 
+                                                <Badge 
                                                     key={index} 
-                                                    variant={player === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player) ? "greenNoHover" : ""}
+
+                                                    // change these when you get the isReady state for all the players ------------------------------------------------------------------------------
+                                                    className={`flex px-3 py-2 h-10 rounded-lg items-center ${isReady ? "cursor-pointer" : ""}`}
+                                                    variant={player.playerName === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player.playerName) ? "greenNoHover" : ""}
+
+
                                                 >
                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        <p className="text-slate-900">{player.charAt(0).toUpperCase()}</p>
+                                                        <p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
                                                     </div>
-                                                    <p>{player}</p>
+                                                    <p>{player.playerName}</p>
                                                 </Badge>
 
                                             );
@@ -296,7 +324,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} isHost={false} />
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} />
 
                         </div>
 

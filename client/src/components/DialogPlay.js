@@ -42,9 +42,9 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         });
 
-        socket.on("joinedLobby", (players) => {
+        socket.on("joinedLobby", (roomList) => {
 
-			setInLobby(players);
+			setInLobby(roomList);
 
         });
 
@@ -52,17 +52,39 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
 			console.log(`${user} has left the lobby`);
 
-            const playersRemaining = inLobby.filter((player) => { return player !== user });
+            const playersRemaining = inLobby.filter(({playerName}) => { return playerName !== user });
 
             setInLobby(playersRemaining);
 
 		});
+
+        socket.on("receiveIsReady", (username, isReady) => {
+
+            setInLobby(
+
+                inLobby.map((player) => {
+
+                    if (player.playerName === username) {
+
+                        return {...player, isReady: isReady };
+
+                    } else {
+
+                        return player;
+
+                    }
+
+                })
+            );
+
+        });
 
         return () => {
 
             socket.removeAllListeners("getRoomInfo");
             socket.removeAllListeners("joinedLobby");
 			socket.removeAllListeners("leftRoom");
+            socket.removeAllListeners("receiveIsReady");
 
         }
 
@@ -155,7 +177,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} isHost={true} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} />
 
                 </div>
 

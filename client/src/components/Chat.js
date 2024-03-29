@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
-function Chat({ chatExpanded, username, roomName, inLobby, roomID, isHost }) {
+function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -66,6 +66,8 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, isHost }) {
 
             console.log(messageData);
 
+            setMessageList((list) => [...list, messageData]);
+
         });
 
         const listenForKeydown = (event) => {
@@ -115,13 +117,13 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, isHost }) {
                             
                             {inLobby && (
 
-                                inLobby.map((player, index) => {
+                                inLobby.map(({playerName}, index) => {
 
                                     return (
 
                                         <DropdownMenuItem key={index} className="flex flex-row flex-none">
                                             <User className="flex flex-none mr-2 h-4 w-4" />
-                                            <h2 className="flex break-all">{player}</h2>
+                                            <h2 className="flex break-all">{playerName}</h2>
                                         </DropdownMenuItem>
 
                                     );
@@ -138,7 +140,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, isHost }) {
 
             <div className="flex flex-col h-full w-full overflow-hidden">
 
-                <div className="flex flex-col w-full h-full p-3 overflow-y-scroll overflow-x-hidden">
+                <div className="flex flex-col w-full h-full py-4 pr-3 pl-5 overflow-y-scroll overflow-x-hidden">
 
                     {messageList.map((messageContent, index) => {
 

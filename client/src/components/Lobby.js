@@ -10,8 +10,6 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [totaPlayers, setTotalPlayers] = useState(0);
-
 	const [allowSharing, setAllowSharing] = useState(false);
 
 	const [copied, setCopied] = useState(false);
@@ -22,13 +20,27 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 		selectedPlayers.forEach((player) => {
 
-			if (!inLobby.includes(player)) {
+			if (!inLobby.some(({playerName}) => { return playerName === player })) {
 
 				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player }));
 
 			}
 
 		});
+
+		if (inLobby) {
+
+			inLobby.forEach((player) => {
+
+				if (!player.isReady) {
+	
+					setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+	
+				}
+	
+			});
+
+		}
 
 	}, [inLobby]);
 
@@ -80,13 +92,23 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 	const handleSelectPlayer = (player) => {
 
-		if (!selectedPlayers.includes(player)) {
+		if (player.isReady) {
 
-			setSelectedPlayers([...selectedPlayers, player]);
+			console.log("sure " + player + " is ready");
+
+			if (!selectedPlayers.includes(player.playerName)) {
+
+				setSelectedPlayers([...selectedPlayers, player.playerName]);
+	
+			} else {
+	
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+	
+			}
 
 		} else {
 
-			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player }));
+			console.log(player.playerName + " is not ready");
 
 		}
 
@@ -141,11 +163,16 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 						return (
 
-							<Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" key={index} onClick={() => { handleSelectPlayer(player) }} variant={selectedPlayers.includes(player) ? "greenNoHover" : ""}>
+							<Badge 
+								key={index} 
+								className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
+								onClick={() => { handleSelectPlayer(player) }} 
+								variant={player.isReady ? (selectedPlayers.includes(player.playerName) ? "greenNoHover" : "default") : "disabled"}
+							>
 								<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-									<p className="text-slate-900">{player.charAt(0).toUpperCase()}</p>
+									<p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
 								</div>
-								<p>{player}</p>
+								<p>{player.playerName}</p>
 							</Badge>
 
 						);
@@ -160,7 +187,6 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 								<Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="empty" key={index}>
 									<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-									{/* <p>Player {gameInfo.numPlayers - (gameInfo.numPlayers - inLobby.length) + index + 1}</p> */}
 									<p>Player {inLobby.length + index + 1}</p>
 								</Badge>
 	
