@@ -8,11 +8,13 @@ const Game = function (props) {
   const [word, setWord] = useState("");
   const [generatedWords, setGeneratedWords] = useState([]);
   const [guess, setGuess] = useState("");
-  const [correctGuess, setCorrectGuess] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  const [correctGuess, setCorrectGuess] = useState(null);
   const [errMsg, setErrMsg] = useState(false);
 
   const generateWord = async () => {
     // get word from word bank in backend
+    setClicked(false);
     const url = "http://localhost:3001/getMysteryWord";
     try {
       const response = await axios.get(url);
@@ -32,22 +34,25 @@ const Game = function (props) {
   };
 
   const handleChange = (e) => {
+    setClicked(false);
     setGuess(e.target.value);
     setCorrectGuess(false);
     setErrMsg(false);
   };
 
-  const checkGuesserWord = () => {
+  const checkGuesserWord = (e) => {
+    setClicked(true);
     const checkGuess = guess.toLowerCase().trim();
     if (!/^[a-z]+$/.test(checkGuess)) {
       // should not console log if all lower case, one word and no special chars
       setErrMsg(true);
-      console.log("Guessed word contains spaces or special characters");
     }
     const checkWord = word.toLowerCase().trim();
     if (checkGuess === checkWord) {
       setGuess(checkGuess);
       setCorrectGuess(true);
+    } else {
+      setCorrectGuess(false);
     }
   };
 
@@ -81,9 +86,11 @@ const Game = function (props) {
             Guess
           </Button>
           {guess && <div>{guess}</div>}
-          {correctGuess && (
+          {correctGuess === true && clicked ? (
             <div className="text-green-600">{`Guesser got the mystery word: ${guess}`}</div>
-          )}
+          ) : correctGuess === false && clicked ? (
+            <div className="text-red-600">Guess was incorrect.</div>
+          ) : null}
         </div>
       )}
       {errMsg && (
