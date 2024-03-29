@@ -146,7 +146,18 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
 
                         return (
 
-                            <div key={index} className={`flex flex-col w-full mb-4 ${username === messageContent.author ? "items-end" : "items-start"}`}>
+                            <div key={index} className={`flex flex-col w-full gap-2 ${username === messageContent.author ? "mb-4 items-end" : "mb-6 items-start"}`}>
+
+                                {(username !== messageContent.author) && (
+                                    
+                                    <div className="mr-1">
+
+                                        <p className="leading-none text-xs">{messageContent.author}</p>
+
+                                    </div>
+                                
+                                
+                                )}
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
 
@@ -154,7 +165,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
 
                                 </div>
 
-                                <div className="mt-1 mr-1">
+                                <div className="mr-1">
 
                                     <p className="leading-none text-xs">{messageContent.time}</p>
 

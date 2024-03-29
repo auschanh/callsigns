@@ -92,7 +92,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
                 roomID: roomID,
                 roomName: roomName,
-                host: socket.id,
+                host: username,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
                 allowSharing: false
@@ -141,7 +141,9 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             const roomList = getPlayersInLobby(roomID);
 
-            console.log("players in " + findRoom.roomName + ": " + roomList);
+            console.log("players in " + findRoom.roomName + ": ");
+
+            console.log(roomList);
 
             socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
 
@@ -185,11 +187,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("sendIsReady", (roomID, username) => {
+    socket.on("sendIsReady", (roomID) => {
 
         socket.isReady = !socket.isReady;
 
-        socket.to(roomID).emit("receiveIsReady", username, socket.isReady);
+        const roomList = getPlayersInLobby(roomID);
+
+        io.to(roomID).emit("receiveIsReady", roomList);
 
     });
 

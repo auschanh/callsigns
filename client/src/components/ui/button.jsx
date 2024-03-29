@@ -25,6 +25,7 @@ const buttonVariants = cva(
         grey: "bg-slate-500 text-slate-50 hover:bg-slate-500/80 dark:bg-slate-900 dark:text-slate-50 dark:hover:bg-slate-900/90", 
         amber: "bg-amber-500 text-slate-50 hover:bg-amber-500/80 dark:bg-amber-900 dark:text-slate-50 dark:hover:bg-amber-900/90", 
         border: "border border-slate-400 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+        indigo: "bg-indigo-600 text-slate-50 hover:bg-indigo-600/90 dark:bg-indigo-50 dark:text-slate-900 dark:hover:bg-indigo-50/90",
       },
       size: {
         default: "h-10 px-4 py-2",

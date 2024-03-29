@@ -58,24 +58,9 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
 		});
 
-        socket.on("receiveIsReady", (username, isReady) => {
+        socket.on("receiveIsReady", (roomList) => {
 
-            setInLobby(
-
-                inLobby.map((player) => {
-
-                    if (player.playerName === username) {
-
-                        return {...player, isReady: isReady };
-
-                    } else {
-
-                        return player;
-
-                    }
-
-                })
-            );
+            setInLobby(roomList);
 
         });
 

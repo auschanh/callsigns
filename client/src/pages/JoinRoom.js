@@ -12,6 +12,7 @@ import { Button } from "../components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Copy, Check, MessageSquare } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
@@ -65,7 +66,9 @@ function JoinRoom() {
             })();
         }
 
-        if (username) {
+        if (username && !lobby.find(({playerName}) => { return playerName === username })) {
+
+            console.log("username triggered");
 
             (async () => {
 
@@ -125,24 +128,23 @@ function JoinRoom() {
 
         });
 
-        socket.on("receiveIsReady", (username, isReady) => {
+        socket.on("joinedLobby", (roomList) => {
 
-            setLobby(
+			setLobby(roomList);
 
-                lobby.map((player) => {
+        });
 
-                    if (player.playerName === username) {
+        socket.on("leftRoom", (user) => {
 
-                        return {...player, isReady: isReady };
+			console.log(`${user} has left the lobby`);
 
-                    } else {
+            setLobby(lobby.filter(({playerName}) => { return playerName !== user}));
 
-                        return player;
+		});
 
-                    }
+        socket.on("receiveIsReady", (roomList) => {
 
-                })
-            );
+            setLobby(roomList);
 
         });
 
@@ -150,16 +152,19 @@ function JoinRoom() {
 
             socket.removeAllListeners("roomExists");
             socket.removeAllListeners("getLobby");
+            socket.removeAllListeners("joinedLobby");
+            socket.removeAllListeners("leftRoom");
             socket.removeAllListeners("receiveIsReady");
 
         }
 
-    }, [socket, roomID, username, roomName]);
+    }, [socket, roomID, username, roomName, lobby]);
 
     const form = useForm();
 
     function onSubmit(values) {
 
+        // cannot enter an existing username
         if (values.username !== "") {
 
             console.log(values.username);
@@ -208,7 +213,7 @@ function JoinRoom() {
 
         try {
 
-            socket.emit("sendIsReady", roomID, username);
+            socket.emit("sendIsReady", roomID);
 
         } catch (error) {
 
@@ -256,31 +261,65 @@ function JoinRoom() {
                                         </div>
                                     </div>
 
-                                    <h1 className="text-sm font-semibold mb-2">The host is selecting the players for this round:</h1>
+                                    <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting the players for this round:`}</h1>
 
                                     <div className="flex flex-wrap gap-x-3 gap-y-3">
 
-                                        {lobby.map((player, index) => {
+                                        {lobby?.map((player, index) => {
 
-                                            return (
+                                            if (player.playerName === roomDetails.host) {
 
-                                                <Badge 
-                                                    key={index} 
+                                                return (
 
-                                                    // change these when you get the isReady state for all the players ------------------------------------------------------------------------------
-                                                    className={`flex px-3 py-2 h-10 rounded-lg items-center ${isReady ? "cursor-pointer" : ""}`}
-                                                    variant={player.playerName === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player.playerName) ? "greenNoHover" : ""}
+                                                    <TooltipProvider key={index}>                      
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button 
+                                                                    className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
+                                                                    variant="indigo"
+                                                                >
+                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                        <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+                                                                    </div>
+                                                                    <p className="text-xs">{player.playerName}</p>
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p className="font-semibold">{`👑 Host`}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
 
+                                                )
 
-                                                >
-                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        <p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
-                                                    </div>
-                                                    <p>{player.playerName}</p>
-                                                </Badge>
+                                            } else {
 
-                                            );
+                                                return (
 
+                                                    <Badge 
+                                                        key={index} 
+    
+                                                        // change these when you get the isReady state for all the players ------------------------------------------------------------------------------
+                                                        className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
+                                                        // variant={player.playerName === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player.playerName) ? "greenNoHover" : ""}
+                                                        variant={
+                                                            selectedPlayers.includes(player.playerName) 
+                                                                ? "greenNoHover" 
+                                                                : 
+                                                                    player.isReady 
+                                                                    ? "default" 
+                                                                    : "disabled"
+                                                        }
+    
+                                                    >
+                                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                            <p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
+                                                        </div>
+                                                        <p>{player.playerName}</p>
+                                                    </Badge>
+    
+                                                );
+                                            }
                                         })}
 
                                         {lobby && Array.from({ length: roomDetails.numPlayers - lobby.length }, (_, index) => {
