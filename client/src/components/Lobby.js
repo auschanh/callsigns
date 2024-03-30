@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { SmallSwitch } from "../components/ui/small-switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft, MessageSquare } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatExpanded }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -28,19 +29,15 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 		});
 
-		if (inLobby) {
+		inLobby?.forEach((player) => {
 
-			inLobby.forEach((player) => {
+			if (selectedPlayers.includes(player.playerName) && !player.isReady) {
 
-				if (!player.isReady) {
-	
-					setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
-	
-				}
-	
-			});
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
 
-		}
+			} 
+
+		});
 
 	}, [inLobby]);
 
@@ -127,10 +124,10 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 						<p>Edit</p>
 					</Button>
 
-					<Button className="gap-x-2" variant="border" onClick={() => {setChatExpanded(value => !value)}}>
+					<Button className="gap-x-2" variant="border" onClick={handleChatExpansion}>
 						<h2 className="text-xs leading-none m-0 p-0">Chat</h2>
 						<MessageSquare size={14} />
-						<div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${allowSharing ? "" : "invisible opacity-20"}`}/>
+						<div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`} />
 					</Button>
 
 				</div>
@@ -161,21 +158,51 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, setChatE
 
 					{inLobby && inLobby.map((player, index) => {
 
-						return (
+						if (player.playerName === gameInfo.username) {
 
-							<Badge 
-								key={index} 
-								className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
-								onClick={() => { handleSelectPlayer(player) }} 
-								variant={player.isReady ? (selectedPlayers.includes(player.playerName) ? "greenNoHover" : "default") : "disabled"}
-							>
-								<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-									<p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
-								</div>
-								<p>{player.playerName}</p>
-							</Badge>
+							return (
 
-						);
+								<TooltipProvider key={index}>                      
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button 
+												className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
+												variant={selectedPlayers.includes(player.playerName) ? "greenNoHover" : "indigo"}
+												onClick={() => { handleSelectPlayer(player) }} 
+											>
+												<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+													<p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+												</div>
+												<p className="text-xs">{player.playerName}</p>
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p className="font-semibold">{`👑 Host`}</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+
+							)
+
+						} else {
+
+							return (
+
+								<Badge 
+									key={index} 
+									className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
+									onClick={() => { handleSelectPlayer(player) }} 
+									variant={player.isReady ? (selectedPlayers.includes(player.playerName) ? "greenNoHover" : "default") : "disabled"}
+								>
+									<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+										<p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
+									</div>
+									<p>{player.playerName}</p>
+								</Badge>
+
+							);
+
+						}
 
 					})}
 

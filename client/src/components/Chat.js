@@ -2,16 +2,17 @@ import React, { useEffect, useState, useRef } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
-function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
+function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, setNewMessage }) {
 
     const [socket, setSocket] = useSocketContext();
 
     const [message, setMessage] = useState('');
 
-    const [messageList, setMessageList] = useState([]);
+    const [messageList, setMessageList] = messages;
 
     const lastMessageRef = useRef(null);
 
@@ -68,6 +69,12 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
 
             setMessageList((list) => [...list, messageData]);
 
+            if (!chatExpanded) {
+
+                setNewMessage(true);
+
+            }
+
         });
 
         const listenForKeydown = (event) => {
@@ -103,7 +110,28 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
 
             <div className={`flex flex-row items-center mb-1 px-4 py-2 h-[10%] bg-slate-200/70 border-solid border-b border-slate-400`}>
 
-                <div className="h-2 w-2 bg-green-500 rounded mr-3"/>
+                <TooltipProvider>                      
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+
+                            {inLobby?.some((player) => { return (player.playerName !== username && player.isReady) }) && (
+
+                                <div className="h-2 w-2 bg-green-500 rounded mr-3"/>
+
+                            ) || (
+
+                                <div className="h-2 w-2 bg-red-500 rounded mr-3"/>
+
+
+                            )}
+                            
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p className="font-semibold">{inLobby?.some((player) => { return (player.playerName !== username && player.isReady) }) ? "Active" : "Inactive"}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                
                 <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{roomName}</h2>
 
                 <DropdownMenu className="relative">
@@ -115,22 +143,18 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID }) {
                         <DropdownMenuSeparator className="bg-slate-300" />
                         <DropdownMenuGroup>
                             
-                            {inLobby && (
+                            {inLobby?.map(({playerName}, index) => {
 
-                                inLobby.map(({playerName}, index) => {
+                                return (
 
-                                    return (
+                                    <DropdownMenuItem key={index} className="flex flex-row flex-none">
+                                        <User className="flex flex-none mr-2 h-4 w-4" />
+                                        <h2 className="flex break-all">{playerName}</h2>
+                                    </DropdownMenuItem>
 
-                                        <DropdownMenuItem key={index} className="flex flex-row flex-none">
-                                            <User className="flex flex-none mr-2 h-4 w-4" />
-                                            <h2 className="flex break-all">{playerName}</h2>
-                                        </DropdownMenuItem>
+                                );
 
-                                    );
-
-                                })
-
-                            )}
+                            })}
 
                         </DropdownMenuGroup>
                     </DropdownMenuContent>

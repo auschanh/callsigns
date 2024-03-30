@@ -40,6 +40,10 @@ function JoinRoom() {
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
+    const [messageList, setMessageList] = useState([]);
+
+    const [newMessage, setNewMessage] = useState(false);
+
     const [open, setOpen] = useState(true);
 
     // use %20 in address bar for space
@@ -160,6 +164,22 @@ function JoinRoom() {
 
     }, [socket, roomID, username, roomName, lobby]);
 
+    useEffect(() => {
+
+        if (chatExpanded) {
+
+            setNewMessage(false);
+
+        }
+
+    }, [chatExpanded]);
+
+    const handleChatExpansion = () => {
+
+		setChatExpanded(!chatExpanded);
+
+	}
+
     const form = useForm();
 
     function onSubmit(values) {
@@ -241,10 +261,10 @@ function JoinRoom() {
 
                                     <h1 className="font-semibold text-xl underline">{roomName}</h1>
 
-                                    <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={() => {setChatExpanded(value => !value)}}>
+                                    <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={handleChatExpansion}>
                                         <h2 className="text-xs leading-none m-0 p-0">Chat</h2>
                                         <MessageSquare size={14} />
-                                        <div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${isReady ? "" : "invisible opacity-20"}`}/>
+                                        <div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`} />
                                     </Button>
 
                                 </div>
@@ -363,7 +383,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} />
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
 
                         </div>
 

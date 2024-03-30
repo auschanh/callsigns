@@ -30,6 +30,10 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
+    const [messageList, setMessageList] = useState([]);
+
+    const [newMessage, setNewMessage] = useState(false);
+
     useEffect(() => {
 
         socket.on("getRoomInfo", (link, roomList, roomID) => {
@@ -75,6 +79,22 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     }, [socket, inLobby]);
 
+    useEffect(() => {
+
+        if (chatExpanded) {
+
+            setNewMessage(false);
+
+        }
+
+    }, [chatExpanded]);
+
+    const handleChatExpansion = () => {
+
+		setChatExpanded(!chatExpanded);
+
+	}
+
     const previousSlide = () => {
         
         setCurrentSlide(currentSlide - 1);
@@ -101,7 +121,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} setChatExpanded={setChatExpanded} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} />
 
                 )}
 
@@ -162,7 +182,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
 
                 </div>
 
