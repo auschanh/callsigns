@@ -52,13 +52,30 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
                 throw error;
 
-            }            
+            }
 
-            setMessageList((list) => [...list, messageData]);
+            displayMessage(messageData);
 
             setMessage('');
 
         }
+    }
+
+    const displayMessage = (messageData) => {
+
+        // if there's a new speaker
+        if (messageData.author !== messageList[messageList.length - 1]?.author) {
+
+            console.log(messageData.author + ": new speaker");
+
+        } else {
+
+            
+
+        }
+
+        setMessageList((list) => [...list, messageData]);
+
     }
 
     useEffect(() => {
@@ -67,7 +84,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
             console.log(messageData);
 
-            setMessageList((list) => [...list, messageData]);
+            displayMessage(messageData);
 
             if (!chatExpanded) {
 
@@ -170,9 +187,9 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
                         return (
 
-                            <div key={index} className={`flex flex-col w-full gap-2 ${username === messageContent.author ? "mb-4 items-end" : "mb-6 items-start"}`}>
+                            <div key={index} className={`flex flex-col w-full gap-2 mb-1 ${username === messageContent.author ? "items-end" : "items-start"}`}>
 
-                                {(username !== messageContent.author) && (
+                                {(messageContent.author !== messageList[index - 1]?.author) && (
                                     
                                     <div className="mr-1">
 
@@ -189,15 +206,19 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
                                 </div>
 
-                                <div className="mr-1">
+                                {(messageContent.author !== messageList[index + 1]?.author) && (
+                                    
+                                    <div className="mr-1 leading-none text-xs">
 
-                                    <p className="leading-none text-xs">{messageContent.time}</p>
+                                        {messageContent.time}
 
-                                </div>
+                                    </div>
+                                
+                                )}
 
                             </div>
 
-                        )
+                        );
 
                     })}
 

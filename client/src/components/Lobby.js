@@ -156,7 +156,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 				<div className="flex flex-wrap gap-x-3 gap-y-3">
 
-					{inLobby && inLobby.map((player, index) => {
+					{inLobby?.map((player, index) => {
 
 						if (player.playerName === gameInfo.username) {
 

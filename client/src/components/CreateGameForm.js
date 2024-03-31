@@ -192,7 +192,7 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 									defaultValue={field.value}
 									className="flex flex-row gap-4"
 								>
-									{Array.from({ length: 7 }).map((_, index) => {
+									{Array.from({ length: 7 }, (_, index) => {
 										return (
 											<FormItem
 												key={index + 1}
@@ -267,7 +267,7 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 
 									{isAiPlayers && 
 
-										Array.from({ length: 6 }).map((_, index) => {
+										Array.from({ length: 6 }, (_, index) => {
 
 											if (index + 1 <= (7 - playerCount)) {
 
