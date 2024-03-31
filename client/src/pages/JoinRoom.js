@@ -317,11 +317,8 @@ function JoinRoom() {
                                                 return (
 
                                                     <Badge 
-                                                        key={index} 
-    
-                                                        // change these when you get the isReady state for all the players ------------------------------------------------------------------------------
-                                                        className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
-                                                        // variant={player.playerName === username ? (isReady ? "default" : "disabled") : selectedPlayers.includes(player.playerName) ? "greenNoHover" : ""}
+                                                        key={index}
+                                                        className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
                                                         variant={
                                                             selectedPlayers.includes(player.playerName) 
                                                                 ? "greenNoHover" 

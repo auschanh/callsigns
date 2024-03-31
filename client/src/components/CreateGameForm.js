@@ -146,7 +146,6 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 							<FormLabel>Username</FormLabel>
 							<FormControl>
 								<Input
-									autoFocus
 									placeholder={"Enter Username"}
 									{...field}
 									onChange={handleInputChange}

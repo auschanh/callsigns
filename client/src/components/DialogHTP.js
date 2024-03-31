@@ -10,9 +10,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
 
-function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
+function DialogHTP({ tailwindStyles, variant, isHTPOpen, htpToPlay }) {
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = isHTPOpen;
 
     const username = undefined;
 
@@ -29,7 +29,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
     const hintValidationRef = useRef(null);
 
-    const [playOpen, setPlayOpen] = isPlayOpen;
+    // const [playOpen, setPlayOpen] = isPlayOpen;
 
     const submissions = [
 
@@ -209,7 +209,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center mt-12">
+            <div className="flex flex-col w-full items-center mt-[10%]">
                 <div className="flex flex-col items-center mb-10">
                     <Label className="text-[0.7rem]">Mystery Word</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
@@ -461,7 +461,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
             <DialogTrigger asChild>
                 <Button className={tailwindStyles} variant={variant}>How To Play</Button>
             </DialogTrigger>
-            <DialogContent className="flex flex-col h-[80vh] w-[60vw] p-10 justify-between">
+            <DialogContent className="flex flex-col h-[80vh] top-[10%] w-[60vw] left-[20%] p-10 justify-between">
                 <DialogHeader>
                     <DialogTitle>How To Play</DialogTitle>
                     <DialogDescription />
@@ -517,11 +517,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
                 <DialogFooter>
 
-                    <div onClick={() => {setOpen(false); setPlayOpen(true);}}>
-
-                        <DialogPlay triggerName={"Let's Play!"} isOpen={[playOpen, setPlayOpen]} />
-
-                    </div>
+                    <Button variant="default" onClick={htpToPlay}>Let's Play!</Button>
 
                 </DialogFooter>
 

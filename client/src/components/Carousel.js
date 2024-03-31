@@ -78,7 +78,7 @@ const Carousel = forwardRef(function({ children: slides, slideState, spaceBetwee
                 </div>
             </button>
 
-            <div className="overflow-hidden relative h-full">
+            <div className="overflow-hidden relative h-full p-1">
 
                 <div className="flex transition-transform ease-in-out duration-700 h-full" style={{ transform: `translateX(calc(-${currentSlide * 100}% - ${currentSlide * spaceBetweenSlides}rem))`}}>{slides}</div>
 

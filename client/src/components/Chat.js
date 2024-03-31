@@ -16,6 +16,8 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
     const lastMessageRef = useRef(null);
 
+    const inputRef = useRef(null);
+
     const handleChange = (event) => {
 
         setMessage(event.target.value);
@@ -54,28 +56,13 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
             }
 
-            displayMessage(messageData);
+            setMessageList((list) => [...list, messageData]);
 
             setMessage('');
 
-        }
-    }
-
-    const displayMessage = (messageData) => {
-
-        // if there's a new speaker
-        if (messageData.author !== messageList[messageList.length - 1]?.author) {
-
-            console.log(messageData.author + ": new speaker");
-
-        } else {
-
-            
+            inputRef.current.focus();
 
         }
-
-        setMessageList((list) => [...list, messageData]);
-
     }
 
     useEffect(() => {
@@ -84,7 +71,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
             console.log(messageData);
 
-            displayMessage(messageData);
+            setMessageList((list) => [...list, messageData]);
 
             if (!chatExpanded) {
 
@@ -239,6 +226,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
                     placeholder="Send a message..."
                     value={message}
                     onChange={handleChange}
+                    ref={inputRef}
                 />
 
                 <Button 

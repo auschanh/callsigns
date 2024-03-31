@@ -13,6 +13,8 @@ const Home = function () {
 
 	const [playOpen, setPlayOpen] = useState(false);
 
+	const [htpOpen, setHTPOpen] = useState(false);
+
 	useEffect(() => {
 
 		socket.on("connectToRoom", (message) => {
@@ -25,6 +27,14 @@ const Home = function () {
 
 	}, [socket]);
 
+	const htpToPlay = () => {
+
+		setHTPOpen(false);
+
+		setPlayOpen(true);
+
+	}
+
 	return (
 
 		<div className="h-screen w-screen bg-blue-950 flex flex-col items-center">
@@ -36,7 +46,7 @@ const Home = function () {
 
 				<DialogPlay tailwindStyles={"w-32 bg-green-600 text-white hover:bg-green-600/80 active:bg-green-500"} variant={"secondary"} triggerName={"Play"} isOpen={[playOpen, setPlayOpen]} />
 
-				<DialogHTP tailwindStyles={"w-32 bg-red-600 text-white hover:bg-red-600/80 active:bg-red-500"} variant={"secondary"} isPlayOpen={[playOpen, setPlayOpen]} />
+				<DialogHTP tailwindStyles={"w-32 bg-red-600 text-white hover:bg-red-600/80 active:bg-red-500"} variant={"secondary"} isHTPOpen={[htpOpen, setHTPOpen]} htpToPlay={htpToPlay} />
 
 			</div>
 
