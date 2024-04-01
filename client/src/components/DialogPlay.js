@@ -46,6 +46,12 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         });
 
+        socket.on("updateRoomInfo", (roomList, roomDetails) => {
+
+            setInLobby(roomList);
+
+        });
+
         socket.on("joinedLobby", (roomList) => {
 
 			setInLobby(roomList);
@@ -71,6 +77,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
         return () => {
 
             socket.removeAllListeners("getRoomInfo");
+            socket.removeAllListeners("updateRoomInfo");
             socket.removeAllListeners("joinedLobby");
 			socket.removeAllListeners("leftRoom");
             socket.removeAllListeners("receiveIsReady");

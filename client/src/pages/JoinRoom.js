@@ -20,8 +20,6 @@ function JoinRoom() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [roomName, setRoomName] = useState();
-
     const [username, setUsername] = useState();
 
     const [success, setSuccess] = useState(0);
@@ -51,7 +49,7 @@ function JoinRoom() {
 
     useEffect(() => {
 
-        if (roomName === undefined) {
+        if (roomDetails === undefined) {
 
             console.log("checking room");
 
@@ -59,7 +57,7 @@ function JoinRoom() {
 
                 try {
     
-                    await socket.emit("roomCheck", roomID, setRoomName);
+                    await socket.emit("roomCheck", roomID);
     
                 } catch (error) {
     
@@ -132,9 +130,17 @@ function JoinRoom() {
 
         });
 
-        socket.on("joinedLobby", (roomList) => {
+        socket.on("updateRoomInfo", (othersInLobby, newDetails) => {
 
-			setLobby(roomList);
+            setLobby(othersInLobby);
+
+            setRoomDetails(newDetails);
+
+        });
+
+        socket.on("joinedLobby", (othersInLobby) => {
+
+			setLobby(othersInLobby);
 
         });
 
@@ -156,13 +162,14 @@ function JoinRoom() {
 
             socket.removeAllListeners("roomExists");
             socket.removeAllListeners("getLobby");
+            socket.removeAllListeners("updateRoomInfo");
             socket.removeAllListeners("joinedLobby");
             socket.removeAllListeners("leftRoom");
             socket.removeAllListeners("receiveIsReady");
 
         }
 
-    }, [socket, roomID, username, roomName, lobby]);
+    }, [socket, roomID, username, lobby, roomDetails]);
 
     useEffect(() => {
 
@@ -259,7 +266,7 @@ function JoinRoom() {
 
                                 <div className="flex flex-row items-end w-full">
 
-                                    <h1 className="font-semibold text-xl underline">{roomName}</h1>
+                                    <h1 className="font-semibold text-xl underline">{roomDetails.roomName}</h1>
 
                                     <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={handleChatExpansion}>
                                         <h2 className="text-xs leading-none m-0 p-0">Chat</h2>
@@ -268,6 +275,25 @@ function JoinRoom() {
                                     </Button>
 
                                 </div>
+
+                                {username && (
+
+                                    <TooltipProvider>                      
+                                        <Tooltip>
+                                            <div className="py-2 w-fit">
+                                                <h1 className="text-xl font-extralight">{`Welcome `}
+                                                    <TooltipTrigger asChild>
+                                                        <span className="font-normal hover:underline hover:cursor-pointer" onClick={() => {setOpen(true)}}>{username}</span>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p className="font-semibold">{`Change Username`}</p>
+                                                    </TooltipContent>
+                                                !</h1>
+                                            </div>
+                                        </Tooltip>
+                                    </TooltipProvider>
+
+                                )}
 
                                 <div>
 
@@ -281,7 +307,7 @@ function JoinRoom() {
                                         </div>
                                     </div>
 
-                                    <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting the players for this round:`}</h1>
+                                    <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
 
                                     <div className="flex flex-wrap gap-x-3 gap-y-3">
 
@@ -380,7 +406,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomName} inLobby={lobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={lobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
 
                         </div>
 
@@ -401,14 +427,14 @@ function JoinRoom() {
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent className="gap-0">
 
-                    {roomName && (
+                    {roomDetails && (
 
                         <>
 
                             <AlertDialogHeader className="space-y-0 mb-8">
                                 <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    You'll be joining {roomName}
+                                    You'll be joining {roomDetails.roomName}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
 
@@ -427,6 +453,7 @@ function JoinRoom() {
                                                         placeholder={"Enter Your Username"} 
                                                         {...field}
                                                         id="username"
+                                                        onFocus={(event) => event.target.select()}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

@@ -134,6 +134,25 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 				<h1 className="font-semibold text-lg mb-6 border border-b-slate-900">{gameInfo.roomName}</h1>
 
+				{gameInfo && (
+
+					<TooltipProvider>                      
+						<Tooltip>
+							<div className="py-2 w-fit mb-6">
+								<h1 className="text-xl font-extralight">{`Welcome `}
+									<TooltipTrigger asChild>
+										<span className="font-normal hover:underline hover:cursor-pointer" onClick={previousSlide}>{gameInfo.username}</span>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p className="font-semibold">{`Change Username`}</p>
+									</TooltipContent>
+								!</h1>
+							</div>
+						</Tooltip>
+					</TooltipProvider>
+
+				)}
+
 				<div className="mb-6">
 					<div className="flex flex-row items-center mb-2">
 						<h1 className="text-sm font-semibold">Link</h1>

@@ -78,6 +78,8 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     
     socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated) => {
 
+        socket.username = username;
+
         if (!isRoomCreated) {
 
             const roomID = socket.id + Math.floor(Math.random() * 10);
@@ -99,23 +101,24 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     
             });
 
+            socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, [{playerName: socket.username, isReady: socket.isReady}], socket.roomID);
+
         } else {
 
             const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.roomID});
 
+            findRoom.host = username;
             findRoom.roomName = roomName;
             findRoom.numPlayers = numPlayers;
             findRoom.aiPlayers = aiPlayers;
 
+            const roomList = getPlayersInLobby(socket.roomID);
+
+            io.to(socket.roomID).emit("updateRoomInfo", roomList, findRoom);
+
         }
 
-        socket.username = username;
-
         getSocketInfo();
-
-        const roomList = getPlayersInLobby(socket.roomID);
-
-        socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList, socket.roomID);
 
         console.log(roomLookup);
 
@@ -131,13 +134,11 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("roomCheck", (roomID, setRoomName) => {
+    socket.on("roomCheck", (roomID) => {
 
         const findRoom = roomLookup.find((room) => {return room.roomID === roomID});
 
         if (findRoom) {
-
-            setRoomName(findRoom.roomName);
 
             const roomList = getPlayersInLobby(roomID);
 
@@ -148,8 +149,6 @@ io.on("connection", (socket) => { // every connection has a unique socket id
             socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
 
         } else {
-
-            setRoomName(false);
 
             socket.emit("roomExists");
             
@@ -166,8 +165,6 @@ io.on("connection", (socket) => { // every connection has a unique socket id
         socket.join(roomName);
 
         socket.roomID = roomName;
-
-        socket.isReady = false;
 
         getSocketInfo();
 
@@ -200,6 +197,12 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     socket.on("sendMessage", (roomName, messageData) => {
 
         socket.to(roomName).emit("receiveMessage", messageData);
+
+    });
+
+    socket.on("newUsername", (roomID, prevUsername, newUsername) => {
+
+        socket.to(roomID).emit("getNewUsername", prevUsername, newUsername);
 
     });
 

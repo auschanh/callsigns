@@ -14,6 +14,8 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
     const [messageList, setMessageList] = messages;
 
+    const [currentUsername, setCurrentUsername] = useState('');
+
     const lastMessageRef = useRef(null);
 
     const inputRef = useRef(null);
@@ -65,7 +67,50 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
         }
     }
 
+    const replaceUsername = async (prevUsername, newUsername) => {
+
+        setMessageList(messageList.map((message) => {
+
+            if (message.author === prevUsername) {
+
+                return {...message, author: newUsername};
+
+            } else {
+
+                return message;
+
+            }
+
+        }));
+
+        if (prevUsername === currentUsername) {
+
+            try {
+
+                await socket.emit("newUsername", roomID, currentUsername, username);
+    
+            } catch (error) {
+    
+                throw error;
+    
+            }
+    
+            setCurrentUsername(username);
+
+        }
+    }
+
     useEffect(() => {
+
+        if (!currentUsername) {
+
+            setCurrentUsername(username);
+
+        } else if (currentUsername !== username) {
+
+            replaceUsername(currentUsername, username);
+
+        }
 
         socket.on("receiveMessage", (messageData) => {
 
@@ -78,6 +123,12 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
                 setNewMessage(true);
 
             }
+
+        });
+
+        socket.on("getNewUsername", (prevUsername, newUsername) => {
+
+            replaceUsername(prevUsername, newUsername);
 
         });
 
@@ -96,11 +147,12 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
         return () => {
 
             socket.removeAllListeners("receiveMessage");
+            socket.removeAllListeners("getNewUsername");
             document.removeEventListener("keydown", listenForKeydown);
 
         }
 
-    }, [socket, document.activeElement, sendMessage]);
+    }, [socket, document.activeElement, sendMessage, currentUsername, username, chatExpanded]);
 
     useEffect(() => {
 
@@ -168,7 +220,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
             <div className="flex flex-col h-full w-full overflow-hidden">
 
-                <div className="flex flex-col w-full h-full py-4 pr-3 pl-5 overflow-y-scroll overflow-x-hidden">
+                <div className="flex flex-col w-full h-full py-4 pr-3 pl-4 overflow-y-scroll overflow-x-hidden">
 
                     {messageList.map((messageContent, index) => {
 
@@ -184,7 +236,6 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
                                     </div>
                                 
-                                
                                 )}
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
@@ -195,7 +246,7 @@ function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, set
 
                                 {(messageContent.author !== messageList[index + 1]?.author) && (
                                     
-                                    <div className="mr-1 leading-none text-xs">
+                                    <div className="mr-1 mb-4 leading-none text-xs">
 
                                         {messageContent.time}
 
