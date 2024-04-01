@@ -160,7 +160,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         } else {
 
-            socket.emit("roomExists");
+            socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
             
         }
 
@@ -168,29 +168,51 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     socket.on("joinRoom", (roomName, username) => {
 
-        socket.username = username;
-
-        console.log(username + " is joining " + roomName);
-
-        socket.join(roomName);
-
-        socket.roomID = roomName;
-
-        getSocketInfo();
-
         const findRoom = roomLookup.find(({roomID}) => {return roomID === roomName});
 
-        const roomList = getPlayersInLobby(roomName);
+        const lobby = [...[...io.sockets.adapter.rooms].find((room) => {return room[0] === roomName})[1]];
 
-        if (roomList.some(({playerName}) => { return playerName === username}) && !findRoom.isClosedRoom) {      
+        if (lobby.includes(socket.id)) {
 
-            socket.emit("getLobby", roomList, findRoom);
+            console.log(socket.username + " is changing their username to " + username);
 
-            socket.to(roomName).emit("joinedLobby", roomList);
+            socket.username = username;
+
+            getSocketInfo();
+
+            const roomList = getPlayersInLobby(roomName);
+
+            io.to(roomName).emit("joinedLobby", roomList);
+
+        } else if (findRoom && !findRoom.isClosedRoom) {
+
+            socket.username = username;
+
+            console.log(username + " is joining " + roomName);
+
+            socket.join(roomName);
+
+            socket.roomID = roomName;
+
+            getSocketInfo();
+
+            const roomList = getPlayersInLobby(roomName);
+
+            if (roomList.some(({playerName}) => { return playerName === username})) {      
+
+                socket.emit("getLobby", roomList, findRoom);
+    
+                socket.to(roomName).emit("joinedLobby", roomList);
+    
+            } else {
+
+                socket.emit("getLobby");
+    
+            }
 
         } else {
 
-            socket.emit("getLobby");
+            socket.emit("getLobby", ...[,,], findRoom?.isClosedRoom);
 
         }
 

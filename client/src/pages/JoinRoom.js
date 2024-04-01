@@ -51,7 +51,7 @@ function JoinRoom() {
 
     useEffect(() => {
 
-        if (roomDetails === undefined) {
+        if (roomDetails === undefined && !isClosedRoom) {
 
             console.log("checking room");
 
@@ -90,11 +90,11 @@ function JoinRoom() {
 
         } else {
 
-            console.log("nope");
+            console.log("not gonna try to join room");
 
         }
 
-        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
 
             if (othersInLobby) {
 
@@ -108,15 +108,22 @@ function JoinRoom() {
 
             } else {
 
-                console.log(`could not join room ${roomID}`);
+                if (isClosedRoom) {
 
-                setSuccess(2);
+                    setIsClosedRoom(true);
 
+                } else {
+
+                    console.log(`could not join room ${roomID}`);
+
+                    setSuccess();
+
+                }
             }
 
         });
 
-        socket.on("getLobby", (othersInLobby, roomDetails) => {
+        socket.on("getLobby", (othersInLobby, roomDetails, isClosedRoom) => {
 
             if (othersInLobby) {
 
@@ -126,9 +133,19 @@ function JoinRoom() {
 
             } else {
 
-                console.log(`could not join room ${roomID}`);
+                if (isClosedRoom) {
 
-                setSuccess(2);
+                    setUsername();
+
+                    setIsClosedRoom(true);
+
+                } else {
+
+                    console.log(`could not join room ${roomID}`);
+
+                }
+
+                setSuccess();
 
                 setOpen(true);
 
@@ -490,6 +507,21 @@ function JoinRoom() {
                                     <Button className="flex flex-row self-end" type="submit">Submit</Button>
                                 </form>
                             </Form>
+
+                        </>
+
+                    ) || isClosedRoom && (
+
+                        <>
+
+                            <AlertDialogHeader className="space-y-2">
+                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                            </AlertDialogHeader>
+
+                            <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
+                                <p>This is a closed room.</p>
+                                <p>Please contact the host to join this room.</p>
+                            </div>
 
                         </>
 
