@@ -36,6 +36,8 @@ function JoinRoom() {
 
     const [isReady, setIsReady] = useState(false);
 
+    const [isClosedRoom, setIsClosedRoom] = useState();
+
     const [chatExpanded, setChatExpanded] = useState(false);
 
     const [messageList, setMessageList] = useState([]);
@@ -114,17 +116,23 @@ function JoinRoom() {
 
         });
 
-        socket.on("getLobby", (othersInLobby) => {
+        socket.on("getLobby", (othersInLobby, roomDetails) => {
 
             if (othersInLobby) {
 
                 setLobby(othersInLobby);
+
+                setRoomDetails(roomDetails);
 
             } else {
 
                 console.log(`could not join room ${roomID}`);
 
                 setSuccess(2);
+
+                setOpen(true);
+
+                setRoomDetails();
 
             }
 
@@ -158,6 +166,12 @@ function JoinRoom() {
 
         });
 
+        socket.on("isRoomClosed", (isClosedRoom) => {
+
+            setIsClosedRoom(isClosedRoom);
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -166,6 +180,7 @@ function JoinRoom() {
             socket.removeAllListeners("joinedLobby");
             socket.removeAllListeners("leftRoom");
             socket.removeAllListeners("receiveIsReady");
+            socket.removeAllListeners("isRoomClosed");
 
         }
 
@@ -256,9 +271,9 @@ function JoinRoom() {
 
             <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
 
-                <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
+                {success === 1 && (
 
-                    {success === 1 && (
+                    <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
                         <div className="flex flex-row h-full w-full gap-6">
 
@@ -301,10 +316,26 @@ function JoinRoom() {
                                         <div className="flex flex-row items-center mb-2">
                                             <h1 className="text-sm font-semibold">Link</h1>
                                         </div>
-                                        <div className="flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
-                                            <p className="text-sm break-all">{sessionUrl}</p>
-                                            <Button className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+
+                                        <div className={`flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 dark:border-slate-800 dark:bg-slate-950 relative transition-all duration-300 ${!isClosedRoom ? "bg-white" : "bg-slate-200"}`}>
+
+                                            {!isClosedRoom && (
+
+                                                <>
+
+                                                    <p className="text-sm break-all">{sessionUrl}</p>
+                                                    <Button className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+
+                                                </>
+
+                                            ) || (
+
+                                                <p className="text-sm break-all">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed the room</p>
+
+                                            )}
+
                                         </div>
+                                        
                                     </div>
 
                                     <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
@@ -353,14 +384,14 @@ function JoinRoom() {
                                                                     ? "default" 
                                                                     : "disabled"
                                                         }
-    
+
                                                     >
                                                         <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                             <p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
                                                         </div>
                                                         <p>{player.playerName}</p>
                                                     </Badge>
-    
+
                                                 );
                                             }
                                         })}
@@ -410,17 +441,13 @@ function JoinRoom() {
 
                         </div>
 
-                    ) || success === 2 && (
+                    </div>
 
-                        <div>
+                ) || success === 2 && (
 
-                            <p>{`Could not join room: ${roomID}`}</p>
+                    <></>
 
-                        </div>
-
-                    )} 
-
-                </div>
+                )}
 
             </div>
 

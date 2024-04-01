@@ -11,7 +11,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [allowSharing, setAllowSharing] = useState(false);
+	const [isClosedRoom, setIsClosedRoom] = useState(false);
 
 	const [copied, setCopied] = useState(false);
 
@@ -41,11 +41,11 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 	}, [inLobby]);
 
-	const handleAllowSharing = async () => {
+	const handleCloseRoom = async () => {
 
 		try {
 
-			await socket.emit("allowSharing", !allowSharing);
+			await socket.emit("closeRoom", !isClosedRoom);
 
 		} catch (error) {
 
@@ -53,7 +53,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 		}
 
-		setAllowSharing(!allowSharing);
+		setIsClosedRoom(!isClosedRoom);
 
 	}
 
@@ -157,11 +157,11 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 					<div className="flex flex-row items-center mb-2">
 						<h1 className="text-sm font-semibold">Link</h1>
 						<div className="flex items-center justify-end w-full">
-							<p className="text-xs mr-2">Allow sharing:</p>
+							<p className="text-xs mr-2">Closed Room:</p>
 							<SmallSwitch
 								className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
-								checked={allowSharing}
-								onCheckedChange={handleAllowSharing}
+								checked={isClosedRoom}
+								onCheckedChange={handleCloseRoom}
 							/>
 						</div>
 					</div>

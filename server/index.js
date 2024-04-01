@@ -97,7 +97,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
                 host: username,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
-                allowSharing: false
+                isClosedRoom: false
     
             });
 
@@ -124,11 +124,21 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
-    socket.on("allowSharing", (allowSharing) => {
+    socket.on("closeRoom", (isClosedRoom) => {
 
         const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.roomID});
 
-        findRoom.allowSharing = allowSharing;
+        if (findRoom) {
+
+            findRoom.isClosedRoom = isClosedRoom;
+
+            socket.to(socket.roomID).emit("isRoomClosed", isClosedRoom);
+
+        } else {
+
+            console.log("unable to find room");
+
+        }
 
         console.log(findRoom);
 
@@ -138,7 +148,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         const findRoom = roomLookup.find((room) => {return room.roomID === roomID});
 
-        if (findRoom) {
+        if (findRoom && !findRoom.isClosedRoom) {
 
             const roomList = getPlayersInLobby(roomID);
 
@@ -168,11 +178,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         getSocketInfo();
 
+        const findRoom = roomLookup.find(({roomID}) => {return roomID === roomName});
+
         const roomList = getPlayersInLobby(roomName);
 
-        if (roomList.some(({playerName}) => { return playerName === username})) {      
+        if (roomList.some(({playerName}) => { return playerName === username}) && !findRoom.isClosedRoom) {      
 
-            socket.emit("getLobby", roomList);
+            socket.emit("getLobby", roomList, findRoom);
 
             socket.to(roomName).emit("joinedLobby", roomList);
 
