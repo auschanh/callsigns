@@ -95,6 +95,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
                 roomID: roomID,
                 roomName: roomName,
                 host: username,
+                hostID: socket.id,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
                 isClosedRoom: false
@@ -198,11 +199,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             const roomList = getPlayersInLobby(roomName);
 
-            if (roomList.some(({playerName}) => { return playerName === username})) {      
+            if (roomList.some(({playerName}) => { return playerName === username})) {     
 
                 socket.emit("getLobby", roomList, findRoom);
     
                 socket.to(roomName).emit("joinedLobby", roomList);
+
+                socket.to(findRoom.hostID).emit("sendSelectedPlayers");
     
             } else {
 
@@ -225,6 +228,12 @@ io.on("connection", (socket) => { // every connection has a unique socket id
         const roomList = getPlayersInLobby(roomID);
 
         io.to(roomID).emit("receiveIsReady", roomList);
+
+    });
+
+    socket.on("setSelectedPlayers", (selectedPlayers) => {
+
+        socket.to(socket.roomID).emit("getSelectedPlayers", selectedPlayers);
 
     });
 

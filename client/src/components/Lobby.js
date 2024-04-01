@@ -41,6 +41,36 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 	}, [inLobby]);
 
+	const sendSelected = async () => {
+
+		try {
+
+			await socket.emit("setSelectedPlayers", selectedPlayers);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+	}
+
+	useEffect(() => {
+
+		socket.on("sendSelectedPlayers", () => {
+
+			sendSelected();
+
+		});
+
+	}, [socket, sendSelected]);
+
+	useEffect(() => {
+
+		sendSelected();
+
+	}, [selectedPlayers, sendSelected]);
+
 	const handleCloseRoom = async () => {
 
 		try {
@@ -91,7 +121,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 		if (player.isReady) {
 
-			console.log("sure " + player + " is ready");
+			console.log("sure " + player.playerName + " is ready");
 
 			if (!selectedPlayers.includes(player.playerName)) {
 
@@ -186,7 +216,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 										<TooltipTrigger asChild>
 											<Button 
 												className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
-												variant={selectedPlayers.includes(player.playerName) ? "greenNoHover" : "indigo"}
+												variant={selectedPlayers.includes(player.playerName) ? "green" : "indigo"}
 												onClick={() => { handleSelectPlayer(player) }} 
 											>
 												<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
@@ -211,7 +241,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 									key={index} 
 									className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
 									onClick={() => { handleSelectPlayer(player) }} 
-									variant={player.isReady ? (selectedPlayers.includes(player.playerName) ? "greenNoHover" : "default") : "disabled"}
+									variant={player.isReady ? (selectedPlayers.includes(player.playerName) ? "green" : "default") : "disabled"}
 								>
 									<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
 										<p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>

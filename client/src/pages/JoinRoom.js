@@ -183,6 +183,12 @@ function JoinRoom() {
 
         });
 
+        socket.on("getSelectedPlayers", (selectedPlayers) => {
+
+            setSelectedPlayers(selectedPlayers);
+
+        });
+
         socket.on("isRoomClosed", (isClosedRoom) => {
 
             setIsClosedRoom(isClosedRoom);
@@ -197,6 +203,7 @@ function JoinRoom() {
             socket.removeAllListeners("joinedLobby");
             socket.removeAllListeners("leftRoom");
             socket.removeAllListeners("receiveIsReady");
+            socket.removeAllListeners("getSelectedPlayers");
             socket.removeAllListeners("isRoomClosed");
 
         }
@@ -347,7 +354,7 @@ function JoinRoom() {
 
                                             ) || (
 
-                                                <p className="text-sm break-all">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed the room</p>
+                                                <p className="text-sm break-all">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
 
                                             )}
 
@@ -370,7 +377,11 @@ function JoinRoom() {
                                                             <TooltipTrigger asChild>
                                                                 <Button 
                                                                     className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
-                                                                    variant="indigo"
+                                                                    variant={
+                                                                        selectedPlayers.includes(player.playerName)
+                                                                            ? "green"
+                                                                            : "indigo"
+                                                                    }
                                                                 >
                                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                                         <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
@@ -395,7 +406,7 @@ function JoinRoom() {
                                                         className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
                                                         variant={
                                                             selectedPlayers.includes(player.playerName) 
-                                                                ? "greenNoHover" 
+                                                                ? "green" 
                                                                 : 
                                                                     player.isReady 
                                                                     ? "default" 
@@ -449,7 +460,7 @@ function JoinRoom() {
                                 </div>
 
                                 <div className="flex flex-row mt-auto w-full justify-end">
-                                    <Button className="w-25" onClick={handleReady} variant={ isReady ? "greenNoHover": "default" }>{ isReady ? "Ready!" : "Ready Up" }</Button>
+                                    <Button className="w-28" onClick={handleReady} variant={ isReady ? "green": "default" }>{ isReady ? "Ready!" : "Ready Up" }</Button>
                                 </div>
 
                             </div>
