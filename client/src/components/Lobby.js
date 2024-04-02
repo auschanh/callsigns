@@ -7,11 +7,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../com
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft, MessageSquare } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [isClosedRoom, setIsClosedRoom] = useState(false);
+	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 
 	const [copied, setCopied] = useState(false);
 

@@ -8,7 +8,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [] }) {
+const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [], prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -79,7 +79,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, pro
 
 			console.log(`${user} has left the lobby`);
 
-            const playersRemaining = inLobby.filter(({playerName}) => { return playerName !== user });
+            const playersRemaining = inLobby?.filter(({playerName}) => { return playerName !== user });
 
             setInLobby(playersRemaining);
 
@@ -145,7 +145,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, pro
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
 
                 )}
 

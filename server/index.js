@@ -154,7 +154,9 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         const findRoom = roomLookup.find((room) => {return room.roomID === roomID});
 
-        if (findRoom && !findRoom.isClosedRoom) {
+        const socketsInLobby = [...[...io.sockets.adapter.rooms].find((room) => { return room[0] === roomID })[1]];
+
+        if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
 
             const roomList = getPlayersInLobby(roomID);
 

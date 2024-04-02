@@ -101,7 +101,7 @@ function NewHost() {
 
                 {roomDetails && (
 
-                    <DialogPlay tailwindStyles={"invisible"} isOpen={[playOpen]} propSlide={1} isNewHost={true} prevMessageList={messageList} />
+                    <DialogPlay tailwindStyles={"invisible"} isOpen={[playOpen]} propSlide={1} isNewHost={true} prevMessageList={messageList} prevClosedRoom={roomDetails.isClosedRoom} />
 
                 )}
 
