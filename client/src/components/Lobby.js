@@ -187,7 +187,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 					<div className="flex flex-row items-center mb-2">
 						<h1 className="text-sm font-semibold">Link</h1>
 						<div className="flex items-center justify-end w-full">
-							<p className="text-xs mr-2">Closed Room:</p>
+							<p className="text-xs mr-2">Close Room:</p>
 							<SmallSwitch
 								className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
 								checked={isClosedRoom}

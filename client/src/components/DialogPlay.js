@@ -8,11 +8,11 @@ import { useSocketContext } from "../contexts/SocketContext";
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
+const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [] }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const [currentSlide, setCurrentSlide] = useState(propSlide);
 
     const spaceBetweenSlides = 5;
 
@@ -26,11 +26,11 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
     const [roomID, setRoomID] = useState();
 
-    const [isRoomCreated, setIsRoomCreated] = useState(false);
+    const [isRoomCreated, setIsRoomCreated] = useState(isNewHost);
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
-    const [messageList, setMessageList] = useState([]);
+    const [messageList, setMessageList] = useState(prevMessageList);
 
     const [newMessage, setNewMessage] = useState(false);
 
@@ -46,9 +46,26 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         });
 
-        socket.on("updateRoomInfo", (roomList, roomDetails) => {
+        socket.on("updateRoomInfo", (link, roomList, roomID, roomDetails) => {
 
             setInLobby(roomList);
+
+            if (isNewHost) {
+
+                setSessionUrl(link);
+
+                setRoomID(roomID);
+
+                setGameInfo({
+
+                    username: roomDetails.host,
+                    roomName: roomDetails.roomName,
+                    numPlayers: roomDetails.numPlayers,
+                    aiPlayers: roomDetails.aiPlayers
+
+                });
+
+            }
 
         });
 
@@ -84,7 +101,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         }
 
-    }, [socket, inLobby]);
+    }, [socket, inLobby, isNewHost]);
 
     useEffect(() => {
 
@@ -118,7 +135,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
 
         content:
 
-            <CreateGameForm setGameInfo={setGameInfo} nextSlide={nextSlide} roomCreated={[isRoomCreated, setIsRoomCreated]} />
+            <CreateGameForm gameInfoState={[gameInfo, setGameInfo]} nextSlide={nextSlide} roomCreated={[isRoomCreated, setIsRoomCreated]} />
 
     }, {
 
@@ -144,7 +161,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen }) {
                 <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className={`flex flex-none flex-col h-[85vh] top-[7.5%] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw] left-[20%]" : "w-[35vw] left-[32.5%]"}`}>
+            <DialogContent className={`flex flex-none flex-col h-[85vh] top-[7.5%] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw] left-[20%]" : "w-[35vw] left-[32.5%]"}`} hideClose={isNewHost}>
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>

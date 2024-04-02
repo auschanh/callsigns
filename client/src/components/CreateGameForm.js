@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -42,9 +42,11 @@ const formSchema = z.object({
 
 });
 
-export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) {
+export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 	const [socket, setSocket] = useSocketContext();
+
+	const [gameInfo, setGameInfo] = gameInfoState;
 
 	const [changedRoomName, setChangedRoomName] = useState(false);
 
@@ -93,6 +95,49 @@ export default function CreateGameForm({ setGameInfo, nextSlide, roomCreated }) 
 		nextSlide();
 
 	}
+
+	useEffect(() => {
+
+		if (gameInfo) {
+
+			if (!form.getValues("username")) {
+
+				form.setValue("username", gameInfo.username);
+	
+			}
+	
+			if (!form.getValues("roomName"))	{
+	
+				form.setValue("roomName", gameInfo.roomName);
+	
+			}
+	
+			if (!form.getValues("numPlayers")) {
+	
+				form.setValue("numPlayers", gameInfo.numPlayers);
+	
+			}
+	
+			if (!form.getValues("aiPlayers")) {
+	
+				form.setValue("aiPlayers", gameInfo.aiPlayers);
+	
+			}
+	
+			if (playerCount === undefined) {
+	
+				if (gameInfo.aiPlayers !== 0) {
+
+					setIsAiPlayers(value => !value);
+
+				}
+	
+				setPlayerCount(gameInfo.numPlayers);
+	
+			}
+		}
+
+	}, [gameInfo, form]);
 
 	function handleInputChange(event) {
 

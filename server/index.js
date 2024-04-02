@@ -80,6 +80,8 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         socket.username = username;
 
+        socket.isReady = true;
+
         if (!isRoomCreated) {
 
             const roomID = socket.id + Math.floor(Math.random() * 10);
@@ -87,8 +89,6 @@ io.on("connection", (socket) => { // every connection has a unique socket id
             socket.join(roomID);
 
             socket.roomID = roomID;
-
-            socket.isReady = true;
 
             roomLookup.push({
 
@@ -98,7 +98,8 @@ io.on("connection", (socket) => { // every connection has a unique socket id
                 hostID: socket.id,
                 numPlayers: numPlayers,
                 aiPlayers: aiPlayers,
-                isClosedRoom: false
+                isClosedRoom: false,
+                isGameStarted: false
     
             });
 
@@ -108,14 +109,18 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
             const findRoom = roomLookup.find(({roomID}) => {return roomID === socket.roomID});
 
-            findRoom.host = username;
-            findRoom.roomName = roomName;
-            findRoom.numPlayers = numPlayers;
-            findRoom.aiPlayers = aiPlayers;
+            if (findRoom) {
 
-            const roomList = getPlayersInLobby(socket.roomID);
+                findRoom.host = username;
+                findRoom.roomName = roomName;
+                findRoom.numPlayers = numPlayers;
+                findRoom.aiPlayers = aiPlayers;
 
-            io.to(socket.roomID).emit("updateRoomInfo", roomList, findRoom);
+                const roomList = getPlayersInLobby(socket.roomID);
+
+                io.to(socket.roomID).emit("updateRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList, socket.roomID, findRoom);
+
+            }
 
         }
 
@@ -249,6 +254,12 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
     });
 
+    socket.on("saveMessageList", (messageList) => {
+
+        socket.emit("receiveMessageList", messageList);
+
+    });
+
     socket.on("disconnecting", () => {
 
         const leavingRooms = [...socket.rooms];
@@ -278,6 +289,28 @@ io.on("connection", (socket) => { // every connection has a unique socket id
                 // ---------------------------------------------------------
                 socket.to(room).emit("leftRoom", socket.username);
                 // ---------------------------------------------------------
+
+                const findRoom = roomLookup.find(({roomID}) => { return roomID === room });
+
+                // if you're the host
+                if (findRoom && findRoom.hostID === socket.id) {
+
+                    const socketsInLobby = [...[...io.sockets.adapter.rooms].find((room) => { return room[0] === socket.roomID })[1]];
+
+                    const newHostSocketID = socketsInLobby.find((playerSocket) => { return playerSocket !== socket.id });
+
+                    const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === newHostSocketID });
+
+                    findRoom.host = foundSocket.username;
+                    findRoom.hostID = foundSocket.id;
+
+                    if (!findRoom.isGameStarted) {
+
+                        socket.to(foundSocket.id).emit("newHost");
+
+                    }
+                    
+                }
 
             }
 

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Chat from "../components/Chat";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
@@ -48,6 +48,8 @@ function JoinRoom() {
 
     // use %20 in address bar for space
     let { roomID } = useParams();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -155,7 +157,7 @@ function JoinRoom() {
 
         });
 
-        socket.on("updateRoomInfo", (othersInLobby, newDetails) => {
+        socket.on("updateRoomInfo", (link, othersInLobby, roomID, newDetails) => {
 
             setLobby(othersInLobby);
 
@@ -195,6 +197,14 @@ function JoinRoom() {
 
         });
 
+        socket.on("newHost", () => {
+
+            socket.emit("saveMessageList", messageList);
+
+            navigate(`/newhost/${roomID}`);
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -205,10 +215,11 @@ function JoinRoom() {
             socket.removeAllListeners("receiveIsReady");
             socket.removeAllListeners("getSelectedPlayers");
             socket.removeAllListeners("isRoomClosed");
+            socket.removeAllListeners("newHost");
 
         }
 
-    }, [socket, roomID, username, lobby, roomDetails]);
+    }, [socket, roomID, username, lobby, roomDetails, messageList]);
 
     useEffect(() => {
 
