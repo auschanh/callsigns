@@ -8,7 +8,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [], prevClosedRoom }) {
+const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [], prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -158,7 +158,7 @@ const DialogPlay = function ({ tailwindStyles, variant, triggerName, isOpen, pro
         <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogTrigger asChild>
-                <Button className={tailwindStyles} variant={variant}>{triggerName}</Button>
+                <Button className={tailwindStyles}>{triggerName}</Button>
             </DialogTrigger>
 
             <DialogContent className={`flex flex-none flex-col h-[85vh] top-[7.5%] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw] left-[20%]" : "w-[35vw] left-[32.5%]"}`} hideClose={isNewHost}>
