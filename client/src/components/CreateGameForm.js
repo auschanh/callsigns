@@ -112,13 +112,13 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 	
 			}
 	
-			if (!form.getValues("numPlayers")) {
+			if (!form.getValues("numPlayers") || (form.getValues("numPlayers") !== gameInfo.numPlayers)) {
 	
 				form.setValue("numPlayers", gameInfo.numPlayers);
 	
 			}
 	
-			if (!form.getValues("aiPlayers")) {
+			if (!form.getValues("aiPlayers") || (form.getValues("aiPlayers") !== gameInfo.aiPlayers)) {
 	
 				form.setValue("aiPlayers", gameInfo.aiPlayers);
 	

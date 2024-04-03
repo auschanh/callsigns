@@ -38,6 +38,8 @@ function JoinRoom() {
 
     const [isClosedRoom, setIsClosedRoom] = useState();
 
+    const [beenRemoved, setBeenRemoved] = useState(false);
+
     const [chatExpanded, setChatExpanded] = useState(false);
 
     const [messageList, setMessageList] = useState([]);
@@ -53,7 +55,7 @@ function JoinRoom() {
 
     useEffect(() => {
 
-        if (roomDetails === undefined && !isClosedRoom) {
+        if (roomDetails === undefined && !isClosedRoom && !beenRemoved) {
 
             console.log("checking room");
 
@@ -205,6 +207,20 @@ function JoinRoom() {
 
         });
 
+        socket.on("exitLobby", () => {
+
+            setBeenRemoved(true);
+
+            setUsername();
+
+            setSuccess();
+
+            setOpen(true);
+
+            setRoomDetails();
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -216,6 +232,7 @@ function JoinRoom() {
             socket.removeAllListeners("getSelectedPlayers");
             socket.removeAllListeners("isRoomClosed");
             socket.removeAllListeners("newHost");
+            socket.removeAllListeners("exitLobby");
 
         }
 
@@ -306,7 +323,7 @@ function JoinRoom() {
 
             <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
 
-                {success === 1 && (
+                {success && (
 
                     <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
@@ -365,7 +382,7 @@ function JoinRoom() {
 
                                             ) || (
 
-                                                <p className="text-sm break-all">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+                                                <p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
 
                                             )}
 
@@ -482,10 +499,6 @@ function JoinRoom() {
 
                     </div>
 
-                ) || success === 2 && (
-
-                    <></>
-
                 )}
 
             </div>
@@ -529,6 +542,21 @@ function JoinRoom() {
                                     <Button className="flex flex-row self-end" type="submit">Submit</Button>
                                 </form>
                             </Form>
+
+                        </>
+
+                    ) || beenRemoved && (
+
+                        <>
+
+                            <AlertDialogHeader className="space-y-2">
+                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                            </AlertDialogHeader>
+
+                            <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
+                                <p>You have been removed from this lobby.</p>
+                                <p>Please contact the host for further details.</p>
+                            </div>
 
                         </>
 

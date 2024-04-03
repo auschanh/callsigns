@@ -154,22 +154,28 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
         const findRoom = roomLookup.find((room) => {return room.roomID === roomID});
 
-        const socketsInLobby = [...[...io.sockets.adapter.rooms].find((room) => { return room[0] === roomID })[1]];
+        const lobby = [...io.sockets.adapter.rooms].find((room) => { return room[0] === roomID });
 
-        if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
+        if (lobby) {
 
-            const roomList = getPlayersInLobby(roomID);
+            const socketsInLobby = [...lobby[1]];
 
-            console.log("players in " + findRoom.roomName + ": ");
+            if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
 
-            console.log(roomList);
+                const roomList = getPlayersInLobby(roomID);
 
-            socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
+                console.log("players in " + findRoom.roomName + ": ");
 
-        } else {
+                console.log(roomList);
 
-            socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
-            
+                socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
+
+            } else {
+
+                socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
+                
+            }
+
         }
 
     });
@@ -241,6 +247,22 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     socket.on("setSelectedPlayers", (selectedPlayers) => {
 
         socket.to(socket.roomID).emit("getSelectedPlayers", selectedPlayers);
+
+    });
+
+    socket.on("removePlayer", (player) => {
+
+        const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.username === player });
+
+        console.log(`${player} has been removed from ${socket.roomID}`);
+
+        socket.to(foundSocket.id).emit("exitLobby");
+
+        foundSocket.leave(socket.roomID);
+
+        console.log(getPlayersInLobby(socket.roomID));
+
+        io.to(socket.roomID).emit("leftRoom", player);
 
     });
 

@@ -50,20 +50,20 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
             setInLobby(roomList);
 
+            setGameInfo({
+
+                username: roomDetails.host,
+                roomName: roomDetails.roomName,
+                numPlayers: roomDetails.numPlayers,
+                aiPlayers: roomDetails.aiPlayers
+
+            });
+
             if (isNewHost) {
 
                 setSessionUrl(link);
 
                 setRoomID(roomID);
-
-                setGameInfo({
-
-                    username: roomDetails.host,
-                    roomName: roomDetails.roomName,
-                    numPlayers: roomDetails.numPlayers,
-                    aiPlayers: roomDetails.aiPlayers
-
-                });
 
             }
 
