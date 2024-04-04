@@ -48,7 +48,7 @@ const WordGenerator = function (props) {
     const stemmedGuess = stemmer(checkGuess);
     let singularGuess = "";
     if (!/^[a-z]+$/.test(checkGuess)) {
-      // should not console log if all lower case, one word and no special chars
+      // should not console log if all lower case, one word and no special chars.
       setErrMsg(true);
     } else {
       singularGuess = pluralize.singular(stemmedGuess);
