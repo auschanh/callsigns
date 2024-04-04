@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import Carousel from './Carousel';
 import DialogPlay from './DialogPlay';
 import { Button } from "./ui/button";
@@ -11,9 +10,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Check, X, Trash2 } from "lucide-react";
 
-function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
+function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = isHTPOpen;
 
     const username = undefined;
 
@@ -30,13 +29,13 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
     const hintValidationRef = useRef(null);
 
-    const [playOpen, setPlayOpen] = isPlayOpen;
+    // const [playOpen, setPlayOpen] = isPlayOpen;
 
     const submissions = [
 
         {
 
-            playerName: username || "Dave",
+            playerName: username || "You",
             hint: example[0]
 
         }, {
@@ -181,44 +180,44 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
     const rules = [{
 
         content: 
-            <div className="flex flex-col w-full items-center mt-32">
-                <Label>Mystery Word</Label>
+            <div className="flex flex-col w-full items-center self-center">
+                <Label>Callsign</Label>
                 <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                     <p>{mysteryWord}</p>
                 </div>
             </div>,
 
         footer: 
-            <div className="text-center">
-                A new mystery word is generated each round.
+            <div>
+                A new callsign is generated each round.
             </div>
 
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center mt-[150px]">
+            <div className="flex flex-col w-full items-center self-center">
                 <div className="flex p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                    <p>Alex is the guesser</p>
+                    <p>Alex is the stranded agent!</p>
                 </div>
             </div>,
 
         footer: 
-            <div className="text-center">
-                Each round will have a new guesser who will not know what the mystery word is.
+            <div>
+                Each round will have a new stranded agent who will not know what their callsign is.
             </div>
 
     }, {
 
         content:
-            <div className="mt-14">
+            <div className="flex flex-col w-full items-center mt-[8%]">
                 <div className="flex flex-col items-center mb-10">
-                    <Label className="text-[0.7rem]">Mystery Word</Label>
+                    <Label className="text-[0.7rem]">Callsign</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
 
-                <div className="flex flex-col w-full items-center mb-8">
+                <div>
 
                     <form name="exampleForm" onSubmit={handleSubmit} className="flex flex-col items-center w-full">
 
@@ -265,17 +264,17 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
             </div>,
 
         footer:
-            <div className="text-center">
-                Players must submit just one word to help the guesser determine what the mystery word is.
+            <div>
+                Players must submit just one word to help the stranded agent determine what their callsign is.
             </div>
 
     }, {
 
         content:
-            <div className="w-full">
+            <div className="w-full self-center">
 
                 <div className="flex flex-col items-center mb-8">
-                    <Label className="text-[0.7rem]">Mystery Word</Label>
+                    <Label className="text-[0.7rem]">Callsign</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
@@ -340,10 +339,9 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
             </div>,
 
         footer: 
-            <div className="flex flex-col text-center">
-                <p>
-                    Once all players have submitted their one-word hints, they must then determine if any of their hints are too similar to one another or to the mystery word itself.
-                </p>
+            <div>
+                {/* Once all players have submitted their one-word hints, they must then determine if any of their hints are too similar to one another or to the mystery word itself. */}
+                Once all hints are submitted, players must then determine if any of the hints are too similar to one another or to the callsign itself.
             </div>
 
     }, {
@@ -355,9 +353,9 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
                     <AccordionTrigger>Good hints are usually:</AccordionTrigger>
                     <AccordionContent>
                         <ul className="list-disc ml-4">
-                            <li>Not too closely related to the mystery word because other players might have the same idea</li>
-                            <li>Not too obscure unless you're sure the guesser can figure it out</li>
-                            <li>References that the guesser can pick up on</li>
+                            <li>Not too closely related to the callsign because other members of your team might have the same idea</li>
+                            <li>Not too obscure unless you're sure the stranded agent can figure it out</li>
+                            <li>References that the stranded agent can pick up on</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
@@ -365,10 +363,10 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
                     <AccordionTrigger>Hints cannot:</AccordionTrigger>
                     <AccordionContent>
                         <ul className="list-disc ml-4">
-                            <li>Be an alternate spelling of the mystery word</li>
-                            <li>Be in a different language than the mystery word</li>
-                            <li>Be a different word that sounds the same as the mystery word</li>
-                            <li>Contain any part of the mystery word</li>
+                            <li>Be an alternate spelling of the callsign</li>
+                            <li>Be in a different language than the callsign</li>
+                            <li>Be a different word that sounds the same as the callsign</li>
+                            <li>Contain any part of the callsign</li>
                             <li>Contain any special characters, including hyphens</li>
                         </ul>
                     </AccordionContent>
@@ -376,18 +374,18 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
             </Accordion>,
 
         footer:
-            <div className="text-center">
-                Check out these tips if you need any help coming up with good hints.
-                Hints that are either too similar to one another or illegal will not be revealed to the guesser.
+            <div>
+                {/* Check out these tips if you need any help coming up with good hints. */}
+                Hints that are either too similar to one another or illegal will not be revealed to the stranded agent.
             </div>
 
     }, {
 
         content:
-            <div className="w-full">
+            <div className="w-full self-center">
 
                 <div className="flex flex-col items-center mb-8">
-                    <Label className="text-[0.7rem]">Mystery Word</Label>
+                    <Label className="text-[0.7rem]">Callsign</Label>
                     <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
@@ -446,13 +444,13 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
                 </div>
 
-                <h1 className="mb-4 text-lg text-center font-medium">Now it's up to the guesser to find the mystery word...</h1>
+                <h1 className="text-lg text-center font-medium">Now it's up to the stranded agent to figure out their callsign...</h1>
 
             </div>,
 
         footer: 
-            <div className="text-center">
-                Finally, all of the approved hints will be revealed to the guesser who must then use only these hints to successfully guess the mystery word.
+            <div>
+                Finally, all of the approved hints will be revealed to the stranded agent who must then use only these hints to successfully guess their callsign.
             </div>
 
     }];
@@ -461,9 +459,9 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className={tailwindStyles} variant={variant}>How To Play</Button>
+                <Button className={tailwindStyles}>How To Play</Button>
             </DialogTrigger>
-            <DialogContent className="flex flex-col h-[80vh] w-[60vw] p-10 justify-between">
+            <DialogContent className="flex flex-col h-[80vh] top-[10%] w-[60vw] left-[20%] p-10 justify-between">
                 <DialogHeader>
                     <DialogTitle>How To Play</DialogTitle>
                     <DialogDescription />
@@ -499,10 +497,11 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
                                 <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
                                     <div className="grid grid-flow-row  grid-rows-12 h-full">
-                                        <CardContent className="row-span-8 justify-center mt-8">
+                                        <CardContent className="grid row-span-8 mt-6 py-0">
                                             {card.content}
                                         </CardContent>
-                                        <CardFooter className="flex flex-col row-span-4 mb-12 h-fit mt-8 mx-8">
+                                        <CardFooter className="flex flex-col bg-slate-50 h-[55%] rounded-lg border border-slate-400 row-span-4 mt-4 mx-12 px-8 py-0 justify-center text-center">
+                                        {/* <CardFooter className="flex flex-col bg-slate-50 h-[55%] rounded-lg border border-slate-400 row-span-4 mt-4 mx-12 px-8 py-0 items-start justify-center"> */}
                                             {card.footer}
                                         </CardFooter>
                                     </div>
@@ -518,11 +517,7 @@ function DialogHTP({ tailwindStyles, variant, triggerName, isPlayOpen }) {
 
                 <DialogFooter>
 
-                    <div onClick={() => {setOpen(false); setPlayOpen(true);}}>
-
-                        <DialogPlay triggerName={"Let's Play!"} isOpen={[playOpen, setPlayOpen]} />
-
-                    </div>
+                    <Button variant="default" onClick={htpToPlay}>Let's Play!</Button>
 
                 </DialogFooter>
 
