@@ -16,6 +16,28 @@ function App() {
 
 	const [socket, setSocket] = useState(mainSocket);
 
+	const [playerName, setPlayerName] = useState();
+
+	const [selectedPlayers, setSelectedPlayers] = useState();
+
+	const navigate = useNavigate();
+
+	useEffect(() => {
+
+		socket.on("redirectGame", (roomID, playerName, selectedPlayers) => {
+
+			console.log(playerName);
+
+			setPlayerName(playerName);
+
+			setSelectedPlayers(selectedPlayers);
+
+			navigate(`/game/${roomID}`);
+
+		});
+
+	}, [socket]);
+
 	return (
 
 		<div className="App">

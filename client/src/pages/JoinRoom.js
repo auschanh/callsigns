@@ -221,12 +221,6 @@ function JoinRoom() {
 
         });
 
-        socket.on("redirectGame", () => {
-
-			navigate(`/game/${roomID}`);
-
-		});
-
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -239,7 +233,6 @@ function JoinRoom() {
             socket.removeAllListeners("isRoomClosed");
             socket.removeAllListeners("newHost");
             socket.removeAllListeners("exitLobby");
-            socket.removeAllListeners("redirectGame");
 
         }
 

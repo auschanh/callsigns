@@ -312,9 +312,13 @@ io.on("connection", (socket) => { // every connection has a unique socket id
             // looking through all sockets, find a way to confine it to a room
             const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {return socketObj.username === playerName});
 
+            // const socketsInLobby = io.sockets.adapter.rooms.get(roomName);
+
+            // console.log(socketsInLobby);
+
             console.log(foundSocket.id);
 
-            socket.to(foundSocket.id).emit("redirectGame");
+            socket.to(foundSocket.id).emit("redirectGame", socket.roomID, playerName, selectedPlayers);
 
         });
 
