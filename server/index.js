@@ -124,7 +124,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     
             });
 
-            socket.emit("getRoomInfo", `http://localhost:3000/game/${socket.roomID}`, [{playerName: socket.username, isReady: socket.isReady}], socket.roomID);
+            socket.emit("getRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, [{playerName: socket.username, isReady: socket.isReady}], socket.roomID);
 
         } else {
 
@@ -139,7 +139,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
                 const roomList = getPlayersInLobby(socket.roomID);
 
-                io.to(socket.roomID).emit("updateRoomInfo", `http://localhost:3000/game/${socket.roomID}`, roomList, socket.roomID, findRoom);
+                io.to(socket.roomID).emit("updateRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
 
             }
 
@@ -189,7 +189,7 @@ io.on("connection", (socket) => { // every connection has a unique socket id
 
                 console.log(roomList);
 
-                socket.emit("roomExists", roomList, `http://localhost:3000/game/${roomID}`, findRoom);
+                socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom);
 
             } else {
 
@@ -302,6 +302,21 @@ io.on("connection", (socket) => { // every connection has a unique socket id
     socket.on("saveMessageList", (messageList) => {
 
         socket.emit("receiveMessageList", messageList);
+
+    });
+
+    socket.on("startGame", (selectedPlayers) => {
+
+        selectedPlayers.forEach((playerName, index) => {
+
+            // looking through all sockets, find a way to confine it to a room
+            const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {return socketObj.username === playerName});
+
+            console.log(foundSocket.id);
+
+            socket.to(foundSocket.id).emit("redirectGame");
+
+        });
 
     });
 

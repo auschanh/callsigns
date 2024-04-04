@@ -145,7 +145,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} roomID={roomID} />
 
                 )}
 

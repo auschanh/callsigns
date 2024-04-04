@@ -26,13 +26,13 @@ function App() {
 
 					<Route exact path="/" element={ <Home /> } />
 
-					<Route exact path="game" element={ <Game /> } />
+					<Route exact path="lobby/:roomID" element={ <JoinRoom /> } />
 
-					<Route exact path="game/:roomID" element={ <JoinRoom /> } />
+					<Route exact path="game/:roomID" element={ <Game /> } />
 
 					<Route exact path="newhost/:roomID" element={ <NewHost /> } />
 
-					<Route path="*" element={ <Navigate replace to="/" /> } />
+					{/* <Route path="*" element={ <Navigate replace to="/" /> } /> */}
 
 				</Routes>
 

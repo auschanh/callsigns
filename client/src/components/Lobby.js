@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
@@ -9,7 +9,7 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, C
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom, roomID }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -22,6 +22,8 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 	const [removePlayerName, setRemovePlayerName] = useState();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 
@@ -195,6 +197,22 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 		}
 
+	}
+
+	const startGame = async () => {
+
+		try {
+
+			await socket.emit("startGame", selectedPlayers);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+		navigate(`/game/${roomID}`);
+		
 	}
 
 	return (
@@ -457,7 +475,7 @@ const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleCh
 
 				{/* <Link to="game"> */}
 				<div className="flex flex-row mt-auto w-full justify-end">
-					<Button className="w-25" onClick={() => {console.log(selectedPlayers)}} disabled={ selectedPlayers.length === gameInfo.numPlayers ? false : true }>Start Game</Button>
+					<Button className="w-25" onClick={startGame} disabled={ selectedPlayers.length === gameInfo.numPlayers ? false : true }>Start Game</Button>
 				</div>
 				{/* </Link> */}
 
