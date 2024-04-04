@@ -16,7 +16,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
     const username = undefined;
 
-    const mysteryWord = "coffee";
+    const mysteryWord = "coffeee";
 
     const [currentSlide, setCurrentSlide] = useState(0);
 
