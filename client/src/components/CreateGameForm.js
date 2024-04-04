@@ -132,9 +132,10 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 
 				}
 	
-				setPlayerCount(gameInfo.numPlayers);
-	
 			}
+
+			setPlayerCount(gameInfo.numPlayers);
+
 		}
 
 	}, [gameInfo, form]);

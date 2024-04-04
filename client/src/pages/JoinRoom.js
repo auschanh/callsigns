@@ -13,7 +13,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
-import { Copy, Check, MessageSquare } from "lucide-react";
+import { Copy, Check, MessageSquare, LockKeyhole } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 
 function JoinRoom() {
@@ -382,7 +382,10 @@ function JoinRoom() {
 
                                             ) || (
 
-                                                <p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+                                                <>
+                                                    <LockKeyhole className="stroke-2 stroke-slate-900 mr-3" size={15} />
+                                                    <p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+                                                </>
 
                                             )}
 
@@ -429,24 +432,37 @@ function JoinRoom() {
 
                                                 return (
 
-                                                    <Badge 
-                                                        key={index}
-                                                        className={`flex px-3 py-2 h-10 rounded-lg items-center ${player.isReady ? "cursor-pointer" : ""}`}
-                                                        variant={
-                                                            selectedPlayers.includes(player.playerName) 
-                                                                ? "green" 
-                                                                : 
-                                                                    player.isReady 
-                                                                    ? "default" 
-                                                                    : "disabled"
-                                                        }
+                                                    <TooltipProvider key={index}>                      
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                                    variant={
+                                                                        selectedPlayers.includes(player.playerName) 
+                                                                            ? "green" 
+                                                                            : 
+                                                                                player.isReady 
+                                                                                ? "default" 
+                                                                                : "disabled"
+                                                                    }
+                                                                >
+                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                        <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+                                                                    </div>
+                                                                    <p className="text-xs">{player.playerName}</p>
+                                                                </Button>
+                                                            </TooltipTrigger>
 
-                                                    >
-                                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                            <p className="text-slate-900">{player.playerName.charAt(0).toUpperCase()}</p>
-                                                        </div>
-                                                        <p>{player.playerName}</p>
-                                                    </Badge>
+                                                            {!player.isReady && (
+
+                                                                <TooltipContent>
+                                                                    <p className="font-semibold">This player is not ready</p>
+                                                                </TooltipContent>
+
+                                                            )}
+
+                                                        </Tooltip>
+                                                    </TooltipProvider>
 
                                                 );
                                             }
@@ -458,7 +474,7 @@ function JoinRoom() {
 
                                                 return (
 
-                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="empty" key={index}>
+                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                         <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
                                                         <p>Player {lobby.length + index + 1}</p>
                                                     </Badge>
@@ -472,7 +488,7 @@ function JoinRoom() {
 
                                             return (
 
-                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center" variant="bot" key={index}>
+                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                         <p className="text-slate-900">🤖</p>
                                                     </div>
