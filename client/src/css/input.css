@@ -22,7 +22,7 @@
 .example-mark {
     width: 12px;
     height: 12px;
-    border: 2px solid rgb(0, 0, 0);
+    border: 2px solid green;
     background-color: rgb(255, 255, 255);
     cursor: pointer;
     border-radius: 50%;
@@ -32,13 +32,14 @@
   }
   
   .example-mark.example-mark-active {
-    border: 2px solid #00d4ff;
+    border: 2px solid #ff0000;
+    box-shadow: 0 0 0 2px red;
     background-color: rgb(255, 255, 255);
   }
   
   .example-mark.example-mark-completed {
     border: 2px solid rgb(255, 255, 255);
-    background-color: #00d4ff;
+    background-color: #ff0000;
   }
   
   .example-thumb {
@@ -60,7 +61,7 @@
   }
   
   .example-track.example-track-0 {
-    background: #00d4ff;
+    background: #ef4444;
   }
   
   .vertical-slider .example-thumb {

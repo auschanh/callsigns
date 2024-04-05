@@ -24,7 +24,7 @@ const Game = function (props) {
 
   const cards = [
     {
-      title: "Card 1",
+      title: "Round Start",
       color: "#52B2CF"
     },
     {
@@ -50,8 +50,8 @@ const Game = function (props) {
 ];
   
   return (
-    <div>
-      <div className="flex mt-2 ml-2">
+    <div className="bg-black">
+      <div className="flex pt-2 pl-2">
         <div className="fixed w-[5%] mt-10">
           <Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} />
         </div>
