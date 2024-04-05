@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Link,
-  Navigate,
-  Route,
-  Routes,
-  Redirect,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate } from "react-router-dom";
 import "./css/styles.css";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
@@ -22,48 +14,69 @@ import io from "socket.io-client";
 const mainSocket = io.connect("http://localhost:3001");
 
 function App() {
-  const [socket, setSocket] = useState(mainSocket);
 
-  const [playerName, setPlayerName] = useState();
+	const [socket, setSocket] = useState(mainSocket);
 
-  const [selectedPlayers, setSelectedPlayers] = useState();
+	const [playerName, setPlayerName] = useState();
 
-  const [roomID, setRoomID] = useState();
+	const [selectedPlayers, setSelectedPlayers] = useState();
 
-  const navigate = useNavigate();
+	const [roomID, setRoomID] = useState();
 
-  useEffect(() => {
-    socket.on("redirectGame", (roomID, playerName, selectedPlayers) => {
-      console.log(playerName);
+	const navigate = useNavigate();
 
-      setPlayerName(playerName);
+	useEffect(() => {
 
-      setSelectedPlayers(selectedPlayers);
+		socket.on("redirectGame", (roomID, playerName, selectedPlayers) => {
 
-      setRoomID(roomID);
+			setPlayerName(playerName);
 
-      navigate(`/game/${roomID}`);
-    });
-  }, [socket]);
+			setSelectedPlayers(selectedPlayers);
 
-  return (
-    <div className="App">
-      <SocketContext.Provider value={[socket, setSocket]}>
-        <GameInfoContext.Provider value={[playerName, selectedPlayers, roomID]}>
-          <Routes>
-            <Route exact path="/" element={<Home />} />
+			setRoomID(roomID);
 
-            <Route exact path="lobby/:roomID" element={<JoinRoom />} />
-            <Route exact path="game/:roomID" element={<Game />} />
+			navigate(`/game/${roomID}`);
 
-            <Route exact path="newhost/:roomID" element={<NewHost />} />
+		});
 
-            {/* <Route path="*" element={ <Navigate replace to="/" /> } /> */}
-          </Routes>
-        </GameInfoContext.Provider>
-      </SocketContext.Provider>
-    </div>
-  );
+		return () => {
+
+			socket.removeAllListeners("redirectGame");
+
+		}
+
+	}, [socket]);
+
+	return (
+
+		<div className="App">
+
+			<SocketContext.Provider value={[socket, setSocket]}>
+
+				<GameInfoContext.Provider value={[playerName, selectedPlayers, roomID]}>
+
+					<Routes>
+
+						<Route exact path="/" element={<Home />} />
+
+						<Route exact path="lobby/:roomID" element={<JoinRoom />} />
+
+						<Route exact path="game/:roomID" element={<Game />} />
+
+						<Route exact path="newhost/:roomID" element={<NewHost />} />
+
+						<Route path="*" element={<Navigate replace to="/" />} />
+
+					</Routes>
+
+				</GameInfoContext.Provider>
+
+			</SocketContext.Provider>
+
+		</div>
+
+	);
+
 }
 
 export default App;

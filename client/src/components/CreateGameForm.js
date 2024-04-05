@@ -165,6 +165,8 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 
 	const handlePlayerCount = (players) => {
 
+		form.setValue("numPlayers", players);
+
 		setPlayerCount(players);
 
 		form.setValue("aiPlayers", 0);
@@ -258,7 +260,7 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 														<RadioGroupItem
 															value={index + 1}
 															className="invisble h-0 w-0 border-none"
-															onClick={() => {handlePlayerCount(index + 1);}}
+															onClick={() => {handlePlayerCount(index + 1)}}
 														/>
 													</FormControl>
 													{index + 1}
