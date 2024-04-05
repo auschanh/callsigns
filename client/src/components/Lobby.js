@@ -476,7 +476,7 @@ const Lobby = function ({
 
 				<div className="flex flex-row mt-auto w-full justify-end">
 					<Button
-						className="w-25"
+						className="w-25 mt-12 mb-8"
 						onClick={startGame}
 						disabled={
 							selectedPlayers.length === gameInfo.numPlayers ? false : true

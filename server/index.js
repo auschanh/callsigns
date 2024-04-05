@@ -121,6 +121,8 @@ io.on("connection", (socket) => {
 				aiPlayers: aiPlayers,
 				isClosedRoom: false,
 				isGameStarted: false,
+				guesser: "",
+				guesserID: ""
 			});
 
 			socket.emit("getRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
@@ -192,6 +194,10 @@ io.on("connection", (socket) => {
 				socket.emit("roomExists", ...[, , ,], findRoom?.isClosedRoom);
 
 			}
+
+		} else {
+
+			socket.emit("roomExists", ...[, , ,], findRoom?.isClosedRoom);
 
 		}
 
@@ -307,6 +313,10 @@ io.on("connection", (socket) => {
 
 	socket.on("startGame", (selectedPlayers) => {
 
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
+
+		findRoom.isGameStarted = true;
+
 		// get all socketIDs in lobby as strings
 		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
 
@@ -325,6 +335,22 @@ io.on("connection", (socket) => {
 
 		});
 
+		if (findRoom.guesser === "" && findRoom.guesserID === "") {
+
+			const guesser = usernames[Math.floor(Math.random() * usernames.length)];
+
+			findRoom.guesser = guesser.username;
+			findRoom.guesserID = guesser.socketID;
+
+		} else {
+
+			const guesserIndex = usernames.findIndex(({username}) => { return username === findRoom.guesser});
+
+			findRoom.guesser = usernames[guesserIndex].username;
+			findRoom.guesserID = usernames[guesserIndex].socketID;
+
+		}
+
 		// then look at all the selected players
 		selectedPlayers.forEach((playerName) => {
 
@@ -337,6 +363,12 @@ io.on("connection", (socket) => {
 
 		// set host info
 		socket.emit("redirectGame", socket.roomID, socket.username, selectedPlayers);
+
+	});
+
+	socket.on("sendCallsign", (callsign, generatedWords) => {
+
+		socket.to(socket.roomID).emit("receiveCallsign", callsign, generatedWords);
 
 	});
 

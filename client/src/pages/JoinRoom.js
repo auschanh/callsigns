@@ -49,7 +49,7 @@ function JoinRoom() {
     const [open, setOpen] = useState(true);
 
     // use %20 in address bar for space
-    let { roomID } = useParams();
+    const { roomID } = useParams();
 
     const navigate = useNavigate();
 
