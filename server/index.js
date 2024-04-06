@@ -194,13 +194,13 @@ io.on("connection", (socket) => {
 
 			} else {
 
-				socket.emit("roomExists", ...[, , ,], findRoom?.isClosedRoom);
+				socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
 
 			}
 
 		} else {
 
-			socket.emit("roomExists", ...[, , ,], findRoom?.isClosedRoom);
+			socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
 
 		}
 
@@ -254,7 +254,7 @@ io.on("connection", (socket) => {
 
 		} else {
 
-			socket.emit("getLobby", ...[, ,], findRoom?.isClosedRoom);
+			socket.emit("getLobby", ...[,,], findRoom?.isClosedRoom);
 
 		}
 
@@ -278,21 +278,31 @@ io.on("connection", (socket) => {
 
 	socket.on("removePlayer", (player) => {
 
-		const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {
+		[...io.sockets.adapter.rooms.get(socket.roomID)].some((socketID) => {
 
-			return socketObj.username === player;
+			const foundSocket = io.sockets.sockets.get(socketID);
+
+			if (player === foundSocket.username) {
+
+				console.log(`${player} has been removed from ${socket.roomID}`);
+
+				socket.to(foundSocket.id).emit("exitLobby");
+
+				foundSocket.leave(socket.roomID);
+
+				console.log(getPlayersInLobby(socket.roomID));
+
+				io.to(socket.roomID).emit("leftRoom", player);
+
+				return true;
+
+			} else {
+
+				return false;
+
+			}
 
 		});
-
-		console.log(`${player} has been removed from ${socket.roomID}`);
-
-		socket.to(foundSocket.id).emit("exitLobby");
-
-		foundSocket.leave(socket.roomID);
-
-		console.log(getPlayersInLobby(socket.roomID));
-
-		io.to(socket.roomID).emit("leftRoom", player);
 
 	});
 
