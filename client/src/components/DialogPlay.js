@@ -186,7 +186,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                                             <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
                                                 <div className="h-full">
-                                                    <CardContent className="px-8 pb-10 pt-6 h-full">
+                                                    <CardContent className="px-8 pb-0 pt-6 h-full">
                                                         {slide.content}
                                                     </CardContent>
                                                 </div>

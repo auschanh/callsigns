@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
 
 	const getPlayersInLobby = (roomName) => {
 
-		const lobby = [...io.sockets.adapter.rooms].find((room) => { return room[0] === roomName })[1];
+		const lobby = io.sockets.adapter.rooms.get(roomName);
 
 		return usernameLookup([...lobby]);
 
@@ -83,7 +83,7 @@ io.on("connection", (socket) => {
 
 		return lobbyArray.map((socketID) => {
 
-			let foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === socketID });
+			const foundSocket = io.sockets.sockets.get(socketID);
 
 			return {
 
@@ -153,16 +153,19 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("closeRoom", (isClosedRoom) => {
-		const findRoom = roomLookup.find(({ roomID }) => {
-			return roomID === socket.roomID;
-		});
+
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
 
 		if (findRoom) {
+
 			findRoom.isClosedRoom = isClosedRoom;
 
 			socket.to(socket.roomID).emit("isRoomClosed", isClosedRoom);
+
 		} else {
+
 			console.log("unable to find room");
+			
 		}
 
 		console.log(findRoom);
@@ -173,11 +176,11 @@ io.on("connection", (socket) => {
 
 		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
 
-		const lobby = [...io.sockets.adapter.rooms].find((room) => { return room[0] === roomID });
+		const lobby = io.sockets.adapter.rooms.get(roomID);
 
 		if (lobby) {
 
-			const socketsInLobby = [...lobby[1]];
+			const socketsInLobby = [...lobby];
 
 			if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
 
@@ -207,7 +210,7 @@ io.on("connection", (socket) => {
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName});
 
-		const lobby = [...[...io.sockets.adapter.rooms].find((room) => { return room[0] === roomName })[1]];
+		const lobby = [...io.sockets.adapter.rooms.get(roomName)];
 
 		if (lobby.includes(socket.id)) {
 
@@ -323,7 +326,7 @@ io.on("connection", (socket) => {
 		const usernames = socketsInLobby.map((socketID) => {
 
 			// use those strings to get the actual socket objects
-			const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === socketID });
+			const foundSocket = io.sockets.sockets.get(socketID);
 
 			return {
 
@@ -407,11 +410,11 @@ io.on("connection", (socket) => {
 				// if you're the host
 				if (findRoom && findRoom.hostID === socket.id) {
 
-					const socketsInLobby = [...[...io.sockets.adapter.rooms].find((room) => {return room[0] === socket.roomID})[1]];
+					const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
 
 					const newHostSocketID = socketsInLobby.find((playerSocket) => { return playerSocket !== socket.id });
 
-					const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === newHostSocketID });
+					const foundSocket = io.sockets.sockets.get(newHostSocketID);
 
 					findRoom.host = foundSocket.username;
 					findRoom.hostID = foundSocket.id;

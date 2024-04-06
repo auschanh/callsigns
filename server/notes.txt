@@ -10,7 +10,7 @@
     // array of people
     // console.log([...io.sockets.adapter.sids.keys()]);
 
-    // // full socket information
+    // // get socket object
     // console.log(io.sockets.sockets.get(socket.id));
 
     // either works to send a message to the room
