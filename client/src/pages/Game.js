@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
-import WordGenerator from "../components/WordGenerator";
-import Timeline from "../components/Timeline";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
-
-import axios from "axios";
 
 const Game = function (props) {
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [playerName, selectedPlayers, roomID] = useGameInfoContext();
+	const [roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]] = useGameInfoContext();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
@@ -25,42 +21,7 @@ const Game = function (props) {
 
 	const [playersInLobby, setPlayersInLobby] = useState();
 
-	const [callsign, setCallsign] = useState();
-
-	const [generatedWords, setGeneratedWords] = useState([]);
-
-	const [correctGuess, setCorrectGuess] = useState();
-
-	const [errMsg, setErrMsg] = useState();
-
-	const generateWord = async () => {
-
-		const url = "http://localhost:3001/getMysteryWord";
-
-		try {
-
-			const response = await axios.get(url);
-
-			const retrievedWord = response.data;
-
-			if (generatedWords.includes(retrievedWord)) {
-
-				return generateWord();
-
-			} else {
-
-				return retrievedWord;
-
-			}
-
-		} catch (error) {
-
-			throw error;
-
-		}
-
-	}
-
+	// for host only
 	const sendSelected = async () => {
 
 		try {
@@ -95,33 +56,7 @@ const Game = function (props) {
     
             })();
 
-        } else if (roomDetails.host === playerName && callsign === undefined) {
-
-			(async () => {
-
-				const retrievedWord = await generateWord();
-
-				setCallsign(retrievedWord);
-
-				setGeneratedWords([...generatedWords, retrievedWord]);
-
-				setCorrectGuess(false);
-
-				setErrMsg(false);
-
-				try {
-
-					await socket.emit("sendCallsign", retrievedWord, [...generatedWords, retrievedWord]);
-	
-				} catch (error) {
-	
-					throw error;
-	
-				}
-
-			})();
-
-		}
+        }
 
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
 
@@ -129,17 +64,19 @@ const Game = function (props) {
 
                 setInGame(
 
-					selectedPlayers.filter((player) => { return othersInLobby.find(({playerName}) => { return playerName === player})})
+					selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) })
 					
 				);
-
-				setPlayersInLobby(othersInLobby);
 
                 setRoomDetails(roomDetails);
 
 				setIsClosedRoom(roomDetails.isClosedRoom);
 
+				setPlayersInLobby(othersInLobby);
+
             } else {
+
+				// setRoomDetails(false);
 
             	setIsAlertOpen(true);
 
@@ -147,6 +84,7 @@ const Game = function (props) {
 
         });
 
+		// for host only
 		socket.on("sendSelectedPlayers", () => {
 
 			sendSelected();
@@ -163,17 +101,11 @@ const Game = function (props) {
 
 			console.log(`${user} has left the lobby`);
 
-			setInGame(inGame.filter((player) => { return player !== user}));
+			setInGame(inGame.filter((player) => { return player !== user }));
 
-            setPlayersInLobby(playersInLobby.filter(({playerName}) => { return playerName !== user}));
+            setPlayersInLobby(playersInLobby.filter(({playerName}) => { return playerName !== user }));
 
-		});
-
-		socket.on("receiveCallsign", (callsign, generatedWords) => {
-
-			setCallsign(callsign);
-
-			setGeneratedWords(generatedWords);
+			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 
 		});
 
@@ -183,11 +115,9 @@ const Game = function (props) {
 			socket.removeAllListeners("sendSelectedPlayers");
             socket.removeAllListeners("joinedLobby");
             socket.removeAllListeners("leftRoom");
-			socket.removeAllListeners("receiveCallsign");
-
         }
 
-    }, [socket, roomDetails, roomID, playerName, selectedPlayers, sendSelected, inGame, playersInLobby, generatedWords, callsign]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, inGame, playersInLobby]);
 
 	return (
 

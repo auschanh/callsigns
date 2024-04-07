@@ -40,8 +40,17 @@ app.post("/newJsonFile", (req, res) => {
 	res.status(200);
 });
 
+// "Board" --remove this line later
+let count = 72;
+
 const getMysteryWord = () => {
-	const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
+
+	// --remove these lines later
+	const randomWord = wordFile[count].Word;
+	count++;
+
+	// reactivate this line
+	// const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
 	console.log(randomWord);
 	return randomWord;
 };
@@ -348,21 +357,55 @@ io.on("connection", (socket) => {
 
 		});
 
+		// choose a guesser
 		if (findRoom.guesser === "" && findRoom.guesserID === "") {
 
-			const guesser = usernames[Math.floor(Math.random() * usernames.length)];
+			const index = Math.floor(Math.random() * selectedPlayers.length);
+
+			const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
 
 			findRoom.guesser = guesser.username;
 			findRoom.guesserID = guesser.socketID;
 
 		} else {
 
-			const guesserIndex = usernames.findIndex(({username}) => { return username === findRoom.guesser});
+			const prevGuesserIndex = selectedPlayers.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-			findRoom.guesser = usernames[guesserIndex].username;
-			findRoom.guesserID = usernames[guesserIndex].socketID;
+			if (prevGuesserIndex) {
+
+				const currentGuesser = usernames.find(({ username }) => { return username === selectedPlayers[(prevGuesserIndex + 1) % selectedPlayers.length] });
+
+				if (currentGuesser) {
+
+					// next to be guesser
+					findRoom.guesser = currentGuesser.username;
+					findRoom.guesserID = currentGuesser.socketID;
+
+				} else {
+
+					const index = Math.floor(Math.random() * selectedPlayers.length);
+
+					const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+					findRoom.guesser = guesser.username;
+					findRoom.guesserID = guesser.socketID;
+
+				}
+
+			} else {
+
+				const index = Math.floor(Math.random() * selectedPlayers.length);
+
+				const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+				findRoom.guesser = guesser.username;
+				findRoom.guesserID = guesser.socketID;
+
+			}
 
 		}
+
+		const callsign = getMysteryWord();
 
 		// then look at all the selected players
 		selectedPlayers.forEach((playerName) => {
@@ -370,18 +413,18 @@ io.on("connection", (socket) => {
 			// get each selected player's socketID
 			const socketInfo = usernames.find(({username}) => { return username === playerName });
 
-			socket.to(socketInfo.socketID).emit("redirectGame", socket.roomID, playerName, selectedPlayers);
+			socket.to(socketInfo.socketID).emit("redirectGame", socket.roomID, playerName, selectedPlayers, callsign, false);
 
 		});
 
 		// set host info
-		socket.emit("redirectGame", socket.roomID, socket.username, selectedPlayers);
+		socket.emit("redirectGame", socket.roomID, socket.username, selectedPlayers, callsign, true);
 
 	});
 
 	socket.on("sendCallsign", (callsign, generatedWords) => {
 
-		socket.to(socket.roomID).emit("receiveCallsign", callsign, generatedWords);
+		io.to(socket.roomID).emit("receiveCallsign", callsign, generatedWords);
 
 	});
 

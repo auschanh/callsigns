@@ -9,6 +9,8 @@ import SocketContext from "./contexts/SocketContext";
 import GameInfoContext from "./contexts/GameInfoContext";
 import styles from "./css/tailwindStylesLiterals";
 
+import axios from "axios";
+
 import io from "socket.io-client";
 
 const mainSocket = io.connect("http://localhost:3001");
@@ -17,35 +19,112 @@ function App() {
 
 	const [socket, setSocket] = useState(mainSocket);
 
+	const [roomID, setRoomID] = useState();
+
 	const [playerName, setPlayerName] = useState();
 
 	const [selectedPlayers, setSelectedPlayers] = useState();
 
-	const [roomID, setRoomID] = useState();
+	const [callsign, setCallsign] = useState();
+
+	const [generatedWords, setGeneratedWords] = useState(["Board", "Boil", "Bolt"]);
 
 	const navigate = useNavigate();
 
+	const generateWord = async () => {
+
+		const url = "http://localhost:3001/getMysteryWord";
+
+		try {
+
+			const response = await axios.get(url);
+
+			const retrievedWord = response.data;
+
+			if (generatedWords.includes(retrievedWord)) {
+
+				return generateWord();
+
+			} else {
+
+				return retrievedWord;
+
+			}
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+	}
+
 	useEffect(() => {
 
-		socket.on("redirectGame", (roomID, playerName, selectedPlayers) => {
+		socket.on("redirectGame", (roomID, playerName, selectedPlayers, callsign, isHost) => {
 
-			setPlayerName(playerName);
+			(async () => {
 
-			setSelectedPlayers(selectedPlayers);
+				setRoomID(roomID);
 
-			setRoomID(roomID);
+				setPlayerName(playerName);
 
-			navigate(`/game/${roomID}`);
+				setSelectedPlayers(selectedPlayers);
+
+				if (isHost) {
+
+					if (generatedWords.includes(callsign)) {
+
+						const retrievedWord = await generateWord();
+
+						try {
+
+							await socket.emit("sendCallsign", retrievedWord, [...generatedWords, retrievedWord]);
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+	
+					} else {
+
+						try {
+
+							await socket.emit("sendCallsign", callsign, [...generatedWords, callsign]);
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+	
+					}
+
+				}
+
+				navigate(`/game/${roomID}`);
+
+			})();
+
+		});
+
+		socket.on("receiveCallsign", (callsign, generatedWords) => {
+
+			setCallsign(callsign);
+
+			setGeneratedWords(generatedWords);
 
 		});
 
 		return () => {
 
 			socket.removeAllListeners("redirectGame");
+			socket.removeAllListeners("receiveCallsign");
 
 		}
 
-	}, [socket]);
+	}, [socket, generatedWords, generateWord, navigate]);
 
 	return (
 
@@ -53,7 +132,7 @@ function App() {
 
 			<SocketContext.Provider value={[socket, setSocket]}>
 
-				<GameInfoContext.Provider value={[playerName, selectedPlayers, roomID]}>
+				<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]]}>
 
 					<Routes>
 

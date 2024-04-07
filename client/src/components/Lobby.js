@@ -1,63 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-	Link,
-	Navigate,
-	Route,
-	Routes,
-	Redirect,
-	useLocation,
-	useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "./ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { SmallSwitch } from "../components/ui/small-switch";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "../components/ui/tooltip";
-import {
-	ContextMenu,
-	ContextMenuTrigger,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuCheckboxItem,
-	ContextMenuRadioItem,
-	ContextMenuLabel,
-	ContextMenuSeparator,
-	ContextMenuShortcut,
-	ContextMenuGroup,
-	ContextMenuPortal,
-	ContextMenuSub,
-	ContextMenuSubContent,
-	ContextMenuSubTrigger,
-	ContextMenuRadioGroup,
-} from "./ui/context-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
+import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuCheckboxItem, ContextMenuRadioItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut, ContextMenuGroup, ContextMenuPortal, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuRadioGroup } from "./ui/context-menu";
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({
-	gameInfo,
-	sessionUrl,
-	inLobby,
-	previousSlide,
-	handleChatExpansion,
-	newMessage,
-	prevClosedRoom,
-	roomID,
-}) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom, roomID }) {
+
 	const [socket, setSocket] = useSocketContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
@@ -73,144 +26,208 @@ const Lobby = function ({
 	const navigate = useNavigate();
 
 	useEffect(() => {
+
 		selectedPlayers.forEach((player) => {
-			if (
-				!inLobby.some(({ playerName }) => {
-					return playerName === player;
-				})
-			) {
-				setSelectedPlayers(
-					selectedPlayers.filter((value) => {
-						return value !== player;
-					})
-				);
+
+			if (!inLobby.some(({ playerName }) => { return playerName === player })) {
+
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player }));
+
 			}
+
 		});
 
 		inLobby?.forEach((player) => {
+
 			if (selectedPlayers.includes(player.playerName) && !player.isReady) {
-				setSelectedPlayers(
-					selectedPlayers.filter((value) => {
-						return value !== player.playerName;
-					})
-				);
+
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+
 			}
+
 		});
+
 	}, [inLobby]);
 
 	const sendSelected = async () => {
+
 		try {
+
 			await socket.emit("setSelectedPlayers", selectedPlayers);
+
 		} catch (error) {
+
 			throw error;
+
 		}
+
 	};
 
 	useEffect(() => {
+
 		socket.on("sendSelectedPlayers", () => {
+
 			sendSelected();
+
 		});
+
+		return () => {
+
+			socket.removeAllListeners("sendSelectedPlayers");
+
+		}
+
 	}, [socket, sendSelected]);
 
 	useEffect(() => {
+
 		sendSelected();
+
 	}, [selectedPlayers, sendSelected]);
 
 	const handleCloseRoom = async () => {
+
 		try {
+
 			await socket.emit("closeRoom", !isClosedRoom);
+
 		} catch (error) {
+
 			throw error;
+
 		}
 
 		setIsClosedRoom(!isClosedRoom);
+
 	};
 
 	const handleCopy = async () => {
+
 		try {
+
 			if ("clipboard" in navigator) {
+
 				await navigator.clipboard.writeText(sessionUrl);
+
 			} else {
+
 				document.execCommand("copy", true, sessionUrl);
+
 			}
 
 			setCopied(true);
 
 			setTimeout(() => {
+
 				setCopied(false);
+
 			}, 1000);
+
 		} catch (error) {
+
 			throw error;
+
 		}
+
 	};
 
 	const handleSelectPlayer = (player) => {
+
 		if (player.isReady) {
+
 			console.log("sure " + player.playerName + " is ready");
 
 			if (!selectedPlayers.includes(player.playerName)) {
+
 				setSelectedPlayers([...selectedPlayers, player.playerName]);
+
 			} else {
-				setSelectedPlayers(
-					selectedPlayers.filter((value) => {
-						return value !== player.playerName;
-					})
-				);
+
+				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+
 			}
+
 		} else {
+
 			console.log(player.playerName + " is not ready");
+
 		}
 	};
 
 	const handleRemovePlayer = async (playerType) => {
+
 		if (playerType === "bot") {
+
 			try {
-				await socket.emit(
-					"gameInfo",
-					{ ...gameInfo, aiPlayers: gameInfo.aiPlayers - 1 },
-					true
-				);
+
+				await socket.emit("gameInfo", { ...gameInfo, aiPlayers: gameInfo.aiPlayers - 1 }, true);
+
 			} catch (error) {
+
 				throw error;
+
 			}
+
 		} else if (playerType === "missingPlayer") {
+
 			try {
-				await socket.emit(
-					"gameInfo",
-					{ ...gameInfo, numPlayers: gameInfo.numPlayers - 1 },
-					true
-				);
+
+				await socket.emit("gameInfo", { ...gameInfo, numPlayers: gameInfo.numPlayers - 1 }, true);
+
 			} catch (error) {
+
 				throw error;
+
 			}
+
 		} else if (playerType.match(/^player-/gm)) {
+
 			setRemovePlayerName(playerType.substring(7));
 
 			setIsAlertOpen(true);
+
 		}
+
 	};
 
 	const removePlayer = async () => {
+
 		try {
+
 			await socket.emit("removePlayer", removePlayerName);
+
 		} catch (error) {
+
 			throw error;
+
 		}
+
 	};
 
 	const startGame = async () => {
+
 		try {
+
 			await socket.emit("startGame", selectedPlayers);
+
 		} catch (error) {
+
 			throw error;
+
 		}
+
 	};
 
 	return (
+
 		<>
+
 			<div className="flex flex-col h-full">
+
 				<div className="flex flex-col bg-slate-200 border-slate-400 rounded-md">
+
 					<div className="flex flex-row justify-between mb-2 relative">
+
 						<Button
 							className="px-0 w-fit text-xs"
 							variant="link"
@@ -232,6 +249,7 @@ const Lobby = function ({
 									}`}
 							/>
 						</Button>
+
 					</div>
 
 					<h1 className="font-semibold text-lg mb-6 border border-b-slate-900">
@@ -263,8 +281,11 @@ const Lobby = function ({
 					)}
 
 					<div className="mb-6">
+
 						<div className="flex flex-row items-center mb-2">
+
 							<h1 className="text-sm font-semibold">Link</h1>
+
 							<div className="flex items-center justify-end w-full">
 								<p className="text-xs mr-2">Close Room:</p>
 								<SmallSwitch
@@ -273,7 +294,9 @@ const Lobby = function ({
 									onCheckedChange={handleCloseRoom}
 								/>
 							</div>
+
 						</div>
+
 						<div className="flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
 							<p className="text-sm break-all">{sessionUrl}</p>
 							<Button
@@ -284,6 +307,7 @@ const Lobby = function ({
 								{(!copied && <Copy size={12} />) || <Check size={14} />}
 							</Button>
 						</div>
+
 					</div>
 
 					<h1 className="text-sm font-semibold mb-2">
@@ -292,9 +316,13 @@ const Lobby = function ({
 					</h1>
 
 					<div className="flex flex-wrap gap-x-3 gap-y-3">
+
 						{inLobby?.map((player, index) => {
+
 							if (player.playerName === gameInfo.username) {
+
 								return (
+
 									<ContextMenu key={index}>
 										<ContextMenuTrigger>
 											<TooltipProvider>
@@ -335,9 +363,13 @@ const Lobby = function ({
 											</ContextMenuItem>
 										</ContextMenuContent>
 									</ContextMenu>
+
 								);
+
 							} else {
+
 								return (
+
 									<ContextMenu key={index}>
 										<ContextMenuTrigger>
 											<TooltipProvider>
@@ -392,53 +424,60 @@ const Lobby = function ({
 											</ContextMenuItem>
 										</ContextMenuContent>
 									</ContextMenu>
+
 								);
+
 							}
+
 						})}
 
-						{inLobby &&
-							Array.from(
-								{ length: gameInfo.numPlayers - inLobby.length },
-								(_, index) => {
-									if (inLobby.length < gameInfo.numPlayers) {
-										return (
-											<ContextMenu key={index}>
-												<ContextMenuTrigger>
-													<Badge
-														className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-														variant="empty"
-														key={index}
-													>
-														<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-														<p>Player {inLobby.length + index + 1}</p>
-													</Badge>
-												</ContextMenuTrigger>
-												<ContextMenuContent className="p-0 border-0">
-													<ContextMenuItem
-														disabled={
-															gameInfo.numPlayers + gameInfo.aiPlayers <= 3
-														}
-														className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-														onClick={() => {
-															handleRemovePlayer("missingPlayer");
-														}}
-													>
-														{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-															<>
-																<X size={16} />
-																<p>Remove from Lobby</p>
-															</>
-														)) || <p className="pl-2">Minimum 3 players</p>}
-													</ContextMenuItem>
-												</ContextMenuContent>
-											</ContextMenu>
-										);
-									}
-								}
-							)}
+						{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
+
+							if (inLobby.length < gameInfo.numPlayers) {
+
+								return (
+
+									<ContextMenu key={index}>
+										<ContextMenuTrigger>
+											<Badge
+												className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+												variant="empty"
+												key={index}
+											>
+												<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+												<p>Player {inLobby.length + index + 1}</p>
+											</Badge>
+										</ContextMenuTrigger>
+										<ContextMenuContent className="p-0 border-0">
+											<ContextMenuItem
+												disabled={
+													gameInfo.numPlayers + gameInfo.aiPlayers <= 3
+												}
+												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+												onClick={() => {
+													handleRemovePlayer("missingPlayer");
+												}}
+											>
+												{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+													<>
+														<X size={16} />
+														<p>Remove from Lobby</p>
+													</>
+												)) || <p className="pl-2">Minimum 3 players</p>}
+											</ContextMenuItem>
+										</ContextMenuContent>
+									</ContextMenu>
+
+								);
+
+							}
+
+						})}
 
 						{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+
 							return (
+
 								<ContextMenu key={index}>
 									<ContextMenuTrigger>
 										<Badge
@@ -469,22 +508,27 @@ const Lobby = function ({
 										</ContextMenuItem>
 									</ContextMenuContent>
 								</ContextMenu>
+
 							);
+
 						})}
+
 					</div>
+
 				</div>
 
 				<div className="flex flex-row mt-auto pb-10 w-full justify-end">
+
 					<Button
 						className="w-25 mt-12"
 						onClick={startGame}
-						disabled={
-							selectedPlayers.length === gameInfo.numPlayers ? false : true
-						}
+						disabled={selectedPlayers.length === gameInfo.numPlayers ? false : true}
 					>
 						Start Game
 					</Button>
+
 				</div>
+
 			</div>
 
 			<AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
@@ -511,8 +555,11 @@ const Lobby = function ({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
 		</>
+
 	);
-};
+
+}
 
 export default Lobby;
