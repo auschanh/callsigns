@@ -6,6 +6,7 @@ import Game from "./pages/Game";
 import JoinRoom from "./pages/JoinRoom";
 import NewHost from "./pages/NewHost";
 import SocketContext from "./contexts/SocketContext";
+import MessageContext from "./contexts/MessageContext";
 import GameInfoContext from "./contexts/GameInfoContext";
 import styles from "./css/tailwindStylesLiterals";
 
@@ -28,6 +29,8 @@ function App() {
 	const [callsign, setCallsign] = useState();
 
 	const [generatedWords, setGeneratedWords] = useState(["Board", "Boil", "Bolt"]);
+
+	const [messageList, setMessageList] = useState([]);
 
 	const navigate = useNavigate();
 
@@ -132,23 +135,27 @@ function App() {
 
 			<SocketContext.Provider value={[socket, setSocket]}>
 
-				<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]]}>
+				<MessageContext.Provider value={[messageList, setMessageList]}>
 
-					<Routes>
+					<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]]}>
 
-						<Route exact path="/" element={<Home />} />
+						<Routes>
 
-						<Route exact path="lobby/:roomID" element={<JoinRoom />} />
+							<Route exact path="/" element={<Home />} />
 
-						<Route exact path="game/:roomID" element={<Game />} />
+							<Route exact path="lobby/:roomID" element={<JoinRoom />} />
 
-						<Route exact path="newhost/:roomID" element={<NewHost />} />
+							<Route exact path="game/:roomID" element={<Game />} />
 
-						<Route path="*" element={<Navigate replace to="/" />} />
+							<Route exact path="newhost/:roomID" element={<NewHost />} />
 
-					</Routes>
+							<Route path="*" element={<Navigate replace to="/" />} />
 
-				</GameInfoContext.Provider>
+						</Routes>
+
+					</GameInfoContext.Provider>
+
+				</MessageContext.Provider>
 
 			</SocketContext.Provider>
 

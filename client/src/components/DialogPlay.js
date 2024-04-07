@@ -8,7 +8,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [], prevClosedRoom }) {
+const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -29,8 +29,6 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
     const [isRoomCreated, setIsRoomCreated] = useState(isNewHost);
 
     const [chatExpanded, setChatExpanded] = useState(false);
-
-    const [messageList, setMessageList] = useState(prevMessageList);
 
     const [newMessage, setNewMessage] = useState(false);
 
@@ -145,7 +143,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} roomID={roomID} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
 
                 )}
 
@@ -206,7 +204,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} setNewMessage={setNewMessage} />
 
                 </div>
 

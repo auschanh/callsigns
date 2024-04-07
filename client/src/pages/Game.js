@@ -58,7 +58,7 @@ const Game = function (props) {
 
         }
 
-        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
             if (othersInLobby) {
 

@@ -9,7 +9,7 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, C
 import { useSocketContext } from "../contexts/SocketContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom, roomID }) {
+const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
 
 	const [socket, setSocket] = useSocketContext();
 

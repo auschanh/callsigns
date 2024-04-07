@@ -191,7 +191,9 @@ io.on("connection", (socket) => {
 
 			const socketsInLobby = [...lobby];
 
-			if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
+			const inRoom = socketsInLobby.includes(socket.id);
+
+			if (findRoom && (!findRoom.isClosedRoom || inRoom)) {
 
 				const roomList = getPlayersInLobby(roomID);
 
@@ -199,17 +201,17 @@ io.on("connection", (socket) => {
 
 				console.log(roomList);
 
-				socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom);
+				socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom, inRoom);
 
 			} else {
 
-				socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
+				socket.emit("roomExists", ...[,,,,], findRoom?.isClosedRoom);
 
 			}
 
 		} else {
 
-			socket.emit("roomExists", ...[,,,], findRoom?.isClosedRoom);
+			socket.emit("roomExists", ...[,,,,], findRoom?.isClosedRoom);
 
 		}
 
@@ -324,12 +326,6 @@ io.on("connection", (socket) => {
 	socket.on("newUsername", (roomID, prevUsername, newUsername) => {
 
 		socket.to(roomID).emit("getNewUsername", prevUsername, newUsername);
-
-	});
-
-	socket.on("saveMessageList", (messageList) => {
-
-		socket.emit("receiveMessageList", messageList);
 
 	});
 

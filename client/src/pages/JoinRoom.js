@@ -42,8 +42,6 @@ function JoinRoom() {
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
-    const [messageList, setMessageList] = useState([]);
-
     const [newMessage, setNewMessage] = useState(false);
 
     const [open, setOpen] = useState(true);
@@ -98,7 +96,7 @@ function JoinRoom() {
 
         }
 
-        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
             if (othersInLobby) {
 
@@ -201,8 +199,6 @@ function JoinRoom() {
 
         socket.on("newHost", () => {
 
-            socket.emit("saveMessageList", messageList);
-
             navigate(`/newhost/${roomID}`);
 
         });
@@ -236,7 +232,7 @@ function JoinRoom() {
 
         }
 
-    }, [socket, roomID, username, lobby, roomDetails, messageList]);
+    }, [socket, roomID, username, lobby, roomDetails]);
 
     useEffect(() => {
 
@@ -509,7 +505,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={lobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={lobby} roomID={roomID} setNewMessage={setNewMessage} />
 
                         </div>
 

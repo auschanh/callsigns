@@ -5,14 +5,15 @@ import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useMessageContext } from "../contexts/MessageContext";
 
-function Chat({ chatExpanded, username, roomName, inLobby, roomID, messages, setNewMessage }) {
+function Chat({ chatExpanded, username, roomName, inLobby, roomID, setNewMessage }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [message, setMessage] = useState('');
+    const [messageList, setMessageList] = useMessageContext();
 
-    const [messageList, setMessageList] = messages;
+    const [message, setMessage] = useState('');
 
     const [currentUsername, setCurrentUsername] = useState('');
 
