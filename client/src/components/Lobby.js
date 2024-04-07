@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
@@ -7,23 +6,25 @@ import { SmallSwitch } from "../components/ui/small-switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuCheckboxItem, ContextMenuRadioItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut, ContextMenuGroup, ContextMenuPortal, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuRadioGroup } from "./ui/context-menu";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, inLobby, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
+const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
 
 	const [socket, setSocket] = useSocketContext();
+
+	const [,,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
+
+	const [inLobby, setInLobby] = useLobbyContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 
 	const [copied, setCopied] = useState(false);
 
-	const [selectedPlayers, setSelectedPlayers] = useState([]);
-
 	const [removePlayerName, setRemovePlayerName] = useState();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
-
-	const navigate = useNavigate();
 
 	useEffect(() => {
 

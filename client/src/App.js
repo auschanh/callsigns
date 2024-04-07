@@ -7,6 +7,7 @@ import JoinRoom from "./pages/JoinRoom";
 import NewHost from "./pages/NewHost";
 import SocketContext from "./contexts/SocketContext";
 import MessageContext from "./contexts/MessageContext";
+import LobbyContext from "./contexts/LobbyContext";
 import GameInfoContext from "./contexts/GameInfoContext";
 import styles from "./css/tailwindStylesLiterals";
 
@@ -24,13 +25,17 @@ function App() {
 
 	const [playerName, setPlayerName] = useState();
 
-	const [selectedPlayers, setSelectedPlayers] = useState();
+	const [selectedPlayers, setSelectedPlayers] = useState([]);
 
 	const [callsign, setCallsign] = useState();
 
 	const [generatedWords, setGeneratedWords] = useState(["Board", "Boil", "Bolt"]);
 
 	const [messageList, setMessageList] = useState([]);
+
+	const [inLobby, setInLobby] = useState([]);
+
+	const [inGame, setInGame] = useState();
 
 	const navigate = useNavigate();
 
@@ -120,14 +125,34 @@ function App() {
 
 		});
 
+		socket.on("getRoomList", (roomList) => {
+
+			setInLobby(roomList);
+
+        });
+
+		socket.on("leftRoom", (user) => {
+
+			console.log(`${user} has left the lobby`);
+
+            setInLobby(inLobby.filter(({playerName}) => { return playerName !== user }));
+
+			setInGame(inGame?.filter((player) => { return player !== user }));
+
+			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
+
+		});
+
 		return () => {
 
 			socket.removeAllListeners("redirectGame");
 			socket.removeAllListeners("receiveCallsign");
+			socket.removeAllListeners("getRoomList");
+			socket.removeAllListeners("leftRoom");
 
 		}
 
-	}, [socket, generatedWords, generateWord, navigate]);
+	}, [socket, generatedWords, generateWord, navigate, inLobby, inGame, selectedPlayers]);
 
 	return (
 
@@ -137,23 +162,27 @@ function App() {
 
 				<MessageContext.Provider value={[messageList, setMessageList]}>
 
-					<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]]}>
+					<LobbyContext.Provider value={[inLobby, setInLobby]}>
 
-						<Routes>
+						<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]]}>
 
-							<Route exact path="/" element={<Home />} />
+							<Routes>
 
-							<Route exact path="lobby/:roomID" element={<JoinRoom />} />
+								<Route exact path="/" element={<Home />} />
 
-							<Route exact path="game/:roomID" element={<Game />} />
+								<Route exact path="lobby/:roomID" element={<JoinRoom />} />
 
-							<Route exact path="newhost/:roomID" element={<NewHost />} />
+								<Route exact path="game/:roomID" element={<Game />} />
 
-							<Route path="*" element={<Navigate replace to="/" />} />
+								<Route exact path="newhost/:roomID" element={<NewHost />} />
 
-						</Routes>
+								<Route path="*" element={<Navigate replace to="/" />} />
 
-					</GameInfoContext.Provider>
+							</Routes>
+
+						</GameInfoContext.Provider>
+					
+					</LobbyContext.Provider>
 
 				</MessageContext.Provider>
 

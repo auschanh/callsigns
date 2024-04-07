@@ -233,7 +233,7 @@ io.on("connection", (socket) => {
 
 			const roomList = getPlayersInLobby(roomName);
 
-			io.to(roomName).emit("joinedLobby", roomList);
+			io.to(roomName).emit("getRoomList", roomList);
 
 		} else if (findRoom && !findRoom.isClosedRoom) {
 
@@ -253,7 +253,7 @@ io.on("connection", (socket) => {
 
 				socket.emit("getLobby", roomList, findRoom);
 
-				socket.to(roomName).emit("joinedLobby", roomList);
+				socket.to(roomName).emit("getRoomList", roomList);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 
@@ -277,7 +277,7 @@ io.on("connection", (socket) => {
 
 		const roomList = getPlayersInLobby(roomID);
 
-		io.to(roomID).emit("receiveIsReady", roomList);
+		io.to(roomID).emit("getRoomList", roomList);
 
 	});
 
@@ -407,7 +407,7 @@ io.on("connection", (socket) => {
 		selectedPlayers.forEach((playerName) => {
 
 			// get each selected player's socketID
-			const socketInfo = usernames.find(({username}) => { return username === playerName });
+			const socketInfo = usernames.find(({ username }) => { return username === playerName });
 
 			socket.to(socketInfo.socketID).emit("redirectGame", socket.roomID, playerName, selectedPlayers, callsign, false);
 

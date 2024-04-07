@@ -4,22 +4,21 @@ import { Input } from "../components/ui/input";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 
 const Game = function (props) {
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers]] = useGameInfoContext();
+	const [roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]] = useGameInfoContext();
+
+	const [inLobby, setInLobby] = useLobbyContext();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
-
-	const [inGame, setInGame] = useState();
 
 	const [roomDetails, setRoomDetails] = useState();
 
 	const [isClosedRoom, setIsClosedRoom] = useState();
-
-	const [playersInLobby, setPlayersInLobby] = useState();
 
 	// for host only
 	const sendSelected = async () => {
@@ -72,7 +71,7 @@ const Game = function (props) {
 
 				setIsClosedRoom(roomDetails.isClosedRoom);
 
-				setPlayersInLobby(othersInLobby);
+				setInLobby(othersInLobby);
 
             } else {
 
@@ -91,33 +90,14 @@ const Game = function (props) {
 
 		});
 
-        socket.on("joinedLobby", (othersInLobby) => {
-
-			setPlayersInLobby(othersInLobby);
-
-        });
-
-        socket.on("leftRoom", (user) => {
-
-			console.log(`${user} has left the lobby`);
-
-			setInGame(inGame.filter((player) => { return player !== user }));
-
-            setPlayersInLobby(playersInLobby.filter(({playerName}) => { return playerName !== user }));
-
-			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
-
-		});
-
         return () => {
 
             socket.removeAllListeners("roomExists");
 			socket.removeAllListeners("sendSelectedPlayers");
-            socket.removeAllListeners("joinedLobby");
-            socket.removeAllListeners("leftRoom");
+            
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, inGame, playersInLobby]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected]);
 
 	return (
 
@@ -153,11 +133,11 @@ const Game = function (props) {
 							
 							{`Players Waiting In Lobby: `}
 
-							{playersInLobby.map((player, index) => {
+							{inLobby.map((player, index) => {
 
 								if (!inGame.includes(player.playerName)) {
 
-									if (index !== playersInLobby.length - 1) {
+									if (index !== inLobby.length - 1) {
 
 										return (<span key={index}>{`${player.playerName}, `}</span>);
 	

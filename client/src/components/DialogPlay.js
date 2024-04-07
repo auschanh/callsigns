@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../components/ui/button";
 import Chat from "./Chat";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
@@ -11,6 +12,8 @@ import Lobby from "./Lobby";
 const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
+
+    const [inLobby, setInLobby] = useLobbyContext();
 
     const [currentSlide, setCurrentSlide] = useState(propSlide);
 
@@ -21,8 +24,6 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
     const [open, setOpen] = isOpen;
 
     const [sessionUrl, setSessionUrl] = useState();
-
-    const [inLobby, setInLobby] = useState();
 
     const [roomID, setRoomID] = useState();
 
@@ -67,39 +68,14 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
         });
 
-        socket.on("joinedLobby", (roomList) => {
-
-			setInLobby(roomList);
-
-        });
-
-		socket.on("leftRoom", (user) => {
-
-			console.log(`${user} has left the lobby`);
-
-            const playersRemaining = inLobby?.filter(({playerName}) => { return playerName !== user });
-
-            setInLobby(playersRemaining);
-
-		});
-
-        socket.on("receiveIsReady", (roomList) => {
-
-            setInLobby(roomList);
-
-        });
-
         return () => {
 
             socket.removeAllListeners("getRoomInfo");
             socket.removeAllListeners("updateRoomInfo");
-            socket.removeAllListeners("joinedLobby");
-			socket.removeAllListeners("leftRoom");
-            socket.removeAllListeners("receiveIsReady");
 
         }
 
-    }, [socket, inLobby, isNewHost]);
+    }, [socket, isNewHost]);
 
     useEffect(() => {
 
@@ -143,7 +119,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
 
                 )}
 
@@ -204,7 +180,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} setNewMessage={setNewMessage} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} setNewMessage={setNewMessage} />
 
                 </div>
 
