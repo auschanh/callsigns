@@ -1,27 +1,29 @@
-import { React, useState } from "react";
+import React, { useState, useRef } from "react";
 
-const CardStack = ({cards}) => {
-    const numCards = cards.length
-    // const cardHeight = '87vh';
-    const cardTopPadding = "1.5em";
-    const cardMargin = "4vw";
-
+const CardStack = ({ cards, selectedCardIndex, setSelectedCardIndex, handleClick }) => {
+  
   return (
     <div className="container">
-        <ul id="cards" className={`pb-[calc(${numCards} * ${cardTopPadding})] mb-[${cardMargin}] pl-0 list-none grid gap-[4vw] grid-row-[repeat(${numCards}, 87vh)] grid-cols-[1fr]`}>
-            {cards.map((card, i) => {
-                return(
-                    <li className={`sticky top-0 pt-[calc(${i+1} * ${cardTopPadding})]`} id={`card${i+1}`}>
-                    <div className={`card-body box-border p-[30px] rounded-[50px] h-[87vh] flex justify-center items-center transition-[0.5s] shadow-[0_0_30px_0_rgba(0,0,0,0.3)]`} style={{ backgroundColor: `${card.color}`}}>
-                        <h2 className="text-4xl">{card.title}</h2>
-                    </div>
-                </li>
-                )
-            })
-            }
-        </ul>
+      <ul className="pl-0 list-none grid gap-4vw grid-cols-1">
+        {cards.map((card, index) => (
+          <li
+            className={`sticky top-0 z-10 transition-all duration-300 ${
+              selectedCardIndex === index ? "-translate-y-[87vh]" : ""
+            }`}
+            key={index}
+            onClick={() => handleClick(index)}
+          >
+            <div
+              className="h-[87vh] rounded-2xl card-body box-border p-30 rounded-50 flex justify-center items-center transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3)"
+              style={{ backgroundColor: card.color }}
+            >
+              <h2 className="text-4xl">{card.title}</h2>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
-    );
+  );
 };
 
 export default CardStack;

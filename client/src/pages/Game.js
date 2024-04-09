@@ -12,6 +12,8 @@ const Game = function (props) {
   const [playerName, selectedPlayers, roomID] = useGameInfoContext();
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+
   const _handleIndexChange = (index) => {
     setCurrentIndex(index);
   };
@@ -21,6 +23,11 @@ const Game = function (props) {
   };
 
   const _handleComplete = () => {};
+
+  const handleClick = (index) => {
+    console.log("CURRENT INDEX IS: ", selectedCardIndex)
+    setSelectedCardIndex(index === selectedCardIndex ? null : index+1);
+  };
 
   const cards = [
     {
@@ -53,9 +60,13 @@ const Game = function (props) {
     <div className="bg-black">
       <div className="flex pt-2 pl-2">
         <div className="fixed w-[5%] mt-10">
-          <Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} />
+          <Slider onChange={_handleIndexChange} currentIndex={selectedCardIndex-1} numCards={cards.length-1} />
         </div>
-          <CardStack cards={cards} className="w-[95%]"/>
+          <CardStack cards={cards} 
+          className="w-[95%]" 
+          selectCardIndex={selectedCardIndex} 
+          setSelectedCardIndex={setSelectedCardIndex} 
+          handleClick={handleClick}/>
       </div>
       
       {/* <div className="flex flex-col text-center items-center justify-center">
