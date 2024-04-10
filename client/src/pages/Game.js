@@ -3,6 +3,7 @@ import { Button } from "../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Switch } from "../components/ui/switch";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
@@ -98,10 +99,17 @@ const Game = function (props) {
 
 		});
 
+		socket.on("isRoomClosed", (isClosedRoom) => {
+
+            setIsClosedRoom(isClosedRoom);
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
 			socket.removeAllListeners("sendSelectedPlayers");
+			socket.removeAllListeners("isRoomClosed");
             
         }
 
@@ -137,21 +145,37 @@ const Game = function (props) {
 
 	}
 
+	const handleCloseRoom = async () => {
+
+		try {
+
+			await socket.emit("closeRoom", !isClosedRoom);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+		setIsClosedRoom(!isClosedRoom);
+
+	};
+
 	return (
 
 		<>
 
 			{roomDetails && (
 
-				<div className="h-screen w-screen bg-slate-400">
+				<div className="h-screen w-screen flex flex-row flex-none bg-slate-300">
 
 					<Popover>
 
 						<PopoverTrigger asChild>
-							<Button className="p-0 aspect-square m-6" variant="outline"><Users size={14} /></Button>
+							<Button className="absolute right-0 p-0 aspect-square m-6" variant="outline"><Users size={14} /></Button>
 						</PopoverTrigger>
 
-						<PopoverContent className="w-96 max-h-[80vh] overflow-auto ml-6 p-4">
+						<PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-6 p-4">
 
 							<div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 hover:bg-slate-200">
 
@@ -243,31 +267,50 @@ const Game = function (props) {
 
 									</AccordionItem>
 
-									<AccordionItem disabled={false} className="w-full border-slate-200" value="item-3">
+									<AccordionItem className={`w-full border-slate-200`} value="item-3">
 
 										<AccordionTrigger>Share Link</AccordionTrigger>
 
 										<AccordionContent>
 
-											<>
+											<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "h-[58px]" : "h-[148px]"}`}>
 
-												{(!isClosedRoom || playerName === roomDetails.host) && (
+												{(playerName === roomDetails.host) && (
 
-													<div className="grid grid-cols-[auto_30px] p-4 gap-4 items-center rounded-lg bg-slate-100 hover:bg-slate-200">
-														<p className="break-all">{sessionUrl}</p>
-														<Button className="h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
-													</div>
-
-												) || (
-
-													<div className={`flex flex-row items-center w-full p-4 pr-14 bg-slate-200 rounded-md border border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 transition-all duration-300}`}>
-														<LockKeyhole className="stroke-2 stroke-slate-900 mr-3" size={15} />
-														<p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+													<div className={`w-full px-4 py-2 rounded-md border border-slate-400 transition-all duration-300 ${isClosedRoom ? "bg-slate-200 hover:bg-slate-100" : "bg-slate-100 hover:bg-slate-50"}`}>
+														<div className="flex flex-row items-center h-10">
+															<p className="flex">Close Room:</p>
+															<Switch 
+																className="ml-auto data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
+																checked={isClosedRoom}
+																onCheckedChange={handleCloseRoom}
+															/>
+														</div>
 													</div>
 
 												)}
 
-											</>
+												<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "invisible opacity-5 -translate-y-3" : ""}`}>
+
+													{(!isClosedRoom) && (
+
+														<div className={`grid grid-cols-[auto_30px] p-4 gap-4 items-center rounded-lg bg-slate-100 hover:bg-slate-200 transition-all ease-in-out duration-300 ${isClosedRoom ? "invisible opacity-20" : "mt-4"}`}>
+															<p className="break-all">{sessionUrl}</p>
+															<Button className="h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+														</div>
+
+													) || (playerName !== roomDetails.host) && (
+
+														<div className={`flex flex-row items-center w-full p-4 pr-14 bg-slate-200 rounded-md border border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 transition-all ease-in-out duration-300`}>
+															<LockKeyhole className="stroke-2 stroke-slate-900 mr-3" size={15} />
+															<p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+														</div>
+
+													)}
+
+												</div>
+
+											</div>
 
 										</AccordionContent>
 
