@@ -24,7 +24,7 @@ function JoinRoom() {
 
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [,,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
+    const [,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
 
     const [username, setUsername] = useState();
 

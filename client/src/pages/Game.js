@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
@@ -13,7 +14,7 @@ const Game = function (props) {
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
@@ -26,6 +27,10 @@ const Game = function (props) {
 	const [isClosedRoom, setIsClosedRoom] = useState();
 
 	const [copied, setCopied] = useState(false);
+
+	const navigate = useNavigate();
+
+	const { roomID } = useParams();
 
 	// for host only
 	const sendSelected = async () => {
@@ -44,7 +49,7 @@ const Game = function (props) {
 
 	useEffect(() => {
 
-        if (roomDetails === undefined) {
+		if (roomDetails === undefined) {
 
             console.log("checking room");
 
@@ -66,7 +71,7 @@ const Game = function (props) {
 
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
-            if (othersInLobby) {
+			if (othersInLobby && playerName !== undefined) {
 
                 setInGame(
 
@@ -80,11 +85,15 @@ const Game = function (props) {
 
 				setInLobby(othersInLobby);
 
-				setSessionUrl(sessionUrl)
+				setSessionUrl(sessionUrl);
 
             } else {
 
 				// setRoomDetails(false);
+
+				console.log(isClosedRoom);
+
+				setIsClosedRoom(isClosedRoom);
 
             	setIsAlertOpen(true);
 
@@ -113,7 +122,7 @@ const Game = function (props) {
             
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName]);
 
 	const handleCopy = async () => {
 
@@ -189,7 +198,7 @@ const Game = function (props) {
 
 							<div>
 
-								<Accordion className="mt-2 px-2" type="multiple" collapsible>
+								<Accordion className="mt-2 px-2" type="multiple">
 
 									<AccordionItem className="w-full border-slate-200" value="item-1">
 
@@ -273,44 +282,71 @@ const Game = function (props) {
 
 										<AccordionContent>
 
-											<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "h-[58px]" : "h-[148px]"}`}>
+											<>
 
 												{(playerName === roomDetails.host) && (
 
-													<div className={`w-full px-4 py-2 rounded-md border border-slate-400 transition-all duration-300 ${isClosedRoom ? "bg-slate-200 hover:bg-slate-100" : "bg-slate-100 hover:bg-slate-50"}`}>
-														<div className="flex flex-row items-center h-10">
-															<p className="flex">Close Room:</p>
-															<Switch 
-																className="ml-auto data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
-																checked={isClosedRoom}
-																onCheckedChange={handleCloseRoom}
-															/>
+													<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "h-[58px]" : "h-[148px]"}`}>
+
+														<div className={`w-full px-4 py-2 rounded-md border border-slate-400 transition-all duration-300 ${isClosedRoom ? "bg-slate-200 hover:bg-slate-100" : "bg-slate-100 hover:bg-slate-50"}`}>
+															<div className="flex flex-row items-center h-10">
+																<p className="flex">Close Room:</p>
+																<Switch 
+																	className="ml-auto data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
+																	checked={isClosedRoom}
+																	onCheckedChange={handleCloseRoom}
+																/>
+															</div>
 														</div>
+														
+														{(!isClosedRoom) && (
+
+															<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "opacity-0 -translate-y-3" : ""}`}>
+																<div className={`grid grid-cols-[auto_30px] p-4 gap-4 items-center rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-100 transition-all ease-in-out duration-300 ${isClosedRoom ? "invisible opacity-20" : "mt-4"}`}>
+																	<p className="break-all">{sessionUrl}</p>
+																	<Button className="h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+																</div>
+															</div>
+
+														)}
+
 													</div>
+
+												) || (
+
+													<>
+
+														<div className={`transition-all ease-in-out duration-500 ${isClosedRoom ? "invisible opacity-5" : ""}`}>
+
+															{(!isClosedRoom) && (
+
+																<div className={`grid grid-cols-[auto_30px] p-4 gap-4 items-center rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-100`}>
+																	<p className={`break-all`}>{sessionUrl}</p>
+																	<Button className="h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
+																</div>
+															
+															)}
+
+														</div>
+															
+														<div className={`transition-all ease-in-out duration-500 ${isClosedRoom ? "" : "invisible opacity-5"}`}>
+
+															{(isClosedRoom) && (
+
+																<div className={`flex flex-row items-center w-full p-4 pr-14 bg-slate-200 rounded-md border border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950`}>
+																	<LockKeyhole className="stroke-2 stroke-slate-900 mr-3" size={15} />
+																	<p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
+																</div>
+
+															)}
+
+														</div>
+
+													</>
 
 												)}
 
-												<div className={`transition-all ease-in-out duration-300 ${isClosedRoom ? "invisible opacity-5 -translate-y-3" : ""}`}>
-
-													{(!isClosedRoom) && (
-
-														<div className={`grid grid-cols-[auto_30px] p-4 gap-4 items-center rounded-lg bg-slate-100 hover:bg-slate-200 transition-all ease-in-out duration-300 ${isClosedRoom ? "invisible opacity-20" : "mt-4"}`}>
-															<p className="break-all">{sessionUrl}</p>
-															<Button className="h-fit p-2 transition-colors ease-out duration-500" onClick={handleCopy} variant={copied ? "greenNoHover" : "border"}>{ (!copied && <Copy size={12} />) || <Check size={14} /> }</Button>
-														</div>
-
-													) || (playerName !== roomDetails.host) && (
-
-														<div className={`flex flex-row items-center w-full p-4 pr-14 bg-slate-200 rounded-md border border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 transition-all ease-in-out duration-300`}>
-															<LockKeyhole className="stroke-2 stroke-slate-900 mr-3" size={15} />
-															<p className="text-sm">Your host <span className="font-semibold underline">{roomDetails.host}</span> has closed this room</p>
-														</div>
-
-													)}
-
-												</div>
-
-											</div>
+											</>
 
 										</AccordionContent>
 
@@ -321,6 +357,7 @@ const Game = function (props) {
 							</div>
 
 						</PopoverContent>
+
 					</Popover>
 
 					<div>
@@ -328,16 +365,6 @@ const Game = function (props) {
 						<div>
 
 							<p>{`The guesser is ${roomDetails.guesser} (${roomDetails.guesserID})`}</p>
-
-							{isClosedRoom && (
-
-								<p>This is a closed room.</p>
-
-							) || (
-
-								<p>This is not a closed room.</p>
-
-							)}
 
 							{callsign && (
 
@@ -391,11 +418,30 @@ const Game = function (props) {
 					<AlertDialogHeader className="space-y-2">
 						<AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
 					</AlertDialogHeader>
+					
+					{(isClosedRoom === null) && (
 
-					<div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
-						<p>Oops! It looks like this room doesn't exist.</p>
-						<p>Please double check the link you were sent.</p>
-					</div>
+						<div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
+							<p>Oops! It looks like this room doesn't exist.</p>
+							<p>Please double check the link you were sent.</p>
+						</div>
+
+					) || (isClosedRoom) && (
+
+						<div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
+							<p>This is a closed room.</p>
+							<p>Please contact the host to join this room.</p>
+						</div>
+
+					) || (!isClosedRoom) && (
+
+						<div className="flex flex-col flex-none h-[20vh] pt-10 items-center text-slate-700">
+							<p>This game is already in progress.</p>
+							<p>Join the lobby and get ready for the next round!</p>
+							<Button className="mt-auto mb-2" onClick={() => {navigate(`/lobby/${roomID}`)}} variant="default">Join Lobby</Button>
+						</div>
+
+					)}
 
 				</AlertDialogContent>
 			</AlertDialog>

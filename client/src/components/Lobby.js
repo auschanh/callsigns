@@ -14,7 +14,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [,,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
+	const [,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
 
 	const [inLobby, setInLobby] = useLobbyContext();
 

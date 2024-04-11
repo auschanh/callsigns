@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate, useParams } from "react-router-dom";
 import "./css/styles.css";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
@@ -20,8 +20,6 @@ const mainSocket = io.connect("http://localhost:3001");
 function App() {
 
 	const [socket, setSocket] = useState(mainSocket);
-
-	const [roomID, setRoomID] = useState();
 
 	const [playerName, setPlayerName] = useState();
 
@@ -72,8 +70,6 @@ function App() {
 		socket.on("redirectGame", (roomID, playerName, selectedPlayers, callsign, isHost) => {
 
 			(async () => {
-
-				setRoomID(roomID);
 
 				setPlayerName(playerName);
 
@@ -164,7 +160,7 @@ function App() {
 
 					<LobbyContext.Provider value={[inLobby, setInLobby]}>
 
-						<GameInfoContext.Provider value={[roomID, playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]]}>
 
 							<Routes>
 
