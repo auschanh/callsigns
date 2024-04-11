@@ -1,21 +1,25 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 
-const CardStack = ({ cards, selectedCardIndex, setSelectedCardIndex, handleClick }) => {
-  
+const CardStack = ({ cards, currentIndex, handleNext }) => {
+
   return (
-    <div className="container">
-      <ul className="pl-0 list-none grid gap-4vw grid-cols-1">
+    <div className="container h-screen overflow-hidden w-4/5 relative">
+      <ul className="pl-0 list-none grid gap-0 grid-cols-1">
         {cards.map((card, index) => (
           <li
-            className={`sticky top-0 z-10 transition-all duration-300 ${
-              selectedCardIndex === index ? "-translate-y-[87vh]" : ""
-            }`}
             key={index}
-            onClick={() => handleClick(index)}
+            className={`absolute top-0 left-0 w-full h-full transition-all duration-500 transform`}
+            style={{
+
+                height: "100vh",
+                transform: `translateY(${(index - currentIndex) * 100}vh)`,
+                                zIndex: index === currentIndex ? "1" : "0"
+            }}
           >
             <div
-              className="h-[87vh] rounded-2xl card-body box-border p-30 rounded-50 flex justify-center items-center transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3)"
+              className="h-screen rounded-2xl card-body box-border p-30 rounded-50 flex justify-center items-center transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3)"
               style={{ backgroundColor: card.color }}
+              onClick={() => handleNext(index)}
             >
               <h2 className="text-4xl">{card.title}</h2>
             </div>
