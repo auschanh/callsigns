@@ -1,10 +1,11 @@
 import React from "react";
 import ReactSlider from "react-slider";
 
-const Slider = ({ onChange, currentIndex, numCards }) => {
+
+const Slider = ({ onChange, currentIndex, numCards, cards }) => {
   return (
     <ReactSlider
-      className="vertical-slider"
+      className="vertical-slider pointer-events-none"
       markClassName="example-mark"
       onChange={onChange}
       trackClassName="example-track"
@@ -17,9 +18,9 @@ const Slider = ({ onChange, currentIndex, numCards }) => {
         if (props.key < currentIndex) {
           props.className = "example-mark example-mark-completed";
         } else if (props.key === currentIndex) {
-          props.className = "example-mark example-mark-active";
+          props.className = "example-mark example-mark-active animate-pulse";
         }
-        return <span {...props} />;
+        return <span {...props}/>
       }}
       orientation="vertical"
     />

@@ -23,41 +23,46 @@ const Game = function (props) {
   const _handleComplete = () => {};
 
   const handleNext = () => {
-    console.log("This was clicked")
     setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
   };
 
   const cards = [
     {
       title: "Round Start",
-      color: "#52B2CF"
+      color: "#52B2CF",
+      phase: "Round Start"
     },
     {
       title: "Card 2",
-      color: "#E5A36F"
+      color: "#E5A36F",
+      phase: "Generate CallSign Phase"
     },
     {
       title: "Card 3",
-      color: "#9CADCE"
+      color: "#9CADCE",
+      phase: "Agents Hint Phase"
     },
     {
       title: "Card 4",
-      color: "#D4AFB9"
+      color: "#D4AFB9",
+      phase: "Eliminate Hints Phase"
     },
     {
       title: "Card 5",
-      color: "#008080"
+      color: "#008080",
+      phase: "Guess CallSign Phase"
     },
     {
       title: "Round End",
-      color: "#FF0000"
+      color: "#FF0000",
+      phase: "Round End"
     }
 ];
   
   return (
     <div className="bg-black overflow-hidden flex">
-        <div className="fixed w-1/5 h-screen mt-10">
-          <Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} />
+        <div className="fixed w-1/5 h-screen mt-10 z-[9999]">
+          <Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
         </div>
         <div className="flex-1">
         <CardStack cards={cards} 
