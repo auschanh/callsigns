@@ -15,8 +15,6 @@ function NewHost() {
 
     const [roomDetails, setRoomDetails] = useState();
 
-    const [messageList, setMessageList] = useState();
-
     let { roomID } = useParams();
 
     const navigate = useNavigate();
@@ -43,51 +41,56 @@ function NewHost() {
 
         }
 
-        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
-            if (othersInLobby) {
+            if (inRoom) {
 
-                console.log("room loaded");
+                if (othersInLobby) {
 
-                const prevGameInfo = {
-
-                    username: roomDetails.host,
-                    roomName: roomDetails.roomName,
-                    numPlayers: roomDetails.numPlayers,
-                    aiPlayers: roomDetails.aiPlayers
-
-                }
-
-                setRoomDetails(roomDetails);
-
-                try {
+                    console.log("room loaded");
     
-                    socket.emit("gameInfo", prevGameInfo, true);
+                    const prevGameInfo = {
     
-                } catch (error) {
+                        username: roomDetails.host,
+                        roomName: roomDetails.roomName,
+                        numPlayers: roomDetails.numPlayers,
+                        aiPlayers: roomDetails.aiPlayers
     
-                    throw error;
+                    }
+    
+                    setRoomDetails(roomDetails);
+    
+                    try {
+        
+                        socket.emit("gameInfo", prevGameInfo, true);
+        
+                    } catch (error) {
+        
+                        throw error;
+        
+                    }
+    
+                } else {
+    
+                    console.log("could not load room");
+
+                    setRoomDetails(false);
     
                 }
 
             } else {
 
-                console.log("could not load room");
+                console.log("you cannot be the new host because you are not in the room");
+
+                setRoomDetails(false);
 
             }
 
         });
 
-        socket.on("receiveMessageList", (messageList) => {
-
-			setMessageList(messageList);
-
-		});
-
         return () => {
 
             socket.removeAllListeners("roomExists");
-            socket.removeAllListeners("receiveMessageList");
 
         }
 
@@ -101,7 +104,7 @@ function NewHost() {
 
                 {roomDetails && (
 
-                    <DialogPlay tailwindStyles={"invisible"} isOpen={[playOpen]} propSlide={1} isNewHost={true} prevMessageList={messageList} prevClosedRoom={roomDetails.isClosedRoom} />
+                    <DialogPlay tailwindStyles={"invisible"} isOpen={[playOpen]} propSlide={1} isNewHost={true} prevClosedRoom={roomDetails.isClosedRoom} />
 
                 )}
 

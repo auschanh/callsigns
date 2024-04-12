@@ -4,13 +4,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../components/ui/button";
 import Chat from "./Chat";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
 
-const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevMessageList = [], prevClosedRoom }) {
+const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
+
+    const [inLobby, setInLobby] = useLobbyContext();
 
     const [currentSlide, setCurrentSlide] = useState(propSlide);
 
@@ -22,15 +25,11 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
     const [sessionUrl, setSessionUrl] = useState();
 
-    const [inLobby, setInLobby] = useState();
-
     const [roomID, setRoomID] = useState();
 
     const [isRoomCreated, setIsRoomCreated] = useState(isNewHost);
 
     const [chatExpanded, setChatExpanded] = useState(false);
-
-    const [messageList, setMessageList] = useState(prevMessageList);
 
     const [newMessage, setNewMessage] = useState(false);
 
@@ -69,39 +68,14 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
         });
 
-        socket.on("joinedLobby", (roomList) => {
-
-			setInLobby(roomList);
-
-        });
-
-		socket.on("leftRoom", (user) => {
-
-			console.log(`${user} has left the lobby`);
-
-            const playersRemaining = inLobby?.filter(({playerName}) => { return playerName !== user });
-
-            setInLobby(playersRemaining);
-
-		});
-
-        socket.on("receiveIsReady", (roomList) => {
-
-            setInLobby(roomList);
-
-        });
-
         return () => {
 
             socket.removeAllListeners("getRoomInfo");
             socket.removeAllListeners("updateRoomInfo");
-            socket.removeAllListeners("joinedLobby");
-			socket.removeAllListeners("leftRoom");
-            socket.removeAllListeners("receiveIsReady");
 
         }
 
-    }, [socket, inLobby, isNewHost]);
+    }, [socket, isNewHost]);
 
     useEffect(() => {
 
@@ -145,7 +119,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} inLobby={inLobby} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} roomID={roomID} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
 
                 )}
 
@@ -186,7 +160,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                                             <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
                                                 <div className="h-full">
-                                                    <CardContent className="px-8 pb-10 pt-6 h-full">
+                                                    <CardContent className="px-8 pb-0 pt-6 h-full">
                                                         {slide.content}
                                                     </CardContent>
                                                 </div>
@@ -206,7 +180,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} inLobby={inLobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
+                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} setNewMessage={setNewMessage} />
 
                 </div>
 

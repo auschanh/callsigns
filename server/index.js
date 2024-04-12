@@ -40,8 +40,17 @@ app.post("/newJsonFile", (req, res) => {
 	res.status(200);
 });
 
+// "Board" --remove this line later
+let count = 72;
+
 const getMysteryWord = () => {
-	const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
+
+	// --remove these lines later
+	const randomWord = wordFile[count].Word;
+	count++;
+
+	// reactivate this line
+	// const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
 	console.log(randomWord);
 	return randomWord;
 };
@@ -73,7 +82,7 @@ io.on("connection", (socket) => {
 
 	const getPlayersInLobby = (roomName) => {
 
-		const lobby = [...io.sockets.adapter.rooms].find((room) => { return room[0] === roomName })[1];
+		const lobby = io.sockets.adapter.rooms.get(roomName);
 
 		return usernameLookup([...lobby]);
 
@@ -83,7 +92,7 @@ io.on("connection", (socket) => {
 
 		return lobbyArray.map((socketID) => {
 
-			let foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === socketID });
+			const foundSocket = io.sockets.sockets.get(socketID);
 
 			return {
 
@@ -121,6 +130,8 @@ io.on("connection", (socket) => {
 				aiPlayers: aiPlayers,
 				isClosedRoom: false,
 				isGameStarted: false,
+				guesser: "",
+				guesserID: ""
 			});
 
 			socket.emit("getRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
@@ -151,16 +162,19 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("closeRoom", (isClosedRoom) => {
-		const findRoom = roomLookup.find(({ roomID }) => {
-			return roomID === socket.roomID;
-		});
+
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
 
 		if (findRoom) {
+
 			findRoom.isClosedRoom = isClosedRoom;
 
 			socket.to(socket.roomID).emit("isRoomClosed", isClosedRoom);
+
 		} else {
+
 			console.log("unable to find room");
+			
 		}
 
 		console.log(findRoom);
@@ -171,13 +185,15 @@ io.on("connection", (socket) => {
 
 		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
 
-		const lobby = [...io.sockets.adapter.rooms].find((room) => { return room[0] === roomID });
+		const lobby = io.sockets.adapter.rooms.get(roomID);
 
 		if (lobby) {
 
-			const socketsInLobby = [...lobby[1]];
+			const socketsInLobby = [...lobby];
 
-			if (findRoom && (!findRoom.isClosedRoom || socketsInLobby.includes(socket.id))) {
+			const inRoom = socketsInLobby.includes(socket.id);
+
+			if (findRoom && (!findRoom.isClosedRoom || inRoom)) {
 
 				const roomList = getPlayersInLobby(roomID);
 
@@ -185,13 +201,17 @@ io.on("connection", (socket) => {
 
 				console.log(roomList);
 
-				socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom);
+				socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom, inRoom);
 
 			} else {
 
-				socket.emit("roomExists", ...[, , ,], findRoom?.isClosedRoom);
+				socket.emit("roomExists", ...[,,,,], findRoom?.isClosedRoom);
 
 			}
+
+		} else {
+
+			socket.emit("roomExists", ...[,,,,], findRoom?.isClosedRoom);
 
 		}
 
@@ -201,7 +221,7 @@ io.on("connection", (socket) => {
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName});
 
-		const lobby = [...[...io.sockets.adapter.rooms].find((room) => { return room[0] === roomName })[1]];
+		const lobby = [...io.sockets.adapter.rooms.get(roomName)];
 
 		if (lobby.includes(socket.id)) {
 
@@ -213,7 +233,7 @@ io.on("connection", (socket) => {
 
 			const roomList = getPlayersInLobby(roomName);
 
-			io.to(roomName).emit("joinedLobby", roomList);
+			io.to(roomName).emit("getRoomList", roomList);
 
 		} else if (findRoom && !findRoom.isClosedRoom) {
 
@@ -233,7 +253,7 @@ io.on("connection", (socket) => {
 
 				socket.emit("getLobby", roomList, findRoom);
 
-				socket.to(roomName).emit("joinedLobby", roomList);
+				socket.to(roomName).emit("getRoomList", roomList);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 
@@ -245,7 +265,7 @@ io.on("connection", (socket) => {
 
 		} else {
 
-			socket.emit("getLobby", ...[, ,], findRoom?.isClosedRoom);
+			socket.emit("getLobby", ...[,,], findRoom?.isClosedRoom);
 
 		}
 
@@ -257,7 +277,7 @@ io.on("connection", (socket) => {
 
 		const roomList = getPlayersInLobby(roomID);
 
-		io.to(roomID).emit("receiveIsReady", roomList);
+		io.to(roomID).emit("getRoomList", roomList);
 
 	});
 
@@ -269,21 +289,31 @@ io.on("connection", (socket) => {
 
 	socket.on("removePlayer", (player) => {
 
-		const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => {
+		[...io.sockets.adapter.rooms.get(socket.roomID)].some((socketID) => {
 
-			return socketObj.username === player;
+			const foundSocket = io.sockets.sockets.get(socketID);
+
+			if (player === foundSocket.username) {
+
+				console.log(`${player} has been removed from ${socket.roomID}`);
+
+				socket.to(foundSocket.id).emit("exitLobby");
+
+				foundSocket.leave(socket.roomID);
+
+				console.log(getPlayersInLobby(socket.roomID));
+
+				io.to(socket.roomID).emit("leftRoom", player);
+
+				return true;
+
+			} else {
+
+				return false;
+
+			}
 
 		});
-
-		console.log(`${player} has been removed from ${socket.roomID}`);
-
-		socket.to(foundSocket.id).emit("exitLobby");
-
-		foundSocket.leave(socket.roomID);
-
-		console.log(getPlayersInLobby(socket.roomID));
-
-		io.to(socket.roomID).emit("leftRoom", player);
 
 	});
 
@@ -299,13 +329,11 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("saveMessageList", (messageList) => {
-
-		socket.emit("receiveMessageList", messageList);
-
-	});
-
 	socket.on("startGame", (selectedPlayers) => {
+
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
+
+		findRoom.isGameStarted = true;
 
 		// get all socketIDs in lobby as strings
 		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
@@ -313,7 +341,7 @@ io.on("connection", (socket) => {
 		const usernames = socketsInLobby.map((socketID) => {
 
 			// use those strings to get the actual socket objects
-			const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === socketID });
+			const foundSocket = io.sockets.sockets.get(socketID);
 
 			return {
 
@@ -325,18 +353,74 @@ io.on("connection", (socket) => {
 
 		});
 
+		// choose a guesser
+		if (findRoom.guesser === "" && findRoom.guesserID === "") {
+
+			const index = Math.floor(Math.random() * selectedPlayers.length);
+
+			const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+			findRoom.guesser = guesser.username;
+			findRoom.guesserID = guesser.socketID;
+
+		} else {
+
+			const prevGuesserIndex = selectedPlayers.findIndex((playerName) => { return playerName === findRoom.guesser });
+
+			if (prevGuesserIndex) {
+
+				const currentGuesser = usernames.find(({ username }) => { return username === selectedPlayers[(prevGuesserIndex + 1) % selectedPlayers.length] });
+
+				if (currentGuesser) {
+
+					// next to be guesser
+					findRoom.guesser = currentGuesser.username;
+					findRoom.guesserID = currentGuesser.socketID;
+
+				} else {
+
+					const index = Math.floor(Math.random() * selectedPlayers.length);
+
+					const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+					findRoom.guesser = guesser.username;
+					findRoom.guesserID = guesser.socketID;
+
+				}
+
+			} else {
+
+				const index = Math.floor(Math.random() * selectedPlayers.length);
+
+				const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+				findRoom.guesser = guesser.username;
+				findRoom.guesserID = guesser.socketID;
+
+			}
+
+		}
+
+		const callsign = getMysteryWord();
+
 		// then look at all the selected players
 		selectedPlayers.forEach((playerName) => {
 
 			// get each selected player's socketID
-			const socketInfo = usernames.find(({username}) => { return username === playerName });
+			const socketInfo = usernames.find(({ username }) => { return username === playerName });
 
-			socket.to(socketInfo.socketID).emit("redirectGame", socket.roomID, playerName, selectedPlayers);
+			socket.to(socketInfo.socketID).emit("redirectGame", socket.roomID, playerName, selectedPlayers, callsign, false);
 
 		});
 
 		// set host info
-		socket.emit("redirectGame", socket.roomID, socket.username, selectedPlayers);
+		socket.emit("redirectGame", socket.roomID, socket.username, selectedPlayers, callsign, true);
+
+	});
+
+	socket.on("sendCallsign", (callsign, generatedWords) => {
+
+		io.to(socket.roomID).emit("receiveCallsign", callsign, generatedWords);
 
 	});
 
@@ -375,11 +459,11 @@ io.on("connection", (socket) => {
 				// if you're the host
 				if (findRoom && findRoom.hostID === socket.id) {
 
-					const socketsInLobby = [...[...io.sockets.adapter.rooms].find((room) => {return room[0] === socket.roomID})[1]];
+					const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
 
 					const newHostSocketID = socketsInLobby.find((playerSocket) => { return playerSocket !== socket.id });
 
-					const foundSocket = [...io.sockets.sockets.values()].find((socketObj) => { return socketObj.id === newHostSocketID });
+					const foundSocket = io.sockets.sockets.get(newHostSocketID);
 
 					findRoom.host = foundSocket.username;
 					findRoom.hostID = foundSocket.id;

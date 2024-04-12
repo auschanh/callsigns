@@ -15,18 +15,20 @@ import { Badge } from "../components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Copy, Check, MessageSquare, LockKeyhole } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 
 function JoinRoom() {
 
     const [socket, setSocket] = useSocketContext();
 
+    const [inLobby, setInLobby] = useLobbyContext();
+
+    const [,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
+
     const [username, setUsername] = useState();
 
     const [success, setSuccess] = useState(0);
-
-    const [lobby, setLobby] = useState();
-
-    const [selectedPlayers, setSelectedPlayers] = useState([]);
 
     const [sessionUrl, setSessionUrl] = useState();
 
@@ -42,14 +44,12 @@ function JoinRoom() {
 
     const [chatExpanded, setChatExpanded] = useState(false);
 
-    const [messageList, setMessageList] = useState([]);
-
     const [newMessage, setNewMessage] = useState(false);
 
     const [open, setOpen] = useState(true);
 
     // use %20 in address bar for space
-    let { roomID } = useParams();
+    const { roomID } = useParams();
 
     const navigate = useNavigate();
 
@@ -74,7 +74,7 @@ function JoinRoom() {
             })();
         }
 
-        if (username && !lobby.find(({playerName}) => { return playerName === username })) {
+        if (username && !inLobby.find(({playerName}) => { return playerName === username })) {
 
             console.log("username triggered");
 
@@ -98,13 +98,13 @@ function JoinRoom() {
 
         }
 
-        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, isClosedRoom) => {
+        socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
             if (othersInLobby) {
 
                 setSuccess(1);
 
-                setLobby(othersInLobby);
+                setInLobby(othersInLobby);
 
                 setSessionUrl(sessionUrl);
 
@@ -131,7 +131,7 @@ function JoinRoom() {
 
             if (othersInLobby) {
 
-                setLobby(othersInLobby);
+                setInLobby(othersInLobby);
 
                 setRoomDetails(roomDetails);
 
@@ -161,29 +161,9 @@ function JoinRoom() {
 
         socket.on("updateRoomInfo", (link, othersInLobby, roomID, newDetails) => {
 
-            setLobby(othersInLobby);
+            setInLobby(othersInLobby);
 
             setRoomDetails(newDetails);
-
-        });
-
-        socket.on("joinedLobby", (othersInLobby) => {
-
-			setLobby(othersInLobby);
-
-        });
-
-        socket.on("leftRoom", (user) => {
-
-			console.log(`${user} has left the lobby`);
-
-            setLobby(lobby.filter(({playerName}) => { return playerName !== user}));
-
-		});
-
-        socket.on("receiveIsReady", (roomList) => {
-
-            setLobby(roomList);
 
         });
 
@@ -200,8 +180,6 @@ function JoinRoom() {
         });
 
         socket.on("newHost", () => {
-
-            socket.emit("saveMessageList", messageList);
 
             navigate(`/newhost/${roomID}`);
 
@@ -226,9 +204,6 @@ function JoinRoom() {
             socket.removeAllListeners("roomExists");
             socket.removeAllListeners("getLobby");
             socket.removeAllListeners("updateRoomInfo");
-            socket.removeAllListeners("joinedLobby");
-            socket.removeAllListeners("leftRoom");
-            socket.removeAllListeners("receiveIsReady");
             socket.removeAllListeners("getSelectedPlayers");
             socket.removeAllListeners("isRoomClosed");
             socket.removeAllListeners("newHost");
@@ -236,7 +211,7 @@ function JoinRoom() {
 
         }
 
-    }, [socket, roomID, username, lobby, roomDetails, messageList]);
+    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved]);
 
     useEffect(() => {
 
@@ -397,7 +372,7 @@ function JoinRoom() {
 
                                     <div className="flex flex-wrap gap-x-3 gap-y-3">
 
-                                        {lobby?.map((player, index) => {
+                                        {inLobby?.map((player, index) => {
 
                                             if (player.playerName === roomDetails.host) {
 
@@ -468,15 +443,15 @@ function JoinRoom() {
                                             }
                                         })}
 
-                                        {lobby && Array.from({ length: roomDetails.numPlayers - lobby.length }, (_, index) => {
+                                        {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
 
-                                            if (lobby.length < roomDetails.numPlayers) {
+                                            if (inLobby.length < roomDetails.numPlayers) {
 
                                                 return (
 
                                                     <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                         <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                        <p>Player {lobby.length + index + 1}</p>
+                                                        <p>Player {inLobby.length + index + 1}</p>
                                                     </Badge>
                         
                                                 );
@@ -509,7 +484,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={lobby} roomID={roomID} messages={[messageList, setMessageList]} setNewMessage={setNewMessage} />
+                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={inLobby} roomID={roomID} setNewMessage={setNewMessage} />
 
                         </div>
 

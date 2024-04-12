@@ -24,17 +24,15 @@ const Home = function () {
 
 	}
 
-	
-
 	return (
 
 		<div className="flex relative h-screen w-screen justify-center bg-black overflow-hidden">
 
-			<div className="aspect-square h-[170%] absolute top-[-35%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#040a14] to-[#02060c] shadow-inner shadow-red-700">
+			<div className="aspect-square h-[170%] absolute top-[-35%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#040a14] to-[#030a14] shadow-inner shadow-red-700">
 
-				<div className="aspect-square h-[93%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#08101c] to-[#040a14] shadow-inner shadow-red-600">
+				<div className="aspect-square h-[93%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#020b1d] to-[#020811] shadow-inner shadow-red-600">
 
-					<div className="aspect-square h-[92%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#0d1421] to-[#08101c] shadow-inner shadow-red-600">
+					<div className="aspect-square h-[92%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#061227] to-[#02060e] shadow-inner shadow-red-600">
 
 						<div className="aspect-square h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500 ">
 

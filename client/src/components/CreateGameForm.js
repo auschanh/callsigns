@@ -184,7 +184,7 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 	return (
 
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+			<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full pb-10">
 				<FormField
 					defaultValue={''}
 					control={form.control}
