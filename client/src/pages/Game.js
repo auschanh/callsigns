@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+// import { getSvgPath } from "figma-squircle";
 import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
@@ -28,6 +31,22 @@ const Game = function (props) {
 
 	const [copied, setCopied] = useState(false);
 
+	// const [divScreen, setDivScreen] = useState(100);
+
+	const [intro1, setIntro1] = useState(false);
+
+	const [intro2, setIntro2] = useState(false);
+	
+	const [intro3, setIntro3] = useState(false);
+
+	const [enterHint, setEnterHint] = useState(false);
+
+	const [hint, setHint] = useState(["", false]);
+
+    const hintInputRef = useRef(null);
+
+    const hintValidationRef = useRef(null);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -46,6 +65,44 @@ const Game = function (props) {
 		}
 
 	};
+
+	// useEffect(() => {
+
+	// 	if (document.querySelector(".backgroundScreen")) {
+
+	// 		setDivScreen(window.getComputedStyle(document.querySelector(".backgroundScreen"), null));
+
+	// 	}
+
+	// }, [document.querySelector(".backgroundScreen")], window);
+
+	useEffect(() => {
+
+		setTimeout(() => {
+
+			setIntro1(true);
+
+		}, 500);
+
+		setTimeout(() => {
+
+			setIntro2(true);
+
+		}, 1000);
+
+		setTimeout(() => {
+
+			setIntro3(true);
+
+		}, 2000);
+
+		setTimeout(() => {
+
+			setEnterHint(true);
+
+		}, 3000);
+
+	}, []);
 
 	useEffect(() => {
 
@@ -170,13 +227,50 @@ const Game = function (props) {
 
 	};
 
+	const handleChange = (event) => {
+
+        setHint([event.target.value, hint[1]]);
+
+    }
+
+	const handleSubmit = (event) => {
+
+        event.preventDefault();
+
+        if (hint[1]) {
+
+            return;
+
+        }
+
+        if (hint[0].toLowerCase() === callsign.toLowerCase()) {
+
+			hintInputRef.current.parentNode.parentNode.classList.add("pt-2");
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot be the mystery word!"
+            
+        } else {
+
+			hintInputRef.current.parentNode.parentNode.classList.remove("pt-2");
+            hintInputRef.current.classList.remove("border-2");
+            hintInputRef.current.classList.remove("border-red-500");
+            hintInputRef.current.classList.add("border-slate-200");
+            hintValidationRef.current.innerText = "";
+            
+            setHint([hint[0], true]);
+
+        }
+    }
+
 	return (
 
 		<>
 
 			{roomDetails && (
 
-				<div className="h-screen w-screen flex flex-row flex-none bg-slate-300">
+				<div className="h-screen w-screen flex flex-row flex-none bg-slate-800">
 
 					<Popover>
 
@@ -360,46 +454,126 @@ const Game = function (props) {
 
 					</Popover>
 
-					<div>
+					<div className="flex flex-col flex-none h-screen w-screen rounded-xl items-center pt-20 justify-center">
 
-						<div>
+						<div className="absolute top-[4%] flex flex-row gap-8">
 
-							<p>{`The guesser is ${roomDetails.guesser} (${roomDetails.guesserID})`}</p>
+							<div className="flex flex-col items-center">
+								<Label className="text-xs text-slate-300">Callsign</Label>
+								<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+									<p className="text-sm text-center">{callsign}</p>
+								</div>
+							</div>
 
-							{callsign && (
+							<div className="flex flex-col items-center">
+								<Label className="text-xs text-slate-300">Stranded Agent</Label>
+								<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+									<p className="text-sm text-center">{roomDetails.guesser}</p>
+								</div>
+							</div>
 
-								<>
+						</div>
+					
+						<div 
+							className="backgroundScreen h-[80vh] w-[65vw] bg-black rounded-3xl text-green-600 font-mono p-16 overflow-hidden"
+							// style={{
+							// 	clipPath: `path('${getSvgPath({
+							// 		width: divScreen["width"]?.slice(0, -2),
+							// 		height: divScreen["height"]?.slice(0, -2),
+							// 		cornerRadius: 100, // defaults to 0
+							// 		cornerSmoothing: 0.8, // cornerSmoothing goes from 0 to 1
+							// 	})}')`
+							// }}
+						>
 
-									<p>{`This round's callsign is: ${callsign}`}</p>
+							<div className={`transition-all ease-in-out duration-500 ${enterHint ? "invisible opacity-5" : ""}`}>
 
-									<p>
+								{!enterHint && (
 
-										{`The generated words are: `}
+									<>
 
-										{generatedWords.map((prevWord, index) => {
+										{intro1 && (
 
-											if (index !== generatedWords.length - 1) {
+											<>
+												<p>{`% Secure link established: ${roomID} ...`}</p>
+												<p>{`% [REDACTED]`}</p>
+												<p>{`% [REDACTED]`}</p>
+											</>
 
-												return (
+										)}
 
-													<span key={index}>{`${prevWord}, `}</span>
+										{intro2 && (
 
-												);
+											<>
+												<p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
+												<p>{`% [REDACTED]`}</p>
+												<p>{`% [REDACTED]`}</p>
+											</>
 
-											} else {
+										)}
 
-												return <span key={index}>{prevWord}</span>
+										{intro3 && (
 
-											}
+											<p>{`% Begin transmission:`}</p>
 
-										})}
+										)}
 
-									</p>
+									</>
 
-								</>
+								)}
 
-							)}
-							
+							</div>
+
+							<div className={`h-full w-full transition-all ease-in-out duration-500 ${enterHint ? "" : "invisible opacity-5"}`}>
+
+								{enterHint && (
+
+									<div className="h-full w-full flex flex-row flex-none items-center justify-center text-black">
+
+										<div className="bg-slate-200 border border-solid border-slate-400 p-8 rounded-lg">
+
+											<form name="exampleForm"
+												onSubmit={handleSubmit} 
+												className="flex flex-col items-center w-full font-sans"
+											>
+
+												<Label htmlFor="example" className="mb-2">Enter a one-word hint:</Label>
+
+												<div className="flex flex-row w-full justify-center items-end">
+
+													<Input
+														className="flex h-10 w-64 border border-solid border-slate-400"
+														type="text" 
+														id="example"
+														name="hint" 
+														value={hint[0]}
+														onChange={handleChange}
+														disabled={hint[1]}
+														ref={hintInputRef}
+													/>
+
+													<Button 
+														className="ml-2 w-24" 
+														variant={hint[1] ? "green" : "default"} 
+														type="submit"
+													>
+														{hint[1] ? "Submitted" : "Submit"}
+													</Button>
+
+												</div>
+
+												<p className="mt-4 text-xs text-red-500" ref={hintValidationRef}></p>
+
+											</form>
+
+										</div>
+
+									</div>
+
+								)}
+
+							</div>
+						
 						</div>
 
 					</div>
