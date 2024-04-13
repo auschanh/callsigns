@@ -7,6 +7,7 @@ import WordGenerator from "../components/WordGenerator";
 import CardStack from "../components/CardStack";
 import Slider from "../components/Slider";
 import GameMenu from "../components/GameMenu";
+import Chat from "../components/Chat";
 // import Step from "../components/Step"
 import { Input } from "../components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
@@ -16,7 +17,7 @@ import { Switch } from "../components/ui/switch";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
-import { User, Users, Copy, Check, LockKeyhole } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 const Game = function (props) {
 	
@@ -33,6 +34,10 @@ const Game = function (props) {
 	const [roomDetails, setRoomDetails] = useState();
 
 	const [isClosedRoom, setIsClosedRoom] = useState();
+
+	const [isChatOpen, setIsChatOpen] = useState(false);
+
+	const [newMessage, setNewMessage] = useState();
 
 	// const [divScreen, setDivScreen] = useState(100);
 
@@ -210,6 +215,16 @@ const Game = function (props) {
 
     }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName]);
 
+	useEffect(() => {
+
+        if (isChatOpen) {
+
+            setNewMessage(false);
+
+        }
+
+    }, [isChatOpen]);
+
 	const handleChange = (event) => {
 
         setHint([event.target.value, hint[1]]);
@@ -330,7 +345,8 @@ const Game = function (props) {
 
 							<div className="w-[50%] bg-slate-200 border border-solid border-slate-400 p-8 rounded-lg text-black">
 
-								<form name="exampleForm"
+								<form
+									name="exampleForm"
 									onSubmit={handleSubmit} 
 									className="flex flex-col items-center w-full font-sans pt-2"
 								>
@@ -432,6 +448,25 @@ const Game = function (props) {
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
+					
+					<Popover open={isChatOpen} onOpenChange={setIsChatOpen}>
+
+						<PopoverTrigger asChild>
+							<div className="absolute top-0 right-0 mt-6 mr-20">
+								<div className="relative">
+									<Button className="p-0 aspect-square mb-1" variant="outline"><MessageSquare size={14} /></Button>
+									<div className={`absolute -top-1 -right-1 aspect-square w-2.5 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
+								</div>
+							</div>
+						</PopoverTrigger>
+
+						<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
+
+							<Chat chatExpanded={isChatOpen} username={playerName} roomName={roomDetails.roomName} roomID={roomID} setNewMessage={setNewMessage} />
+
+						</PopoverContent>
+
+       				 </Popover>
 
 					<div className="absolute top-[4%] flex flex-row gap-8">
 
