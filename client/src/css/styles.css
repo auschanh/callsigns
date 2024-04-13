@@ -820,6 +820,10 @@ video {
   margin-top: auto;
 }
 
+.mt-\[15vh\] {
+  margin-top: 15vh;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -1134,6 +1138,14 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-\[70\%\] {
+  width: 70%;
+}
+
+.w-\[70vw\] {
+  width: 70vw;
 }
 
 .min-w-\[8rem\] {
