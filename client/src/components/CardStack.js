@@ -8,7 +8,7 @@ const CardStack = ({ cards, currentIndex, handleNext }) => {
         {cards.map((card, index) => (
           <li
             key={index}
-            className={`flex justify-center absolute top-0 mt-[15vh] mb-[5vh] left-0 w-full h-full transition-all duration-500 transform`}
+            className={`flex justify-center absolute top-0 mt-[10vh] mb-[10vh] left-0 w-full h-full transition-all duration-500 transform`}
             style={{
 
                 height: "100vh",
