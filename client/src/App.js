@@ -35,6 +35,8 @@ function App() {
 
 	const [inGame, setInGame] = useState();
 
+	const [isPlayerWaiting, setIsPlayerWaiting] = useState(false);
+
 	const navigate = useNavigate();
 
 	const generateWord = async () => {
@@ -121,9 +123,15 @@ function App() {
 
 		});
 
-		socket.on("getRoomList", (roomList) => {
+		socket.on("getRoomList", (roomList, joinDuringGame) => {
 
 			setInLobby(roomList);
+
+			if (joinDuringGame) {
+
+				setIsPlayerWaiting(true);
+
+			}
 
         });
 
@@ -160,7 +168,7 @@ function App() {
 
 					<LobbyContext.Provider value={[inLobby, setInLobby]}>
 
-						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]]}>
 
 							<Routes>
 

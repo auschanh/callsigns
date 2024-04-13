@@ -22,7 +22,7 @@ const Game = function (props) {
 	
 	const [socket, setSocket] = useSocketContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
@@ -41,6 +41,12 @@ const Game = function (props) {
 	const [intro2, setIntro2] = useState(false);
 	
 	const [intro3, setIntro3] = useState(false);
+
+	const [intro4, setIntro4] = useState(false);
+
+	const [intro5, setIntro5] = useState(false);
+
+	const [intro6, setIntro6] = useState(false);
 
 	const [enterHint, setEnterHint] = useState(false);
 
@@ -103,9 +109,27 @@ const Game = function (props) {
 
 		setTimeout(() => {
 
-			setEnterHint(true);
+			setIntro4(true);
 
 		}, 3000);
+
+		setTimeout(() => {
+
+			setIntro5(true);
+
+		}, 4000);
+
+		setTimeout(() => {
+
+			setIntro6(true);
+
+		}, 5000);
+
+		setTimeout(() => {
+
+			setEnterHint(true);
+
+		}, 6000);
 
 	}, []);
 
@@ -151,7 +175,7 @@ const Game = function (props) {
 
             } else {
 
-				// setRoomDetails(false);
+				setRoomDetails(false);
 
 				console.log(isClosedRoom);
 
@@ -204,7 +228,6 @@ const Game = function (props) {
 
         if (hint[0].toLowerCase() === callsign.toLowerCase()) {
 
-			hintInputRef.current.parentNode.parentNode.classList.add("pt-2");
             hintInputRef.current.classList.add("border-2");
             hintInputRef.current.classList.remove("border-slate-400");
             hintInputRef.current.classList.add("border-red-500");
@@ -212,7 +235,6 @@ const Game = function (props) {
             
         } else {
 
-			hintInputRef.current.parentNode.parentNode.classList.remove("pt-2");
             hintInputRef.current.classList.remove("border-2");
             hintInputRef.current.classList.remove("border-red-500");
             hintInputRef.current.classList.add("border-slate-200");
@@ -238,35 +260,149 @@ const Game = function (props) {
 	};
 
 	const cards = [
+
 		{
 			title: "Round Start",
-			color: "#52B2CF",
-			phase: "Round Start"
+			color: "black",
+			phase: "Round Start",
+			content:  
+
+				// <div className="backgroundScreen h-[80vh] w-[65vw] bg-black rounded-3xl text-green-600 font-mono p-16 overflow-hidden"
+				// 	// style={{
+				// 	// 	clipPath: `path('${getSvgPath({
+				// 	// 		width: divScreen["width"]?.slice(0, -2),
+				// 	// 		height: divScreen["height"]?.slice(0, -2),
+				// 	// 		cornerRadius: 100, // defaults to 0
+				// 	// 		cornerSmoothing: 0.8, // cornerSmoothing goes from 0 to 1
+				// 	// 	})}')`
+				// 	// }}
+				// >
+
+				<>
+
+					<div className={`h-full flex flex-none flex-col text-green-600 font-mono transition-all ease-in-out duration-500 ${enterHint ? "invisible opacity-5" : "w-full"}`}>
+
+						{!enterHint && (
+
+							<>
+
+								{intro1 && (
+
+									<>
+										<p>{`% Secure link established: ${roomDetails.roomName} ...`}</p>
+										<p>{`% [REDACTED]`}</p>
+										<p>{`% [REDACTED]`}</p>
+									</>
+
+								)}
+
+								{intro2 && (
+
+									<>
+										<p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
+										<p>{`% [REDACTED]`}</p>
+										<p>{`% [REDACTED]`}</p>
+									</>
+
+								)}
+
+								{intro3 && (
+
+									<>
+										<p>{`% ...`}</p>
+										<p>{`% ...`}</p>
+										<p>{`% ...`}</p>
+										<p>{`% Connection established`}</p>
+										<p>{`% Begin transmission: `}<span>{intro4 && (<>.</>)}</span><span>{intro5 && (<>.</>)}</span><span>{intro6 && (<>.</>)}</span></p>
+									</>
+
+								)}
+
+							</>
+
+						)}
+
+					</div>
+
+					<div className={`h-full flex flex-none items-center justify-center transition-all ease-in-out duration-500 ${enterHint ? "w-full " : "invisible opacity-5"}`}>
+
+						{enterHint && (
+
+							<div className="w-[50%] bg-slate-200 border border-solid border-slate-400 p-8 rounded-lg text-black">
+
+								<form name="exampleForm"
+									onSubmit={handleSubmit} 
+									className="flex flex-col items-center w-full font-sans pt-2"
+								>
+
+									<Label htmlFor="example" className="mb-3">Enter your one-word hint:</Label>
+
+									<div className="flex flex-row w-full justify-center items-end">
+
+										<Input
+											className="flex h-10 w-64 border border-solid border-slate-400"
+											type="text" 
+											id="example"
+											name="hint" 
+											value={hint[0]}
+											onChange={handleChange}
+											disabled={hint[1]}
+											ref={hintInputRef}
+										/>
+
+										<Button 
+											className="ml-2 w-24" 
+											variant={hint[1] ? "green" : "default"} 
+											type="submit"
+										>
+											{hint[1] ? "Submitted" : "Submit"}
+										</Button>
+
+									</div>
+
+									<p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}></p>
+
+								</form>
+
+							</div>
+
+						)}
+
+					</div>
+
+				</>
+				
+				// </div>
 		},
 		{
 			title: "Card 2",
 			color: "#E5A36F",
-			phase: "Generate CallSign Phase"
+			phase: "Generate CallSign Phase",
+			content: ""
 		},
 		{
 			title: "Card 3",
 			color: "#9CADCE",
-			phase: "Agents Hint Phase"
+			phase: "Agents Hint Phase",
+			content: ""
 		},
 		{
 			title: "Card 4",
 			color: "#D4AFB9",
-			phase: "Eliminate Hints Phase"
+			phase: "Eliminate Hints Phase",
+			content: ""
 		},
 		{
 			title: "Card 5",
 			color: "#008080",
-			phase: "Guess CallSign Phase"
+			phase: "Guess CallSign Phase",
+			content: ""
 		},
 		{
 			title: "Round End",
 			color: "#FF0000",
-			phase: "Round End"
+			phase: "Round End",
+			content: ""
 		}
 	];
 
@@ -274,11 +410,7 @@ const Game = function (props) {
 
 		<>
 
-			<div className="bg-black overflow-hidden flex">
-
-				<div className="fixed w-1/5 h-screen mt-10 z-[9999]">
-					<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
-				</div>
+			{/* 
 
 				<div className="flex-1">
 
@@ -289,137 +421,40 @@ const Game = function (props) {
 
 				</div>
 
-			</div>
+			*/}
 
 			{roomDetails && (
 
-				<div className="h-screen w-screen flex flex-row flex-none bg-slate-800">
+				<div className="relative h-screen w-screen flex flex-col flex-none items-center justify-center bg-slate-800 overflow-hidden">
+
+					<div className="absolute left-5 z-[50]">
+						<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
 
-					<div className="flex flex-col flex-none h-screen w-screen rounded-xl items-center pt-20 justify-center">
+					<div className="absolute top-[4%] flex flex-row gap-8">
 
-						<div className="absolute top-[4%] flex flex-row gap-8">
-
-							<div className="flex flex-col items-center">
-								<Label className="text-xs text-slate-300">Callsign</Label>
-								<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-									<p className="text-sm text-center">{callsign}</p>
-								</div>
+						<div className="flex flex-col items-center">
+							<Label className="text-xs text-slate-300">Callsign</Label>
+							<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+								<p className="text-sm text-center">{callsign}</p>
 							</div>
-
-							<div className="flex flex-col items-center">
-								<Label className="text-xs text-slate-300">Stranded Agent</Label>
-								<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-									<p className="text-sm text-center">{roomDetails.guesser}</p>
-								</div>
-							</div>
-
 						</div>
-					
-						<div 
-							className="backgroundScreen h-[80vh] w-[65vw] bg-black rounded-3xl text-green-600 font-mono p-16 overflow-hidden"
-							// style={{
-							// 	clipPath: `path('${getSvgPath({
-							// 		width: divScreen["width"]?.slice(0, -2),
-							// 		height: divScreen["height"]?.slice(0, -2),
-							// 		cornerRadius: 100, // defaults to 0
-							// 		cornerSmoothing: 0.8, // cornerSmoothing goes from 0 to 1
-							// 	})}')`
-							// }}
-						>
 
-							<div className={`transition-all ease-in-out duration-500 ${enterHint ? "invisible opacity-5" : ""}`}>
-
-								{!enterHint && (
-
-									<>
-
-										{intro1 && (
-
-											<>
-												<p>{`% Secure link established: ${roomID} ...`}</p>
-												<p>{`% [REDACTED]`}</p>
-												<p>{`% [REDACTED]`}</p>
-											</>
-
-										)}
-
-										{intro2 && (
-
-											<>
-												<p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
-												<p>{`% [REDACTED]`}</p>
-												<p>{`% [REDACTED]`}</p>
-											</>
-
-										)}
-
-										{intro3 && (
-
-											<p>{`% Begin transmission:`}</p>
-
-										)}
-
-									</>
-
-								)}
-
+						<div className="flex flex-col items-center">
+							<Label className="text-xs text-slate-300">Stranded Agent</Label>
+							<div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+								<p className="text-sm text-center">{roomDetails.guesser}</p>
 							</div>
-
-							<div className={`h-full w-full transition-all ease-in-out duration-500 ${enterHint ? "" : "invisible opacity-5"}`}>
-
-								{enterHint && (
-
-									<div className="h-full w-full flex flex-row flex-none items-center justify-center text-black">
-
-										<div className="bg-slate-200 border border-solid border-slate-400 p-8 rounded-lg">
-
-											<form name="exampleForm"
-												onSubmit={handleSubmit} 
-												className="flex flex-col items-center w-full font-sans"
-											>
-
-												<Label htmlFor="example" className="mb-2">Enter a one-word hint:</Label>
-
-												<div className="flex flex-row w-full justify-center items-end">
-
-													<Input
-														className="flex h-10 w-64 border border-solid border-slate-400"
-														type="text" 
-														id="example"
-														name="hint" 
-														value={hint[0]}
-														onChange={handleChange}
-														disabled={hint[1]}
-														ref={hintInputRef}
-													/>
-
-													<Button 
-														className="ml-2 w-24" 
-														variant={hint[1] ? "green" : "default"} 
-														type="submit"
-													>
-														{hint[1] ? "Submitted" : "Submit"}
-													</Button>
-
-												</div>
-
-												<p className="mt-4 text-xs text-red-500" ref={hintValidationRef}></p>
-
-											</form>
-
-										</div>
-
-									</div>
-
-								)}
-
-							</div>
-						
 						</div>
 
 					</div>
+
+					<CardStack cards={cards} 
+						currentIndex={currentIndex} 
+						handleNext={handleNext}
+					/>
 
 				</div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
@@ -12,13 +12,33 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
 
     const [inLobby, setInLobby] = useLobbyContext();
 
     const [isClosedRoom, setIsClosedRoom] = isClosedRoomState;
 
     const [copied, setCopied] = useState(false);
+
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+    const [isWaitingOpen, setIsWaitingOpen] = useState(false);
+
+    useEffect(() => {
+
+        if (!isPopoverOpen) {
+
+            setIsWaitingOpen(false);
+
+        }
+
+        if (isWaitingOpen) {
+
+            setIsPlayerWaiting(false);
+
+        }
+
+    }, [isPopoverOpen, setIsPlayerWaiting, isWaitingOpen, isPlayerWaiting]);
 
     const handleCopy = async () => {
 
@@ -68,10 +88,15 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
     return (
 
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 
             <PopoverTrigger asChild>
-                <Button className="absolute right-0 p-0 aspect-square m-6" variant="outline"><Users size={14} /></Button>
+                <div className="absolute top-0 right-0 m-6">
+                    <div className="relative">
+                        <Button className="p-0 aspect-square mb-1" variant="outline"><Users size={14} /></Button>
+                        <div className={`absolute -top-1 -right-1 aspect-square w-2.5 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
+                    </div>
+                </div>
             </PopoverTrigger>
 
             <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-6 p-4">
@@ -92,7 +117,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
                         <AccordionItem className="w-full border-slate-200" value="item-1">
 
-                            <AccordionTrigger>In Game:</AccordionTrigger>
+                            <AccordionTrigger>{`In Game:`}</AccordionTrigger>
 
                             <AccordionContent>
 
@@ -120,9 +145,14 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
                         </AccordionItem>
 
-                        <AccordionItem className="w-full border-slate-200" value="item-2">
+                        <AccordionItem open={false} className="w-full border-slate-200" value="item-2">
 
-                            <AccordionTrigger>Waiting in Lobby:</AccordionTrigger>
+                            <AccordionTrigger onClick={() => {setIsWaitingOpen(value => !value)}}>
+                                <div className="flex flex-row items-center w-full">
+                                    <h2>{`Waiting in Lobby:`}</h2>
+                                    <div className={`aspect-square w-2 ml-auto mr-6 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
+                                </div>
+                            </AccordionTrigger>
 
                             <AccordionContent>
 
@@ -168,7 +198,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
                         <AccordionItem className={`w-full border-slate-200`} value="item-3">
 
-                            <AccordionTrigger>Share Link</AccordionTrigger>
+                            <AccordionTrigger>{`Share Link:`}</AccordionTrigger>
 
                             <AccordionContent>
 

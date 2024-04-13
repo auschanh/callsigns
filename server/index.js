@@ -253,7 +253,7 @@ io.on("connection", (socket) => {
 
 				socket.emit("getLobby", roomList, findRoom);
 
-				socket.to(roomName).emit("getRoomList", roomList);
+				socket.to(roomName).emit("getRoomList", roomList, true);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 

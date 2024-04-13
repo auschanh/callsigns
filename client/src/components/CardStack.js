@@ -1,33 +1,62 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const CardStack = ({ cards, currentIndex, handleNext }) => {
 
-  return (
-    <div className="h-screen w-full items-center justify-center overflow-hidden relative">
-      <ul className="pl-0 w-full list-none grid gap-0 grid-cols-1">
-        {cards.map((card, index) => (
-          <li
-            key={index}
-            className={`flex justify-center absolute top-0 mt-[15vh] mb-[5vh] left-0 w-full h-full transition-all duration-500 transform`}
-            style={{
+	useEffect(() => {
 
-                height: "100vh",
-                transform: `translateY(${(index - currentIndex) * 100}vh)`,
-                                zIndex: index === currentIndex ? "1" : "0"
-            }}
-          >
-            <div
-              className="h-[80vh] w-[65vw] rounded-2xl card-body box-border p-30 rounded-50 flex justify-center items-center transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3)"
-              style={{ backgroundColor: card.color }}
-              onClick={() => handleNext(index)}
-            >
-              <h2 className="text-4xl">{card.title}</h2>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+		const listenForKeydown = (event) => {
+
+            if (event.key === "ArrowDown") {
+
+                event.preventDefault();
+
+                handleNext();
+
+            }
+
+        }
+
+        document.addEventListener("keydown", listenForKeydown);
+
+        return () => document.removeEventListener("keydown", listenForKeydown);
+
+	}, []);
+
+	return (
+
+		<div className="flex mt-[8vh] h-[80vh] w-[65vw] items-center justify-center overflow-hidden relative rounded-3xl">
+
+			<ul className="pl-0 h-full w-full list-none">
+
+				{cards.map((card, index) => (
+
+					<li
+						key={index}
+						className={`flex justify-center absolute top-0 left-0 w-full h-full transition-all duration-500 transform`}
+						style={{
+
+							transform: `translateY(${(index - currentIndex) * 85}vh)`,
+							zIndex: index === currentIndex ? "1" : "0"
+						}}
+					>
+
+						<div
+							className="h-full w-full card-body box-border flex transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3) p-16 rounded-3xl"
+							style={{ backgroundColor: card.color }}
+						>
+
+							{card.content}
+
+						</div>
+
+					</li>
+
+				))}
+
+			</ul>
+
+		</div>
+	);
 };
 
 export default CardStack;

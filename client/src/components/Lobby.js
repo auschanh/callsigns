@@ -14,7 +14,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [,,, [selectedPlayers, setSelectedPlayers],,] = useGameInfoContext();
+	const [,,, [selectedPlayers, setSelectedPlayers],,,] = useGameInfoContext();
 
 	const [inLobby, setInLobby] = useLobbyContext();
 
@@ -246,8 +246,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 							<h2 className="text-xs leading-none m-0 p-0">Chat</h2>
 							<MessageSquare size={14} />
 							<div
-								className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"
-									}`}
+								className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`}
 							/>
 						</Button>
 
