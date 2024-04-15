@@ -123,11 +123,11 @@ function App() {
 
 		});
 
-		socket.on("getRoomList", (roomList, joinDuringGame) => {
+		socket.on("getRoomList", (roomList, isGameStarted) => {
 
 			setInLobby(roomList);
 
-			if (joinDuringGame) {
+			if (isGameStarted) {
 
 				setIsPlayerWaiting(true);
 

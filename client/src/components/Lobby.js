@@ -522,7 +522,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 					<Button
 						className="w-25 mt-12"
 						onClick={startGame}
-						disabled={selectedPlayers.length === gameInfo.numPlayers ? false : true}
+						disabled={selectedPlayers.length !== gameInfo.numPlayers}
 					>
 						Start Game
 					</Button>

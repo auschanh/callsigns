@@ -34,7 +34,7 @@ const Home = function () {
 
 					<div className="aspect-square h-[92%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#061227] to-[#02060e] shadow-inner shadow-red-600">
 
-						<div className="aspect-square h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500 ">
+						<div className="aspect-square h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500">
 
 							<div className="w-[75%]">
 

@@ -253,7 +253,9 @@ io.on("connection", (socket) => {
 
 				socket.emit("getLobby", roomList, findRoom);
 
-				socket.to(roomName).emit("getRoomList", roomList, true);
+				console.log("getRoomList activated");
+
+				socket.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 
