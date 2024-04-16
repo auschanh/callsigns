@@ -373,7 +373,7 @@ const Game = function (props) {
 				<div className="relative h-screen w-screen flex flex-col flex-none items-center justify-center overflow-hidden bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%">
 
 					<div className="absolute left-5 z-[50]">
-						<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
@@ -417,8 +417,8 @@ const Game = function (props) {
 
 					<div>
 
-						<div className={`pointer-events-none absolute z-50 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "invisible opacity-5" : ""}`} />
-						<div className={`pointer-events-none absolute z-50 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"}`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "invisible opacity-5" : ""}`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"}`} />
 						
 						<CardStack cards={cards} 
 							currentIndex={currentIndex} 
