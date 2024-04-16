@@ -872,6 +872,14 @@ video {
   margin-right: 5rem;
 }
 
+.mt-\[15vh\] {
+  margin-top: 15vh;
+}
+
+.mt-20 {
+  margin-top: 5rem;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -2121,6 +2129,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.lowercase {
+  text-transform: lowercase;
 }
 
 .leading-none {

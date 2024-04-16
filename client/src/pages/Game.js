@@ -18,6 +18,8 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { MessageSquare } from "lucide-react";
+import { stemmer } from "stemmer";
+import pluralize from "pluralize";
 
 const Game = function (props) {
 	
@@ -50,6 +52,17 @@ const Game = function (props) {
 	const [isVoted, setIsVoted] = useState();
 
 	const [currentIndex, setCurrentIndex] = useState(0);
+
+	const [currentRound, setCurrentRound] = useState(0);
+
+	// state for words
+	const [guess, setGuess] = useState("");
+
+	const [clicked, setClicked] = useState(false);
+
+	const [correctGuess, setCorrectGuess] = useState(null);
+
+	const [errMsg, setErrMsg] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -320,18 +333,26 @@ const Game = function (props) {
 
 	}, [isVoted]);
 
-	const _handleNext = (currentIndex) => {
-		setCurrentIndex(currentIndex + 1);
-	};
+	useEffect(() => {
+		if(currentIndex === 0){
+			setCurrentRound(currentRound+1);
+		}
+	}, [currentIndex])
 
-	const _handleComplete = () => {};
+	const validateWord = (w) => {
+		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
+	}
+
+	const stemmerWord = (w) => {
+		return stemmer(w);
+	}
+
+	const singularizeWord = (w) => {
+		return pluralize.singular(w);
+	}
 
 	const handleNext = () => {
 		setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
-	};
-
-	const _handleIndexChange = (index) => {
-		setCurrentIndex(index);
 	};
 
 	const cards = [
@@ -342,7 +363,15 @@ const Game = function (props) {
 			phase: "Round Start",
 			content:  
 
-				<SubmitHint enterHintState={[enterHint, setEnterHint]} roomDetails={roomDetails} hintState={[hint, setHint]} submissionsState={[submissions, setSubmissions]} />
+				<SubmitHint 
+				enterHintState={[enterHint, setEnterHint]} 
+				roomDetails={roomDetails} 
+				hintState={[hint, setHint]} 
+				submissionsState={[submissions, setSubmissions]} 
+				validateWord={validateWord}
+				stemmerWord={stemmerWord}
+				singularizeWord={singularizeWord}
+				/>
 				
 		},
 		{
@@ -374,6 +403,9 @@ const Game = function (props) {
 
 					<div className="absolute left-5 z-[50]">
 						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+						<div className="text-white mt-6">
+							Round {currentRound}/4
+						</div>
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
