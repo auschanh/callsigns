@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
 
-const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) => {
+const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState }) => {
+
+    const [socket, setSocket] = useSocketContext();
 
     const hintInputRef = useRef(null);
 
@@ -17,7 +20,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
 
     const [hint, setHint] = hintState;
 
-    const [results, setResults] = resultsState;
+    const [submissions, setSubmissions] = submissionsState;
 
     const [intro1, setIntro1] = useState(false);
 
@@ -83,7 +86,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
 
 		hintInputRef.current?.focus();
 
-	}, [hint])
+	}, [hint]);
 
 	const handleChange = (event) => {
 
@@ -91,7 +94,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
 
     }
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 
         event.preventDefault();
 
@@ -126,18 +129,32 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
             
             setHint([hint[0], true]);
 
-			setResults(
+            try {
 
-				results.map((result) => {
+                await socket.emit("submitHint", roomDetails.roomID, playerName, hint[0]);
+    
+            } catch (error) {
+    
+                throw error;
+    
+            }
+        }
+    }
 
-					return result.playerName === playerName ? {...result, hint: hint[0]} : result;
+    const handleUndoSubmit = async () => {
 
+        setHint(["", false]);
 
-				})
+        try {
 
-			);
+            await socket.emit("submitHint", roomDetails.roomID, playerName, "");
+
+        } catch (error) {
+
+            throw error;
 
         }
+
     }
 
     return (
@@ -222,7 +239,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
                                         className={`ml-2 w-24 ${hint[1] ? "hover:bg-slate-500" : ""}`}
                                         variant={hint[1] ? "green" : "default"} 
                                         type="button"
-                                        onClick={hint[1] ? (isUndo ? (() => {setHint(["", false])}) : (() => {})) : handleSubmit}
+                                        onClick={hint[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}
                                         onMouseEnter={() => {setIsUndo(true)}}
                                         onMouseLeave={() => {setIsUndo(false)}}
                                     >
@@ -239,21 +256,57 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
 
                         <div className="flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4">
 
-                            {inGame?.map((player, index) => {
+                            {submissions?.map((submission, index) => {
 
-                                if (player === playerName) {
+                                if (submission.playerName === playerName) {
 
                                     return (
 
                                         <Button
                                             key={index}
                                             className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                            variant={`${hint[1] ? "green" : "grey"}`}
+                                            variant={`${submission.hint !== "" ? "green" : "grey"}`}
                                         >
 
                                             <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+
+                                                {submission.hint !== "" && (
+
+                                                    <Check className="text-slate-900" size={14} />
+
+                                                ) || (
+
+                                                    <Ellipsis className="text-slate-900" size={14} />
+
+                                                )}
+
+                                            </div>
+
+                                            <p className="text-xs">{submission.playerName}</p>
+                                            
+                                        </Button>
+
+                                    );
+
+                                }
+
+                            })}
+
+                            {submissions?.map((submission, index) => {
+
+                                if (submission.playerName !== playerName) {
+
+                                    return (
+
+                                        <Button
+                                            key={index}
+                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                            variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                        >
     
-                                                {hint[1] && (
+                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+    
+                                                {submission.hint !== "" && (
     
                                                     <Check className="text-slate-900" size={14} />
     
@@ -265,28 +318,12 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState }) =>
     
                                             </div>
     
-                                            <p className="text-xs">{player}</p>
+                                            <p className="text-xs">{submission.playerName}</p>
                                             
                                         </Button>
     
                                     );
 
-                                } else {
-
-                                    return (
-
-                                        <Button
-                                            key={index}
-                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                            variant="grey"
-                                        >
-                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                <Ellipsis className="text-slate-900" size={14} />
-                                            </div>
-                                            <p className="text-xs">{player}</p>
-                                        </Button>
-
-                                    );
                                 }
 
                             })}

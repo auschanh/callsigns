@@ -43,62 +43,17 @@ const Game = function (props) {
 
 	const [hint, setHint] = useState(["", false]);
 
+	const [submissions, setSubmissions] = useState();
+
+	const [results, setResults] = useState([]);
+
+	const [isVoted, setIsVoted] = useState();
+
 	const [currentIndex, setCurrentIndex] = useState(0);
 
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
-
-	const submissions = [
-
-        {
-
-            playerName: playerName,
-            hint: hint[0]
-
-        }, {
-
-            playerName: "Amanda",
-            hint: "warm"
-
-        }, {
-
-            playerName: "Stephanie",
-            hint: "warm"
-
-        }, {
-
-            playerName: "Frank",
-            hint: "coffee"
-
-        }, {
-
-            playerName: "Bill",
-            hint: "mug"
-
-        }, {
-
-            playerName: "Mark",
-            hint: "decaf"
-
-        }, {
-
-            playerName: "Sarah",
-            hint: "beans"
-
-        }
-
-    ];
-
-    const [results, setResults] = useState(
-
-        submissions.map((submission) => {
-
-            return {...submission, toRemove: false, beenRemoved: false, visible: true};
-
-        })
-
-    );
 
 	// for host only
 	const sendSelected = async () => {
@@ -141,10 +96,23 @@ const Game = function (props) {
 
 			if (othersInLobby && playerName !== undefined) {
 
-                setInGame(
+				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
 
-					selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) })
-					
+                setInGame(playing);
+
+				setSubmissions(
+
+					playing.map((player) => {
+		
+						return ({
+			
+							playerName: player,
+							hint: ""
+			
+						});
+			
+					})
+
 				);
 
                 setRoomDetails(roomDetails);
@@ -182,15 +150,67 @@ const Game = function (props) {
 
         });
 
+		socket.on("receiveHint", (playerName, hint) => {
+
+			setSubmissions(
+
+				submissions.map((submission) => {
+
+					if (submission.playerName === playerName) {
+
+						return ({...submission, hint: hint});
+
+					} else {
+
+						return submission;
+
+					}
+
+				})
+
+			);
+
+		});
+
+		socket.on("receiveVote", (playerName, externalResults, voted) => {
+
+			setResults(
+
+				results.map((result) => {
+
+					const externalRecord = externalResults.find((record) => { return record.playerName === result.playerName });
+
+					return {...result, count: externalRecord.count }
+
+				})
+
+			);
+
+			setIsVoted(
+
+				isVoted.map((player) => {
+
+					return player.playerName === playerName ? {...player, voted: voted} : player;
+
+				})
+
+			);
+
+			console.log("just voted");
+			
+		});
+
         return () => {
 
             socket.removeAllListeners("roomExists");
 			socket.removeAllListeners("sendSelectedPlayers");
 			socket.removeAllListeners("isRoomClosed");
+			socket.removeAllListeners("receiveHint");
+			socket.removeAllListeners("receiveVote");
             
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted]);
 
 	useEffect(() => {
 
@@ -201,6 +221,65 @@ const Game = function (props) {
         }
 
     }, [isChatOpen]);
+
+	useEffect(() => {
+
+		setSubmissions(
+
+			submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
+
+		);
+
+		setIsVoted(
+
+			inGame?.map((player) => {
+
+				return ({
+
+					playerName: player,
+					voted: false
+
+				});
+
+			})
+
+		);
+
+	}, [inGame]);
+
+	useEffect(() => {
+
+		if (submissions?.every((submission) => { return submission.hint !== ""})) {
+
+			setResults(
+
+				submissions.map((submission) => {
+
+					return {...submission, count: 0, toRemove: false, beenRemoved: false, visible: true};
+		
+				})
+
+			);
+
+			handleNext();
+
+		}
+
+	}, [submissions]);
+
+	useEffect(() => {
+
+		if (isVoted !== undefined) {
+
+			if (isVoted.every((player) => { return player.voted === true })) {
+
+				handleNext();
+	
+			}
+
+		}
+
+	}, [isVoted]);
 
 	const _handleNext = (currentIndex) => {
 		setCurrentIndex(currentIndex + 1);
@@ -224,7 +303,7 @@ const Game = function (props) {
 			phase: "Round Start",
 			content:  
 
-				<SubmitHint enterHintState={[enterHint, setEnterHint]} roomDetails={roomDetails} hintState={[hint, setHint]} resultsState={[results, setResults]} />
+				<SubmitHint enterHintState={[enterHint, setEnterHint]} roomDetails={roomDetails} hintState={[hint, setHint]} submissionsState={[submissions, setSubmissions]} />
 				
 		},
 		{
@@ -232,7 +311,7 @@ const Game = function (props) {
 			phase: "Generate CallSign Phase",
 			content: 
 
-				<SelectHint resultsState={[results, setResults]} />
+				<SelectHint resultsState={[results, setResults]} roomDetails={roomDetails} playerName={playerName} />
 
 		},
 		{

@@ -1,15 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
-import { Check, Trash2, X } from "lucide-react";
+import { useSocketContext } from "../contexts/SocketContext";
+import { Check, Trash2, X, RotateCcw } from "lucide-react";
 
-const SelectHint = ({ resultsState }) => {
+const SelectHint = ({ resultsState, roomDetails, playerName }) => {
 
     const [results, setResults] = resultsState;
+
+    const [socket, setSocket] = useSocketContext();
     
     const [voted, setVoted] = useState(false);
 
-    const changeToRed = (playerName) => {
+    const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
+
+    const [isNoneSelected, setIsNoneSelected] = useState(true);
+
+    useEffect(() => {
+
+        if (isVoteSubmitted) {
+
+            (async () => {
+
+                try {
+    
+                    await socket.emit("submitVote", roomDetails.roomID, playerName, results, voted);
+
+                    console.log("vote submitted");
+
+                    setIsVoteSubmitted(false);
+        
+                } catch (error) {
+        
+                    throw error;
+        
+                }
+    
+            })();
+
+        }
+
+    }, [socket, results, roomDetails, playerName, isVoteSubmitted, voted]);
+
+    const selectToRemove = (playerName) => {
 
         setResults(
 
@@ -20,11 +53,13 @@ const SelectHint = ({ resultsState }) => {
             })
         );
 
+        setIsNoneSelected(false);
+
     }
 
 	const handleRemove = () => {
 
-        if (voted) {
+        if (voted || isNoneSelected) {
 
             return;
 
@@ -34,15 +69,17 @@ const SelectHint = ({ resultsState }) => {
 
         setResults(
 
-            results.map((result, index) => {
+            results.map((result) => {
 
-                return !result.toRemove ? result : index === 0 ? {...result, beenRemoved: true, visible: false} : {...result, beenRemoved: true}
+                return !result.toRemove ? result : {...result, beenRemoved: true, count: result.count + 1};
 
             })
 
         );
 
         setVoted(true);
+
+        setIsVoteSubmitted(true);
 
     }
 
@@ -58,15 +95,35 @@ const SelectHint = ({ resultsState }) => {
 
         setResults(
 
-            results.map((result, index) => {
+            results.map((result) => {
 
-                return index === 0 ? {...result, toRemove: false, beenRemoved: false, visible: true} : {...result, toRemove: false, beenRemoved: false};
+                return !result.toRemove ? result : {...result, toRemove: false, beenRemoved: false, count: result.count - 1};
 
             })
 
         );
 
         setVoted(false);
+
+        setIsVoteSubmitted(true);
+
+        setIsNoneSelected(true);
+
+    }
+
+    const handleClearSelection = () => {
+
+        setResults(
+
+            results.map((result) => {
+
+                return {...result, toRemove: false, beenRemoved: false};
+
+            })
+
+        );
+
+        setIsNoneSelected(true);
 
     }
 
@@ -80,7 +137,7 @@ const SelectHint = ({ resultsState }) => {
 
                     <Label className="mb-12 text-lg leading-none">Select the hints that are too similar or illegal:</Label>
 
-                    <div className="flex flex-row flex-wrap justify-center gap-4">
+                    <div className="flex flex-row flex-wrap justify-center gap-10">
 
                         {results.map((result, index) => {
 
@@ -88,14 +145,21 @@ const SelectHint = ({ resultsState }) => {
 
                                 <div key={index} className="flex flex-col min-w-36 items-center gap-2">
                                     <Label className="text-sm">{result.playerName}</Label>
-                                    <Button 
-                                        onClick={voted ? () => {} : () => changeToRed(result.playerName)} 
-                                        variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
-                                        className={`flex p-2 w-full max-w-sm justify-center ${result.beenRemoved ? "line-through" : ""}`} 
-                                        disabled={voted ? true : false}
-                                    >
-                                        {result.hint}
-                                    </Button>
+                                    <div className="w-full relative">
+
+                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
+                                            <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
+                                        </div>
+
+                                        <Button 
+                                            onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
+                                            variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
+                                            className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
+                                            disabled={voted}
+                                        >
+                                            {result.hint}
+                                        </Button>
+                                    </div>
                                 </div>
 
                             );
@@ -107,7 +171,7 @@ const SelectHint = ({ resultsState }) => {
                 </div>
 
                 <div className="flex flex-row justify-center gap-4 mt-16">
-                    <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44">
+                    <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
 
                         {voted && (
 
@@ -126,9 +190,31 @@ const SelectHint = ({ resultsState }) => {
                         )}
 
                     </Button>
-                    <Button onClick={handleCancel} variant="default" className="flex flex-row w-44">
-                        <X size={16} className="mr-2" />
-                        Cancel Selection
+                    <Button onClick={(isNoneSelected && !voted) ? () => {setVoted(true); setIsVoteSubmitted(true);} : voted ? handleCancel : handleClearSelection} variant={(isNoneSelected && !voted) ? "green" : voted ? "default" : "blue"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+
+                        {(isNoneSelected && !voted) && (
+
+                            <>
+                                <Check size={16} className="mr-2" />
+                                Looks Good!
+                            </>
+
+                        ) || voted && (
+
+                            <>
+                                <X size={16} className="mr-2" />
+                                Cancel Selection
+                            </>
+
+                        ) || (
+
+                            <>
+                                <RotateCcw size={16} className="mr-2" />
+                                Clear Selection
+                            </>
+
+                        )}
+
                     </Button>
                 </div>
 

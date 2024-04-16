@@ -426,6 +426,18 @@ io.on("connection", (socket) => {
 
 	});
 
+	socket.on("submitHint", (roomID, playerName, hint) => {
+
+		io.to(roomID).emit("receiveHint", playerName, hint);
+
+	});
+
+	socket.on("submitVote", (roomID, playerName, results, voted) => {
+
+		io.to(roomID).emit("receiveVote", playerName, results, voted);
+
+	});
+
 	socket.on("disconnecting", () => {
 
 		const leavingRooms = [...socket.rooms];
