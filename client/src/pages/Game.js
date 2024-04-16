@@ -115,6 +115,40 @@ const Game = function (props) {
 
 				);
 
+				setResults(
+
+					playing.map((player) => {
+	
+						return ({
+
+							playerName: player,
+							hint: "",
+							count: 0,
+							toRemove: false,
+							beenRemoved: false,
+							visible: true
+						
+						});
+			
+					})
+	
+				);
+
+				setIsVoted(
+
+					playing.map((player) => {
+
+						return ({
+
+							playerName: player,
+							voted: false
+
+						});
+
+					})
+
+				);
+
                 setRoomDetails(roomDetails);
 
 				setIsClosedRoom(roomDetails.isClosedRoom);
@@ -163,6 +197,24 @@ const Game = function (props) {
 					} else {
 
 						return submission;
+
+					}
+
+				})
+
+			);
+
+			setResults(
+
+				results.map((result) => {
+
+					if (result.playerName === playerName) {
+
+						return ({...result, hint: hint});
+
+					} else {
+
+						return result;
 
 					}
 
@@ -222,6 +274,8 @@ const Game = function (props) {
 
     }, [isChatOpen]);
 
+	// consolidate into just inGame
+	// remove hints from voting when players exit?
 	useEffect(() => {
 
 		setSubmissions(
@@ -230,18 +284,15 @@ const Game = function (props) {
 
 		);
 
+		setResults(
+
+			results?.filter((player) => { return inGame.includes(player.playerName) })
+
+		);
+
 		setIsVoted(
 
-			inGame?.map((player) => {
-
-				return ({
-
-					playerName: player,
-					voted: false
-
-				});
-
-			})
+			isVoted?.filter((player) => { return inGame.includes(player.playerName) })
 
 		);
 
@@ -251,17 +302,7 @@ const Game = function (props) {
 
 		if (submissions?.every((submission) => { return submission.hint !== ""})) {
 
-			setResults(
-
-				submissions.map((submission) => {
-
-					return {...submission, count: 0, toRemove: false, beenRemoved: false, visible: true};
-		
-				})
-
-			);
-
-			handleNext();
+			setCurrentIndex(1);
 
 		}
 
@@ -269,13 +310,11 @@ const Game = function (props) {
 
 	useEffect(() => {
 
-		if (isVoted !== undefined) {
+		console.log(isVoted);
 
-			if (isVoted.every((player) => { return player.voted === true })) {
+		if (isVoted?.every((player) => { return player.voted === true })) {
 
-				handleNext();
-	
-			}
+			setCurrentIndex(2);
 
 		}
 
