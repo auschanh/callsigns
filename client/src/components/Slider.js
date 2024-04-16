@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 
-const Slider = ({ onChange, currentIndex, numCards, cards }) => {
+const Slider = ({ currentIndex, numCards, cards }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
 
   const handleHover = i => {
@@ -27,7 +27,8 @@ const Slider = ({ onChange, currentIndex, numCards, cards }) => {
       <ReactSlider
       className="vertical-slider"
       markClassName="example-mark"
-      onChange={onChange}
+      // onChange={onChange}
+      onClick={(e)=> e.preventDefault()}
       trackClassName="example-track"
       onBeforeChange={handleBeforeChange}
       defaultValue={0}
@@ -39,9 +40,9 @@ const Slider = ({ onChange, currentIndex, numCards, cards }) => {
         const index = props.key;
         const isHovered = hoveredCard === index;
         const card = cards[index];
-        if (props.key < currentIndex) {
+        if (index < currentIndex) {
           props.className = "example-mark example-mark-completed";
-        } else if (props.key === currentIndex) {
+        } else if (index === currentIndex) {
           props.className = isHovered ? "hovered example-mark example-mark-active" : "example-mark example-mark-active animate-pulse";
         }
         return (
@@ -70,8 +71,6 @@ const Slider = ({ onChange, currentIndex, numCards, cards }) => {
     />
     </div>
   );
-    
-    
 };
 
 export default Slider;

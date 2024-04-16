@@ -277,7 +277,7 @@ const Game = function (props) {
 			<div className="bg-black overflow-hidden flex">
 
 				<div className="fixed w-1/5 h-screen mt-10 z-[9999]">
-					<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+					<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
 				</div>
 
 				<div className="flex-1">
