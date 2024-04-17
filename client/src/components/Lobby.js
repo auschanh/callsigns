@@ -10,11 +10,11 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansion, newMessage, prevClosedRoom }) {
+const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansion, newMessage, prevClosedRoom, isGameStarted }) {
 
 	const [socket, setSocket] = useSocketContext();
 
-	const [,,, [selectedPlayers, setSelectedPlayers],,,] = useGameInfoContext();
+	const [,,, [selectedPlayers, setSelectedPlayers], [inGame, setInGame],,] = useGameInfoContext();
 
 	const [inLobby, setInLobby] = useLobbyContext();
 
@@ -310,210 +310,270 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 
 					</div>
 
-					<h1 className="text-sm font-semibold mb-2">
-						Select {gameInfo.numPlayers}{" "}
-						{gameInfo.numPlayers === 1 ? "player" : "players"} for this round:
-					</h1>
+					<div className="mb-6">
 
-					<div className="flex flex-wrap gap-x-3 gap-y-3">
+						<h1 className="text-sm font-semibold mb-2">
+							Select {gameInfo.numPlayers}{" "}
+							{gameInfo.numPlayers === 1 ? "player" : "players"} for this round:
+						</h1>
 
-						{inLobby?.map((player, index) => {
+						<div className="flex flex-wrap gap-x-3 gap-y-3">
 
-							if (player.playerName === gameInfo.username) {
+							{inLobby?.map((player, index) => {
 
-								return (
+								if (player.playerName === gameInfo.username) {
 
-									<ContextMenu key={index}>
-										<ContextMenuTrigger>
-											<TooltipProvider>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<Button
-															className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-															variant={
-																selectedPlayers.includes(player.playerName)
-																	? "green"
-																	: "indigo"
-															}
-															onClick={() => {
-																handleSelectPlayer(player);
-															}}
-														>
-															<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-																<p className="text-slate-900 text-xs font-semibold">
-																	{player.playerName.charAt(0).toUpperCase()}
-																</p>
-															</div>
-															<p className="text-xs">{player.playerName}</p>
-														</Button>
-													</TooltipTrigger>
-													<TooltipContent>
-														<p className="font-semibold">{`👑 Host`}</p>
-													</TooltipContent>
-												</Tooltip>
-											</TooltipProvider>
-										</ContextMenuTrigger>
-										<ContextMenuContent className="p-0 border-0">
-											<ContextMenuItem
-												disabled
-												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-											>
-												<X size={16} />
-												<p>Host cannot be removed from Lobby</p>
-											</ContextMenuItem>
-										</ContextMenuContent>
-									</ContextMenu>
+									return (
 
-								);
-
-							} else {
-
-								return (
-
-									<ContextMenu key={index}>
-										<ContextMenuTrigger>
-											<TooltipProvider>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<Button
-															className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-															onClick={() => {
-																handleSelectPlayer(player);
-															}}
-															variant={
-																player.isReady
-																	? selectedPlayers.includes(player.playerName)
+										<ContextMenu key={index}>
+											<ContextMenuTrigger>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<Button
+																className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+																variant={
+																	selectedPlayers.includes(player.playerName)
 																		? "green"
-																		: "default"
-																	: "disabled"
-															}
-														>
-															<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-																<p className="text-slate-900 text-xs font-semibold">
-																	{player.playerName.charAt(0).toUpperCase()}
-																</p>
-															</div>
-															<p className="text-xs">{player.playerName}</p>
-														</Button>
-													</TooltipTrigger>
-
-													{!player.isReady && (
+																		: "indigo"
+																}
+																onClick={() => {
+																	handleSelectPlayer(player);
+																}}
+															>
+																<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+																	<p className="text-slate-900 text-xs font-semibold">
+																		{player.playerName.charAt(0).toUpperCase()}
+																	</p>
+																</div>
+																<p className="text-xs">{player.playerName}</p>
+															</Button>
+														</TooltipTrigger>
 														<TooltipContent>
-															<p className="font-semibold">
-																This player is not ready
-															</p>
+															<p className="font-semibold">{`👑 Host`}</p>
 														</TooltipContent>
-													)}
-												</Tooltip>
-											</TooltipProvider>
-										</ContextMenuTrigger>
-										<ContextMenuContent className="p-0 border-0">
-											<ContextMenuItem
-												disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
-												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-												onClick={() => {
-													handleRemovePlayer(`player-${player.playerName}`);
-												}}
-											>
-												{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-													<>
-														<X size={16} />
-														<p>Remove from Lobby</p>
-													</>
-												)) || <p className="pl-2">Minimum 3 players</p>}
-											</ContextMenuItem>
-										</ContextMenuContent>
-									</ContextMenu>
+													</Tooltip>
+												</TooltipProvider>
+											</ContextMenuTrigger>
+											<ContextMenuContent className="p-0 border-0">
+												<ContextMenuItem
+													disabled
+													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+												>
+													<X size={16} />
+													<p>Host cannot be removed from Lobby</p>
+												</ContextMenuItem>
+											</ContextMenuContent>
+										</ContextMenu>
 
-								);
+									);
 
-							}
+								} else {
 
-						})}
+									if (!inGame?.includes(player.playerName)) {
 
-						{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
+										return (
 
-							if (inLobby.length < gameInfo.numPlayers) {
+											<ContextMenu key={index}>
+												<ContextMenuTrigger>
+													<TooltipProvider>
+														<Tooltip>
+															<TooltipTrigger asChild>
+																<Button
+																	className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+																	onClick={() => {
+																		handleSelectPlayer(player);
+																	}}
+																	variant={
+																		player.isReady
+																			? selectedPlayers.includes(player.playerName)
+																				? "green"
+																				: "default"
+																			: "disabled"
+																	}
+																>
+																	<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+																		<p className="text-slate-900 text-xs font-semibold">
+																			{player.playerName.charAt(0).toUpperCase()}
+																		</p>
+																	</div>
+																	<p className="text-xs">{player.playerName}</p>
+																</Button>
+															</TooltipTrigger>
+	
+															{!player.isReady && (
+																<TooltipContent>
+																	<p className="font-semibold">
+																		This player is not ready
+																	</p>
+																</TooltipContent>
+															)}
+														</Tooltip>
+													</TooltipProvider>
+												</ContextMenuTrigger>
+												<ContextMenuContent className="p-0 border-0">
+													<ContextMenuItem
+														disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
+														className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+														onClick={() => {
+															handleRemovePlayer(`player-${player.playerName}`);
+														}}
+													>
+														{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+															<>
+																<X size={16} />
+																<p>Remove from Lobby</p>
+															</>
+														)) || <p className="pl-2">Minimum 3 players</p>}
+													</ContextMenuItem>
+												</ContextMenuContent>
+											</ContextMenu>
+	
+										);
 
-								return (
+									}
 
-									<ContextMenu key={index}>
-										<ContextMenuTrigger>
-											<Badge
-												className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-												variant="empty"
-												key={index}
-											>
-												<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-												<p>Player {inLobby.length + index + 1}</p>
-											</Badge>
-										</ContextMenuTrigger>
-										<ContextMenuContent className="p-0 border-0">
-											<ContextMenuItem
-												disabled={
-													gameInfo.numPlayers + gameInfo.aiPlayers <= 3
-												}
-												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-												onClick={() => {
-													handleRemovePlayer("missingPlayer");
-												}}
-											>
-												{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-													<>
-														<X size={16} />
-														<p>Remove from Lobby</p>
-													</>
-												)) || <p className="pl-2">Minimum 3 players</p>}
-											</ContextMenuItem>
-										</ContextMenuContent>
-									</ContextMenu>
+								}
 
-								);
+							})}
 
-							}
+							{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
 
-						})}
+								if (inLobby.length < gameInfo.numPlayers) {
 
-						{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+									return (
 
-							return (
+										<ContextMenu key={index}>
+											<ContextMenuTrigger>
+												<Badge
+													className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+													variant="empty"
+													key={index}
+												>
+													<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+													<p>Player {inLobby.length + index + 1}</p>
+												</Badge>
+											</ContextMenuTrigger>
+											<ContextMenuContent className="p-0 border-0">
+												<ContextMenuItem
+													disabled={
+														gameInfo.numPlayers + gameInfo.aiPlayers <= 3
+													}
+													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+													onClick={() => {
+														handleRemovePlayer("missingPlayer");
+													}}
+												>
+													{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+														<>
+															<X size={16} />
+															<p>Remove from Lobby</p>
+														</>
+													)) || <p className="pl-2">Minimum 3 players</p>}
+												</ContextMenuItem>
+											</ContextMenuContent>
+										</ContextMenu>
 
-								<ContextMenu key={index}>
-									<ContextMenuTrigger>
-										<Badge
-											className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-											variant="bot"
+									);
+
+								}
+
+							})}
+
+							{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+
+								if (!inGame) {
+
+									return (
+
+										<ContextMenu key={index}>
+											<ContextMenuTrigger>
+												<Badge
+													className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+													variant="bot"
+													key={index}
+												>
+													<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+														<p className="text-slate-900">🤖</p>
+													</div>
+													<p>Bot {index + 1}</p>
+												</Badge>
+											</ContextMenuTrigger>
+											<ContextMenuContent className="p-0 border-0">
+												<ContextMenuItem
+													disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
+													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+													onClick={() => {
+														handleRemovePlayer("bot");
+													}}
+												>
+													{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+														<>
+															<X size={16} />
+															<p>Remove from Lobby</p>
+														</>
+													)) || <p className="pl-2">Minimum 3 players</p>}
+												</ContextMenuItem>
+											</ContextMenuContent>
+										</ContextMenu>
+	
+									);
+
+								}
+
+							})}
+
+						</div>
+
+					</div>
+
+					{inGame && (
+
+						<div>
+
+							<h1 className="text-sm font-semibold mb-2">{`Currently in game:`}</h1>
+
+							<div className="flex flex-wrap gap-x-3 gap-y-3">
+
+								{inGame.map((player, index) => {
+
+									return (
+
+										<Button
 											key={index}
+											className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+											variant={"red"}
 										>
+											<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+												<p className="text-slate-900 text-xs font-semibold">{player.charAt(0).toUpperCase()}</p>
+											</div>
+											<p className="text-xs">{player}</p>
+										</Button>
+										
+									);
+
+								})}
+
+								{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+
+									return (
+
+										<Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
 											<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
 												<p className="text-slate-900">🤖</p>
 											</div>
 											<p>Bot {index + 1}</p>
 										</Badge>
-									</ContextMenuTrigger>
-									<ContextMenuContent className="p-0 border-0">
-										<ContextMenuItem
-											disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
-											className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-											onClick={() => {
-												handleRemovePlayer("bot");
-											}}
-										>
-											{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-												<>
-													<X size={16} />
-													<p>Remove from Lobby</p>
-												</>
-											)) || <p className="pl-2">Minimum 3 players</p>}
-										</ContextMenuItem>
-									</ContextMenuContent>
-								</ContextMenu>
 
-							);
+									);
 
-						})}
+								})}
 
-					</div>
+							</div>
+						
+						</div>
+
+					)}
 
 				</div>
 
@@ -522,7 +582,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 					<Button
 						className="w-25 mt-12"
 						onClick={startGame}
-						disabled={selectedPlayers.length !== gameInfo.numPlayers}
+						disabled={isGameStarted || selectedPlayers.length !== gameInfo.numPlayers}
 					>
 						Start Game
 					</Button>

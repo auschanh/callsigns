@@ -24,7 +24,7 @@ function JoinRoom() {
 
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [,,, [selectedPlayers, setSelectedPlayers],,,] = useGameInfoContext();
+    const [playerName,,, [selectedPlayers, setSelectedPlayers], [inGame, setInGame],,] = useGameInfoContext();
 
     const [username, setUsername] = useState();
 
@@ -109,6 +109,30 @@ function JoinRoom() {
                 setSessionUrl(sessionUrl);
 
                 setRoomDetails(roomDetails);
+
+                if (inRoom) {
+
+                    console.log("i'm already in here");
+
+                    setUsername(playerName);
+
+                    setOpen(false);
+
+                    (async () => {
+
+                        try {
+        
+                            await socket.emit("joinRoom", roomID, playerName, true);
+        
+                        } catch (error) {
+        
+                            throw error;
+        
+                        }
+        
+                    })();
+
+                }
 
             } else {
 
@@ -213,6 +237,16 @@ function JoinRoom() {
 
     }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved]);
 
+    useEffect(() => {
+
+		if (inGame?.length === 0) {
+
+			setInGame();
+
+		}
+
+	}, [inGame]);    
+    
     useEffect(() => {
 
         if (chatExpanded) {
@@ -368,113 +402,178 @@ function JoinRoom() {
                                         
                                     </div>
 
-                                    <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
+                                    <div className="mb-6">
 
-                                    <div className="flex flex-wrap gap-x-3 gap-y-3">
+                                        <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
 
-                                        {inLobby?.map((player, index) => {
+                                        <div className="flex flex-wrap gap-x-3 gap-y-3">
 
-                                            if (player.playerName === roomDetails.host) {
+                                            {inLobby?.map((player, index) => {
 
-                                                return (
+                                                if (player.playerName === roomDetails.host) {
 
-                                                    <TooltipProvider key={index}>                      
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <Button 
-                                                                    className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
-                                                                    variant={
-                                                                        selectedPlayers.includes(player.playerName)
-                                                                            ? "green"
-                                                                            : "indigo"
-                                                                    }
-                                                                >
-                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                        <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
-                                                                    </div>
-                                                                    <p className="text-xs">{player.playerName}</p>
-                                                                </Button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                <p className="font-semibold">{`👑 Host`}</p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                                                    if (!inGame?.includes(player.playerName)) {
 
-                                                )
+                                                        return (
 
-                                            } else {
+                                                            <TooltipProvider key={index}>                      
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Button 
+                                                                            className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
+                                                                            variant={
+                                                                                selectedPlayers.includes(player.playerName)
+                                                                                    ? "green"
+                                                                                    : "indigo"
+                                                                            }
+                                                                        >
+                                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                                <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+                                                                            </div>
+                                                                            <p className="text-xs">{player.playerName}</p>
+                                                                        </Button>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        <p className="font-semibold">{`👑 Host`}</p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+    
+                                                        );
 
-                                                return (
+                                                    }
 
-                                                    <TooltipProvider key={index}>                      
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <Button
-                                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                                    variant={
-                                                                        selectedPlayers.includes(player.playerName) 
-                                                                            ? "green" 
-                                                                            : 
-                                                                                player.isReady 
-                                                                                ? "default" 
-                                                                                : "disabled"
-                                                                    }
-                                                                >
-                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                        <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
-                                                                    </div>
-                                                                    <p className="text-xs">{player.playerName}</p>
-                                                                </Button>
-                                                            </TooltipTrigger>
+                                                } else {
 
-                                                            {!player.isReady && (
+                                                    if (!inGame?.includes(player.playerName)) {
 
-                                                                <TooltipContent>
-                                                                    <p className="font-semibold">This player is not ready</p>
-                                                                </TooltipContent>
+                                                        return (
 
-                                                            )}
+                                                            <TooltipProvider key={index}>                      
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Button
+                                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                                            variant={
+                                                                                selectedPlayers.includes(player.playerName) 
+                                                                                    ? "green" 
+                                                                                    : 
+                                                                                        player.isReady 
+                                                                                        ? "default" 
+                                                                                        : "disabled"
+                                                                            }
+                                                                        >
+                                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                                <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+                                                                            </div>
+                                                                            <p className="text-xs">{player.playerName}</p>
+                                                                        </Button>
+                                                                    </TooltipTrigger>
+    
+                                                                    {!player.isReady && (
+    
+                                                                        <TooltipContent>
+                                                                            <p className="font-semibold">This player is not ready</p>
+                                                                        </TooltipContent>
+    
+                                                                    )}
+    
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+    
+                                                        );
 
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                                                    }
 
-                                                );
-                                            }
-                                        })}
+                                                }
+                                            })}
 
-                                        {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
+                                            {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
 
-                                            if (inLobby.length < roomDetails.numPlayers) {
+                                                if (inLobby.length < roomDetails.numPlayers) {
 
-                                                return (
+                                                    return (
 
-                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
-                                                        <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                        <p>Player {inLobby.length + index + 1}</p>
-                                                    </Badge>
-                        
-                                                );
-                                            }
+                                                        <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
+                                                            <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+                                                            <p>Player {inLobby.length + index + 1}</p>
+                                                        </Badge>
+                            
+                                                    );
+                                                }
 
-                                        })}
+                                            })}
 
-                                        {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                            {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
-                                            return (
+                                                if (!inGame) {
 
-                                                <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
-                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        <p className="text-slate-900">🤖</p>
-                                                    </div>
-                                                    <p>Bot {index + 1}</p>
-                                                </Badge>
+                                                    return (
 
-                                            );
+                                                        <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
+                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                <p className="text-slate-900">🤖</p>
+                                                            </div>
+                                                            <p>Bot {index + 1}</p>
+                                                        </Badge>
+    
+                                                    );
 
-                                        })}
+                                                }
 
+                                            })}
+
+                                        </div>
+                                    
                                     </div>
+
+                                    {inGame && (
+
+                                        <div>
+
+                                            <h1 className="text-sm font-semibold mb-2">{`Currently in game:`}</h1>
+
+                                            <div className="flex flex-wrap gap-x-3 gap-y-3">
+
+                                                {inGame.map((player, index) => {
+
+                                                    return (
+
+                                                        <Button
+                                                            key={index}
+                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                            variant={"red"}
+                                                        >
+                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                <p className="text-slate-900 text-xs font-semibold">{player.charAt(0).toUpperCase()}</p>
+                                                            </div>
+                                                            <p className="text-xs">{player}</p>
+                                                        </Button>
+                                                        
+                                                    );
+
+                                                })}
+
+                                                {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+
+                                                    return (
+
+                                                        <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
+                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                <p className="text-slate-900">🤖</p>
+                                                            </div>
+                                                            <p>Bot {index + 1}</p>
+                                                        </Badge>
+
+                                                    );
+
+                                                })}
+
+                                            </div>
+                                        
+                                        </div>
+
+                                    )}
 
                                 </div>
 

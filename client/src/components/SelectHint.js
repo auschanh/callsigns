@@ -42,6 +42,20 @@ const SelectHint = ({ resultsState, roomDetails, playerName }) => {
 
     }, [socket, results, roomDetails, playerName, isVoteSubmitted, voted]);
 
+    useEffect(() => {
+
+        if (results.every(({ toRemove }) => { return toRemove === false })) {
+
+            setIsNoneSelected(true);
+
+        } else {
+
+            setIsNoneSelected(false);
+
+        }
+
+    }, [results]);
+
     const selectToRemove = (playerName) => {
 
         setResults(
@@ -51,9 +65,8 @@ const SelectHint = ({ resultsState, roomDetails, playerName }) => {
                 return result.playerName === playerName ? {...result, toRemove: !result.toRemove} : result;
 
             })
-        );
 
-        setIsNoneSelected(false);
+        );
 
     }
 

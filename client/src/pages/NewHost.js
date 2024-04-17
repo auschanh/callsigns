@@ -4,10 +4,13 @@ import DialogPlay from '../components/DialogPlay';
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 
 function NewHost() {
 
     const [socket, setSocket] = useSocketContext();
+
+    const [playerName,,,,,,] = useGameInfoContext();
 
     const [playOpen, setPlayOpen] = useState(false);
 
@@ -59,6 +62,16 @@ function NewHost() {
                     }
     
                     setRoomDetails(roomDetails);
+
+                    if (playerName !== undefined) {
+
+                        console.log("host returned to lobby");
+
+                        setAlertOpen(false);
+
+                        setPlayOpen(true);
+
+                    }
     
                     try {
         

@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import Chat from "./Chat";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 
 import CreateGameForm from "./CreateGameForm";
 import Lobby from "./Lobby";
@@ -15,11 +16,15 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
     const [inLobby, setInLobby] = useLobbyContext();
 
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+
     const [currentSlide, setCurrentSlide] = useState(propSlide);
 
     const spaceBetweenSlides = 5;
 
 	const [gameInfo, setGameInfo] = useState();
+
+    const [isGameStarted, setIsGameStarted] = useState();
 
     const [open, setOpen] = isOpen;
 
@@ -58,6 +63,8 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
             });
 
+            setIsGameStarted(roomDetails.isGameStarted);
+
             if (isNewHost) {
 
                 setSessionUrl(link);
@@ -76,6 +83,30 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
         }
 
     }, [socket, isNewHost]);
+
+    useEffect(() => {
+
+		if (inGame?.length === 0) {
+
+			setInGame();
+
+            (async () => {
+
+                try {
+
+                    await socket.emit("gameEnded");
+
+                } catch (error) {
+
+                    throw error;
+
+                }
+
+            })();
+
+		}
+
+	}, [inGame]);
 
     useEffect(() => {
 
@@ -119,7 +150,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} isGameStarted={isGameStarted} />
 
                 )}
 

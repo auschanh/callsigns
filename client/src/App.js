@@ -147,12 +147,21 @@ function App() {
 
 		});
 
+		socket.on("notifyReturnToLobby", (playerName) => {
+
+			setInGame(inGame?.filter((player) => { return player !== playerName }));
+
+			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== playerName }));
+
+		});
+
 		return () => {
 
 			socket.removeAllListeners("redirectGame");
 			socket.removeAllListeners("receiveCallsign");
 			socket.removeAllListeners("getRoomList");
 			socket.removeAllListeners("leftRoom");
+			socket.removeAllListeners("notifyReturnToLobby");
 
 		}
 

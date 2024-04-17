@@ -286,7 +286,19 @@ const Game = function (props) {
 
 		setResults(
 
-			results?.filter((player) => { return inGame.includes(player.playerName) })
+			results?.filter((player) => {
+
+				if (player.hint !== "") {
+
+					return player;
+
+				} else {
+
+					return inGame.includes(player.playerName);
+
+				}
+
+			})
 
 		);
 
@@ -310,9 +322,25 @@ const Game = function (props) {
 
 	useEffect(() => {
 
-		console.log(isVoted);
-
 		if (isVoted?.every((player) => { return player.voted === true })) {
+
+			setResults(
+
+				results.map((result) => {
+
+					if (result.count >= (Math.floor(isVoted.length / 2) + 1)) {
+
+						return {...result, visible: false};
+
+					} else {
+
+						return result;
+
+					}
+
+				})
+
+			);
 
 			setCurrentIndex(2);
 
@@ -337,25 +365,37 @@ const Game = function (props) {
 	const cards = [
 
 		{
-			title: "Round Start",
-			// #FFF5DB
-			phase: "Round Start",
+			title: "Hint Selection",
+
+			phase: 
+				<p>
+					<span>{`Come up with a one-word hint to help `}</span>
+					<span className="font-semibold">{roomDetails?.guesser}</span>
+					<span>{` guess their callsign`}</span>
+				</p>,
+
 			content:  
 
 				<SubmitHint enterHintState={[enterHint, setEnterHint]} roomDetails={roomDetails} hintState={[hint, setHint]} submissionsState={[submissions, setSubmissions]} />
 				
 		},
 		{
-			title: "Card 2",
-			phase: "Generate CallSign Phase",
+			title: "Hint Elimination",
+			phase: "Decide which hints are too similar or illegal",
 			content: 
 
 				<SelectHint resultsState={[results, setResults]} roomDetails={roomDetails} playerName={playerName} />
 
 		},
 		{
-			title: "Card 3",
-			phase: "Agents Hint Phase",
+			title: "Hint Transmission",
+			
+			phase: 
+				<p>
+					<span>{`Reveal all approved hints to `}</span>
+					<span className="font-semibold">{roomDetails?.guesser}</span>
+				</p>,		
+
 			content: 
 			
 				<RevealHint resultsState={[results, setResults]} />
@@ -395,7 +435,7 @@ const Game = function (props) {
 
 						</PopoverContent>
 
-       				 </Popover>
+       				</Popover>
 
 					<div className="absolute top-[4%] flex flex-row gap-8">
 

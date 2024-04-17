@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
+import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Switch } from "../components/ui/switch";
 import { User, Users, Copy, Check, LockKeyhole } from "lucide-react";
@@ -23,6 +25,8 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
     const [isWaitingOpen, setIsWaitingOpen] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -86,6 +90,31 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
 	};
 
+    const handleNavigateLobby = async () => {
+
+        try {
+
+            await socket.emit("returnToLobby", roomDetails.roomID, playerName);
+
+            if (playerName === roomDetails.host) {
+
+                navigate(`/newhost/${roomDetails.roomID}`);
+    
+            } else {
+    
+                navigate(`/lobby/${roomDetails.roomID}`);
+    
+            }
+
+
+        } catch (error) {
+
+            throw error;
+
+        }
+
+    }
+
     return (
 
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -101,13 +130,38 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
             <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-6 p-4">
 
-                <div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 hover:bg-slate-200">
+                <div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 [&:hover:not(:has(button:hover))]:bg-slate-200">
 
                     <div className="flex items-center justify-center h-10 aspect-square rounded-full bg-slate-900">
                         <p className="text-slate-50 text-xl">{playerName.charAt(0).toUpperCase()}</p>
                     </div>
 
                     <h3 className="text-lg text-slate-900 px-6">{playerName}</h3>
+
+                    <AlertDialog>
+
+                        <AlertDialogTrigger asChild>
+                            <Button 
+                                className="ml-auto flex flex-row justify-center items-center bg-slate-400 hover:bg-red-600 rounded-lg transition-colors duration-300 cursor-pointer"
+                            >
+                                <h3 className="text-xs font-semibold text-slate-50">Return to Lobby</h3>
+                            </Button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent className="space-y-4">
+
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure you want to return to lobby?</AlertDialogTitle>
+                                <AlertDialogDescription>You won't be able to come back to this game and your progress will be lost.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleNavigateLobby}>Return to Lobby</AlertDialogAction>
+                            </AlertDialogFooter>
+
+                        </AlertDialogContent>
+                    </AlertDialog>
 
                 </div>
 

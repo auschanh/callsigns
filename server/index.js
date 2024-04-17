@@ -217,13 +217,25 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("joinRoom", (roomName, username) => {
+	socket.on("joinRoom", (roomName, username, isReturning) => {
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName});
 
 		const lobby = [...io.sockets.adapter.rooms.get(roomName)];
 
-		if (lobby.includes(socket.id)) {
+		if (isReturning === true) {
+
+			socket.isReady = false;
+
+			const roomList = getPlayersInLobby(roomName);
+
+			socket.emit("getLobby", roomList, findRoom);
+
+			socket.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
+
+			socket.to(findRoom.hostID).emit("sendSelectedPlayers");
+
+		} else if (lobby.includes(socket.id)) {
 
 			console.log(socket.username + " is changing their username to " + username);
 
@@ -252,8 +264,6 @@ io.on("connection", (socket) => {
 			if (roomList.some(({ playerName }) => { return playerName === username })) {
 
 				socket.emit("getLobby", roomList, findRoom);
-
-				console.log("getRoomList activated");
 
 				socket.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
 
@@ -435,6 +445,34 @@ io.on("connection", (socket) => {
 	socket.on("submitVote", (roomID, playerName, results, voted) => {
 
 		io.to(roomID).emit("receiveVote", playerName, results, voted);
+
+	});
+
+	socket.on("returnToLobby", (roomID, playerName) => {
+
+		console.log(`${playerName} is returning to lobby`);
+
+		io.to(roomID).emit("notifyReturnToLobby", playerName);
+
+	});
+
+	socket.on("gameEnded", () => {
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID});
+
+		if (findRoom) {
+
+			findRoom.isGameStarted = false;
+
+			const roomList = getPlayersInLobby(socket.roomID);
+	
+			io.to(socket.roomID).emit("updateRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
+
+		} else {
+
+			console.log("could not find room");
+
+		}
 
 	});
 
