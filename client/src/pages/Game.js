@@ -15,15 +15,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useMessageContext } from "../contexts/MessageContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { MessageSquare } from "lucide-react";
 
-const Game = function (props) {
+function Game() {
 	
 	const [socket, setSocket] = useSocketContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
+
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
@@ -34,10 +37,6 @@ const Game = function (props) {
 	const [roomDetails, setRoomDetails] = useState();
 
 	const [isClosedRoom, setIsClosedRoom] = useState();
-
-	const [isChatOpen, setIsChatOpen] = useState(false);
-
-	const [newMessage, setNewMessage] = useState(false);
 
 	const [enterHint, setEnterHint] = useState(false);
 
@@ -157,6 +156,24 @@ const Game = function (props) {
 
 				setSessionUrl(sessionUrl);
 
+				if (playerName === roomDetails.host) {
+
+					(async () => {
+
+						try {
+			
+							await socket.emit("announceGameStart", playing);
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+			
+					})();
+
+				}
+
             } else {
 
 				setRoomDetails(false);
@@ -263,16 +280,6 @@ const Game = function (props) {
         }
 
     }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted]);
-
-	useEffect(() => {
-
-        if (isChatOpen) {
-
-            setNewMessage(false);
-
-        }
-
-    }, [isChatOpen]);
 
 	// consolidate into just inGame
 	// remove hints from voting when players exit?
@@ -413,12 +420,12 @@ const Game = function (props) {
 				<div className="relative h-screen w-screen flex flex-col flex-none items-center justify-center overflow-hidden bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%">
 
 					<div className="absolute left-5 z-[50]">
-						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+						<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
 					
-					<Popover open={isChatOpen} onOpenChange={setIsChatOpen}>
+					<Popover open={chatExpanded} onOpenChange={setChatExpanded}>
 
 						<PopoverTrigger asChild>
 							<div className="absolute top-0 right-0 mt-6 mr-20">
@@ -431,7 +438,7 @@ const Game = function (props) {
 
 						<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
 
-							<Chat chatExpanded={isChatOpen} username={playerName} roomName={roomDetails.roomName} roomID={roomID} setNewMessage={setNewMessage} />
+							<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
 
 						</PopoverContent>
 
@@ -441,15 +448,27 @@ const Game = function (props) {
 
 						<div className="flex flex-col items-center">
 							<Label className="text-xs text-slate-300">Callsign</Label>
-							<div className="flex mt-1 p-1 w-48 justify-center rounded-md bg-amber-400 hover:bg-amber-400/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
+							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-amber-400 hover:bg-amber-400/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
 								<p className="text-sm text-center">{callsign}</p>
 							</div>
 						</div>
 
 						<div className="flex flex-col items-center">
 							<Label className="text-xs text-slate-300">Stranded Agent</Label>
-							<div className="flex mt-1 p-1 w-48 justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
-								<p className="text-sm text-center">{roomDetails.guesser}</p>
+							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
+								<p className="text-sm text-center">
+
+									{roomDetails.guesser.length > 20 && (
+
+										`${roomDetails.guesser.substring(0, 20)}...`
+
+									) || (
+
+										roomDetails.guesser
+
+									)}
+
+								</p>
 							</div>
 						</div>
 

@@ -29,8 +29,6 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
     const hintValidationRef = useRef(null);
 
-    // const [playOpen, setPlayOpen] = isPlayOpen;
-
     const submissions = [
 
         {

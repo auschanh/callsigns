@@ -6,7 +6,8 @@ import axios from "axios";
 import { stemmer } from "stemmer";
 import pluralize from "pluralize";
 
-const WordGenerator = function (props) {
+function WordGenerator() {
+	
 	const [word, setWord] = useState("");
 	const [generatedWords, setGeneratedWords] = useState([]);
 	const [guess, setGuess] = useState("");

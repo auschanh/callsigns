@@ -4,7 +4,7 @@ import { Label } from './ui/label';
 import { useSocketContext } from "../contexts/SocketContext";
 import { Check, Trash2, X, RotateCcw } from "lucide-react";
 
-const SelectHint = ({ resultsState, roomDetails, playerName }) => {
+function SelectHint({ resultsState, roomDetails, playerName }) {
 
     const [results, setResults] = resultsState;
 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import ReactSlider from "react-slider";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
-const Slider = ({ currentIndex, numCards, cards }) => {
+function Slider({ onChange, currentIndex, numCards, cards }) {
 
 	const [hoveredCard, setHoveredCard] = useState(null);
 
@@ -30,9 +30,10 @@ const Slider = ({ currentIndex, numCards, cards }) => {
 		<div>
 
 			<ReactSlider
+				disabled
 				className="vertical-slider"
 				markClassName="example-mark"
-				// onChange={onChange}
+				onChange={onChange}
 				onClick={(e) => e.preventDefault()}
 				trackClassName="example-track"
 				onBeforeChange={handleBeforeChange}
@@ -41,21 +42,26 @@ const Slider = ({ currentIndex, numCards, cards }) => {
 				min={0}
 				max={numCards}
 				marks
+				orientation="vertical"
 				renderMark={(props) => {
 
 					const index = props.key;
 					const isHovered = hoveredCard === index;
 					const card = cards[index];
+
 					if (index < currentIndex) {
+
 						props.className = "example-mark example-mark-completed";
+
 					} else if (index === currentIndex) {
+
 						props.className = isHovered ? "hovered example-mark example-mark-active" : "example-mark example-mark-active animate-pulse";
+						
 					}
 
 					return (
 						<span
 							key={index}
-							className={`${isHovered ? 'hovered' : ''} relative`}
 							onMouseEnter={() => handleHover(index)}
 							onMouseLeave={handleLeave}
 							{...props}>
@@ -74,8 +80,6 @@ const Slider = ({ currentIndex, numCards, cards }) => {
 						</span>
 					)
 				}}
-
-				orientation="vertical"
 
 			/>
 

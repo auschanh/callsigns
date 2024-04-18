@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
 
 	getSocketInfo();
 
-	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated) => {
+	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated, isReturnedToLobby) => {
 
 		socket.username = username;
 
@@ -148,6 +148,12 @@ io.on("connection", (socket) => {
 				findRoom.aiPlayers = aiPlayers;
 
 				const roomList = getPlayersInLobby(socket.roomID);
+
+				if (isReturnedToLobby) {
+
+					socket.to(socket.roomID).emit("getRoomList", roomList, findRoom.isGameStarted);
+
+				}
 
 				io.to(socket.roomID).emit("updateRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
 
@@ -219,7 +225,7 @@ io.on("connection", (socket) => {
 
 	socket.on("joinRoom", (roomName, username, isReturning) => {
 
-		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName});
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName });
 
 		const lobby = [...io.sockets.adapter.rooms.get(roomName)];
 
@@ -296,6 +302,30 @@ io.on("connection", (socket) => {
 	socket.on("setSelectedPlayers", (selectedPlayers) => {
 
 		socket.to(socket.roomID).emit("getSelectedPlayers", selectedPlayers);
+
+	});
+
+	socket.on("getPlayersInGame", (roomID) => {
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
+
+		if (findRoom) {
+
+			socket.to(findRoom.hostID).emit("sendInGame", socket.id);
+
+		}
+
+	});
+
+	socket.on("transmitInGame", (inGame, socketID) => {
+
+		socket.to(socketID).emit("receiveInGame", inGame);
+
+	});
+
+	socket.on("announceGameStart", (inGame) => {
+
+		socket.to(socket.roomID).emit("receiveInGame", inGame);
 
 	});
 

@@ -15,6 +15,7 @@ import { Badge } from "../components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Copy, Check, MessageSquare, LockKeyhole } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 
@@ -22,9 +23,11 @@ function JoinRoom() {
 
     const [socket, setSocket] = useSocketContext();
 
+    const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
+
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [playerName,,, [selectedPlayers, setSelectedPlayers], [inGame, setInGame],,] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
     const [username, setUsername] = useState();
 
@@ -41,10 +44,6 @@ function JoinRoom() {
     const [isClosedRoom, setIsClosedRoom] = useState();
 
     const [beenRemoved, setBeenRemoved] = useState(false);
-
-    const [chatExpanded, setChatExpanded] = useState(false);
-
-    const [newMessage, setNewMessage] = useState(false);
 
     const [open, setOpen] = useState(true);
 
@@ -134,6 +133,24 @@ function JoinRoom() {
 
                 }
 
+                if (roomDetails.isGameStarted) {
+
+                    (async () => {
+
+                        try {
+        
+                            await socket.emit("getPlayersInGame", roomID);
+        
+                        } catch (error) {
+        
+                            throw error;
+        
+                        }
+        
+                    })();
+
+                }
+
             } else {
 
                 if (isClosedRoom) {
@@ -189,7 +206,10 @@ function JoinRoom() {
 
             setRoomDetails(newDetails);
 
+            setIsGameStarted(newDetails.isGameStarted);
+
         });
+        
 
         socket.on("getSelectedPlayers", (selectedPlayers) => {
 
@@ -202,6 +222,13 @@ function JoinRoom() {
             setIsClosedRoom(isClosedRoom);
 
         });
+
+        socket.on("receiveInGame", (inGame) => {
+
+            setInGame(inGame);
+
+        });
+
 
         socket.on("newHost", () => {
 
@@ -230,12 +257,13 @@ function JoinRoom() {
             socket.removeAllListeners("updateRoomInfo");
             socket.removeAllListeners("getSelectedPlayers");
             socket.removeAllListeners("isRoomClosed");
+            socket.removeAllListeners("receiveInGame");
             socket.removeAllListeners("newHost");
             socket.removeAllListeners("exitLobby");
 
         }
 
-    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved]);
+    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved, playerName]);
 
     useEffect(() => {
 
@@ -245,17 +273,7 @@ function JoinRoom() {
 
 		}
 
-	}, [inGame]);    
-    
-    useEffect(() => {
-
-        if (chatExpanded) {
-
-            setNewMessage(false);
-
-        }
-
-    }, [chatExpanded]);
+	}, [inGame]);
 
     const handleChatExpansion = () => {
 
@@ -330,7 +348,7 @@ function JoinRoom() {
 
         <>
 
-            <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
+            <div className="h-screen w-screen flex flex-col justify-center items-center bg-gradient-to-tr from-slate-950 from-30% via-slate-900 via-75% to-slate-950 to-100%">
 
                 {success && (
 
@@ -347,7 +365,7 @@ function JoinRoom() {
                                     <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={handleChatExpansion}>
                                         <h2 className="text-xs leading-none m-0 p-0">Chat</h2>
                                         <MessageSquare size={14} />
-                                        <div className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`} />
+                                        <div className={`absolute -right-1.5 -top-1.5 aspect-square h-3 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`} />
                                     </Button>
 
                                 </div>
@@ -404,7 +422,7 @@ function JoinRoom() {
 
                                     <div className="mb-6">
 
-                                        <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} is selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
+                                        <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
 
                                         <div className="flex flex-wrap gap-x-3 gap-y-3">
 
@@ -583,7 +601,7 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat chatExpanded={chatExpanded} username={username} roomName={roomDetails.roomName} inLobby={inLobby} roomID={roomID} setNewMessage={setNewMessage} />
+                            <Chat username={username} roomName={roomDetails.roomName} roomID={roomID} />
 
                         </div>
 

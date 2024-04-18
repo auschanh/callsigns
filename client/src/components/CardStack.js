@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-const CardStack = ({ cards, currentIndex, handleNext }) => {
+function CardStack({ cards, currentIndex, handleNext }) {
 
 	useEffect(() => {
 

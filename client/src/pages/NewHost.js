@@ -10,7 +10,7 @@ function NewHost() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName,,,,,,] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
     const [playOpen, setPlayOpen] = useState(false);
 
@@ -75,7 +75,7 @@ function NewHost() {
     
                     try {
         
-                        socket.emit("gameInfo", prevGameInfo, true);
+                        socket.emit("gameInfo", prevGameInfo, true, playerName !== undefined);
         
                     } catch (error) {
         
@@ -107,13 +107,13 @@ function NewHost() {
 
         }
 
-    }, [socket, roomDetails, roomID])
+    }, [socket, roomDetails, roomID, playerName])
 
     return (
 
         <>
 
-            <div className="h-screen w-screen flex flex-col justify-center items-center bg-slate-700">
+            <div className="h-screen w-screen flex flex-col justify-center items-center bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%">
 
                 {roomDetails && (
 

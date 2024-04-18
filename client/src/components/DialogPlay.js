@@ -3,28 +3,28 @@ import { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, Dialog
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "../components/ui/button";
 import Chat from "./Chat";
+import CreateGameForm from "./CreateGameForm";
+import Lobby from "./Lobby";
 import { useSocketContext } from "../contexts/SocketContext";
+import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 
-import CreateGameForm from "./CreateGameForm";
-import Lobby from "./Lobby";
-
-const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevClosedRoom }) {
+function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewHost = false, prevClosedRoom }) {
 
     const [socket, setSocket] = useSocketContext();
 
+    const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
+
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
     const [currentSlide, setCurrentSlide] = useState(propSlide);
 
     const spaceBetweenSlides = 5;
 
 	const [gameInfo, setGameInfo] = useState();
-
-    const [isGameStarted, setIsGameStarted] = useState();
 
     const [open, setOpen] = isOpen;
 
@@ -33,10 +33,6 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
     const [roomID, setRoomID] = useState();
 
     const [isRoomCreated, setIsRoomCreated] = useState(isNewHost);
-
-    const [chatExpanded, setChatExpanded] = useState(false);
-
-    const [newMessage, setNewMessage] = useState(false);
 
     useEffect(() => {
 
@@ -108,22 +104,6 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
 	}, [inGame]);
 
-    useEffect(() => {
-
-        if (chatExpanded) {
-
-            setNewMessage(false);
-
-        }
-
-    }, [chatExpanded]);
-
-    const handleChatExpansion = () => {
-
-		setChatExpanded(!chatExpanded);
-
-	}
-
     const previousSlide = () => {
         
         setCurrentSlide(currentSlide - 1);
@@ -150,7 +130,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} handleChatExpansion={handleChatExpansion} newMessage={newMessage} prevClosedRoom={prevClosedRoom} isGameStarted={isGameStarted} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} prevClosedRoom={prevClosedRoom} />
 
                 )}
 
@@ -211,7 +191,7 @@ const DialogPlay = function ({ tailwindStyles, triggerName, isOpen, propSlide = 
 
                     </div>
 
-                    <Chat chatExpanded={chatExpanded} username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} setNewMessage={setNewMessage} />
+                    <Chat username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} />
 
                 </div>
 

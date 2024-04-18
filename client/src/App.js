@@ -31,11 +31,17 @@ function App() {
 
 	const [messageList, setMessageList] = useState([]);
 
+	const [chatExpanded, setChatExpanded] = useState(false);
+
+	const [newMessage, setNewMessage] = useState(false);
+
 	const [inLobby, setInLobby] = useState([]);
 
 	const [inGame, setInGame] = useState();
 
-	const [isPlayerWaiting, setIsPlayerWaiting] = useState(false);
+	const [isPlayerWaiting, setIsPlayerWaiting] = useState(false);	
+
+	const [isGameStarted, setIsGameStarted] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -76,6 +82,10 @@ function App() {
 				setPlayerName(playerName);
 
 				setSelectedPlayers(selectedPlayers);
+
+				setIsPlayerWaiting(false);
+
+				setChatExpanded(false);
 
 				if (isHost) {
 
@@ -123,6 +133,20 @@ function App() {
 
 		});
 
+		socket.on("receiveMessage", (messageData) => {
+
+            console.log(messageData);
+
+            setMessageList((list) => [...list, messageData]);
+
+            if (!chatExpanded) {
+
+                setNewMessage(true);
+
+            }
+
+        });
+
 		socket.on("getRoomList", (roomList, isGameStarted) => {
 
 			setInLobby(roomList);
@@ -134,6 +158,25 @@ function App() {
 			}
 
         });
+
+		// for host only
+		socket.on("sendInGame", (socketID) => {
+
+			(async () => {
+
+				try {
+
+					await socket.emit("transmitInGame", inGame, socketID);
+	
+				} catch (error) {
+	
+					throw error;
+	
+				}
+	
+			})();
+
+		});
 
 		socket.on("leftRoom", (user) => {
 
@@ -159,13 +202,25 @@ function App() {
 
 			socket.removeAllListeners("redirectGame");
 			socket.removeAllListeners("receiveCallsign");
+			socket.removeAllListeners("receiveMessage");
 			socket.removeAllListeners("getRoomList");
+			socket.removeAllListeners("sendInGame");
 			socket.removeAllListeners("leftRoom");
 			socket.removeAllListeners("notifyReturnToLobby");
 
 		}
 
-	}, [socket, generatedWords, generateWord, navigate, inLobby, inGame, selectedPlayers]);
+	}, [socket, generatedWords, generateWord, navigate, inLobby, inGame, selectedPlayers, chatExpanded]);
+
+	useEffect(() => {
+
+        if (chatExpanded) {
+
+            setNewMessage(false);
+
+        }
+
+    }, [chatExpanded]);
 
 	return (
 
@@ -173,11 +228,11 @@ function App() {
 
 			<SocketContext.Provider value={[socket, setSocket]}>
 
-				<MessageContext.Provider value={[messageList, setMessageList]}>
+				<MessageContext.Provider value={[[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]]}>
 
 					<LobbyContext.Provider value={[inLobby, setInLobby]}>
 
-						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]]}>
 
 							<Routes>
 

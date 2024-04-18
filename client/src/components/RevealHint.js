@@ -4,7 +4,7 @@ import { Label } from './ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X } from "lucide-react";
 
-const RevealHint = ({ resultsState }) => {
+function RevealHint({ resultsState }) {
 
     const [results, setResults] = resultsState;
 

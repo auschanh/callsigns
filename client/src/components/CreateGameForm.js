@@ -42,7 +42,7 @@ const formSchema = z.object({
 
 });
 
-export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
+function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -431,5 +431,9 @@ export default function CreateGameForm({ gameInfoState, nextSlide, roomCreated }
 
 			</form>
 		</Form>
+
 	);
+
 }
+
+export default CreateGameForm;

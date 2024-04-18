@@ -6,7 +6,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
 
-const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState }) => {
+function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -14,7 +14,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState }
 
     const hintValidationRef = useRef(null);
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
     const [enterHint, setEnterHint] = enterHintState;
 

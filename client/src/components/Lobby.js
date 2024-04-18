@@ -6,17 +6,20 @@ import { SmallSwitch } from "../components/ui/small-switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuCheckboxItem, ContextMenuRadioItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut, ContextMenuGroup, ContextMenuPortal, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuRadioGroup } from "./ui/context-menu";
 import { useSocketContext } from "../contexts/SocketContext";
-import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansion, newMessage, prevClosedRoom, isGameStarted }) {
+function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom }) {
 
 	const [socket, setSocket] = useSocketContext();
-
-	const [,,, [selectedPlayers, setSelectedPlayers], [inGame, setInGame],,] = useGameInfoContext();
+	
+	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
 	const [inLobby, setInLobby] = useLobbyContext();
+
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 
@@ -85,6 +88,12 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 		sendSelected();
 
 	}, [selectedPlayers, sendSelected]);
+
+	const handleChatExpansion = () => {
+
+		setChatExpanded(!chatExpanded);
+
+	}
 
 	const handleCloseRoom = async () => {
 
@@ -246,7 +255,7 @@ const Lobby = function ({ gameInfo, sessionUrl, previousSlide, handleChatExpansi
 							<h2 className="text-xs leading-none m-0 p-0">Chat</h2>
 							<MessageSquare size={14} />
 							<div
-								className={`absolute -right-1.5 -top-1.5 aspect-square h-3.5 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`}
+								className={`absolute -right-1.5 -top-1.5 aspect-square h-3 rounded-full bg-cyan-500 transition-all duration-1000" ${newMessage ? "" : "invisible opacity-20"}`}
 							/>
 						</Button>
 

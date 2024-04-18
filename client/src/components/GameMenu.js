@@ -10,11 +10,11 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 
-const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
+function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
 
     const [inLobby, setInLobby] = useLobbyContext();
 
@@ -90,7 +90,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
 	};
 
-    const handleNavigateLobby = async () => {
+    const handleReturnLobby = async () => {
 
         try {
 
@@ -136,7 +136,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
                         <p className="text-slate-50 text-xl">{playerName.charAt(0).toUpperCase()}</p>
                     </div>
 
-                    <h3 className="text-lg text-slate-900 px-6">{playerName}</h3>
+                    <h3 className="text-lg text-slate-900 px-6 break-all">{playerName}</h3>
 
                     <AlertDialog>
 
@@ -157,7 +157,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
                             
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleNavigateLobby}>Return to Lobby</AlertDialogAction>
+                                <AlertDialogAction onClick={handleReturnLobby}>Return to Lobby</AlertDialogAction>
                             </AlertDialogFooter>
 
                         </AlertDialogContent>
@@ -181,11 +181,11 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
 
                                         return (
 
-                                            <div key={index} className="flex flex-row items-center h-14 pl-4 gap-3 rounded-lg transition-colors duration-300 hover:bg-slate-100">
+                                            <div key={index} className="flex flex-row items-center h-14 pl-4 pr-8 gap-3 rounded-lg transition-colors duration-300 hover:bg-slate-100">
 
                                                 <User size={16} />
 
-                                                <p className={`${player === playerName ? "underline" : ""}`}>{player}</p>
+                                                <p className={`break-all ${player === playerName ? "underline" : ""}`}>{player}</p>
 
                                             </div>
 
@@ -204,7 +204,7 @@ const GameMenu = ({ roomDetails, isClosedRoomState, sessionUrl }) => {
                             <AccordionTrigger onClick={() => {setIsWaitingOpen(value => !value)}}>
                                 <div className="flex flex-row items-center w-full">
                                     <h2>{`Waiting in Lobby:`}</h2>
-                                    <div className={`aspect-square w-2 ml-auto mr-6 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
+                                    <div className={`aspect-square w-2.5 ml-auto mr-6 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
                                 </div>
                             </AccordionTrigger>
 

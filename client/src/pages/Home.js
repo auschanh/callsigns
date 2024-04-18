@@ -6,7 +6,7 @@ import DialogPlay from '../components/DialogPlay.js';
 import DialogHTP from '../components/DialogHTP';
 import { useSocketContext } from '../contexts/SocketContext';
 
-const Home = function () {
+function Home() {
 
 	const location = useLocation();
 

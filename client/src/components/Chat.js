@@ -8,11 +8,11 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 
-function Chat({ chatExpanded, username, roomName, roomID, setNewMessage }) {
+function Chat({ username, roomName, roomID }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [messageList, setMessageList] = useMessageContext();
+    const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
     const [inLobby, setInLobby] = useLobbyContext();
 
@@ -116,20 +116,6 @@ function Chat({ chatExpanded, username, roomName, roomID, setNewMessage }) {
 
         }
 
-        socket.on("receiveMessage", (messageData) => {
-
-            console.log(messageData);
-
-            setMessageList((list) => [...list, messageData]);
-
-            if (!chatExpanded) {
-
-                setNewMessage(true);
-
-            }
-
-        });
-
         socket.on("getNewUsername", (prevUsername, newUsername) => {
 
             replaceUsername(prevUsername, newUsername);
@@ -150,13 +136,12 @@ function Chat({ chatExpanded, username, roomName, roomID, setNewMessage }) {
 
         return () => {
 
-            socket.removeAllListeners("receiveMessage");
             socket.removeAllListeners("getNewUsername");
             document.removeEventListener("keydown", listenForKeydown);
 
         }
 
-    }, [socket, document.activeElement, sendMessage, currentUsername, username, chatExpanded]);
+    }, [socket, document.activeElement, sendMessage, replaceUsername, currentUsername, username]);
 
     useEffect(() => {
 
