@@ -11,7 +11,7 @@ import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 
-function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom }) {
+function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlayers }) {
 
 	const [socket, setSocket] = useSocketContext();
 	
@@ -448,87 +448,126 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom }) {
 
 							{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
 
-								if (inLobby.length < gameInfo.numPlayers) {
+								if (!inGame) {
 
-									return (
+									if (inLobby.length < gameInfo.numPlayers) {
 
-										<ContextMenu key={index}>
-											<ContextMenuTrigger>
-												<Badge
-													className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-													variant="empty"
-													key={index}
-												>
-													<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-													<p>Player {inLobby.length + index + 1}</p>
-												</Badge>
-											</ContextMenuTrigger>
-											<ContextMenuContent className="p-0 border-0">
-												<ContextMenuItem
-													disabled={
-														gameInfo.numPlayers + gameInfo.aiPlayers <= 3
-													}
-													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-													onClick={() => {
-														handleRemovePlayer("missingPlayer");
-													}}
-												>
-													{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-														<>
-															<X size={16} />
-															<p>Remove from Lobby</p>
-														</>
-													)) || <p className="pl-2">Minimum 3 players</p>}
-												</ContextMenuItem>
-											</ContextMenuContent>
-										</ContextMenu>
+										return (
 
-									);
+											<ContextMenu key={index}>
+												<ContextMenuTrigger>
+													<Badge
+														className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+														variant="empty"
+														key={index}
+													>
+														<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+														<p>Player {inLobby.length + index + 1}</p>
+													</Badge>
+												</ContextMenuTrigger>
+												<ContextMenuContent className="p-0 border-0">
+													<ContextMenuItem
+														disabled={
+															gameInfo.numPlayers + gameInfo.aiPlayers <= 3
+														}
+														className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+														onClick={() => {
+															handleRemovePlayer("missingPlayer");
+														}}
+													>
+														{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+															<>
+																<X size={16} />
+																<p>Remove from Lobby</p>
+															</>
+														)) || <p className="pl-2">Minimum 3 players</p>}
+													</ContextMenuItem>
+												</ContextMenuContent>
+											</ContextMenu>
 
-								}
+										);
+
+									}
+
+								} 
+
+							})}
+
+							{inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < gameInfo.numPlayers) && Array.from({ length: gameInfo.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+
+								return (
+
+									<ContextMenu key={index}>
+										<ContextMenuTrigger>
+											<Badge
+												className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+												variant="empty"
+												key={index}
+											>
+												<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+												<p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+											</Badge>
+										</ContextMenuTrigger>
+										<ContextMenuContent className="p-0 border-0">
+											<ContextMenuItem
+												disabled={
+													gameInfo.numPlayers + gameInfo.aiPlayers <= 3
+												}
+												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+												onClick={() => {
+													handleRemovePlayer("missingPlayer");
+												}}
+											>
+												{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+													<>
+														<X size={16} />
+														<p>Remove from Lobby</p>
+													</>
+												)) || <p className="pl-2">Minimum 3 players</p>}
+											</ContextMenuItem>
+										</ContextMenuContent>
+									</ContextMenu>
+
+								);
 
 							})}
 
 							{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
 
-								if (!inGame) {
+								return (
 
-									return (
+									<ContextMenu key={index}>
+										<ContextMenuTrigger>
+											<Badge
+												className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+												variant="bot"
+												key={index}
+											>
+												<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+													<p className="text-slate-900">🤖</p>
+												</div>
+												<p>Bot {index + 1}</p>
+											</Badge>
+										</ContextMenuTrigger>
+										<ContextMenuContent className="p-0 border-0">
+											<ContextMenuItem
+												disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
+												className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+												onClick={() => {
+													handleRemovePlayer("bot");
+												}}
+											>
+												{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+													<>
+														<X size={16} />
+														<p>Remove from Lobby</p>
+													</>
+												)) || <p className="pl-2">Minimum 3 players</p>}
+											</ContextMenuItem>
+										</ContextMenuContent>
+									</ContextMenu>
 
-										<ContextMenu key={index}>
-											<ContextMenuTrigger>
-												<Badge
-													className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-													variant="bot"
-													key={index}
-												>
-													<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-														<p className="text-slate-900">🤖</p>
-													</div>
-													<p>Bot {index + 1}</p>
-												</Badge>
-											</ContextMenuTrigger>
-											<ContextMenuContent className="p-0 border-0">
-												<ContextMenuItem
-													disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
-													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
-													onClick={() => {
-														handleRemovePlayer("bot");
-													}}
-												>
-													{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
-														<>
-															<X size={16} />
-															<p>Remove from Lobby</p>
-														</>
-													)) || <p className="pl-2">Minimum 3 players</p>}
-												</ContextMenuItem>
-											</ContextMenuContent>
-										</ContextMenu>
-	
-									);
-
-								}
+								);
 
 							})}
 
@@ -563,7 +602,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom }) {
 
 								})}
 
-								{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+								{Array.from({ length: prevAiPlayers }, (_, index) => {
 
 									return (
 

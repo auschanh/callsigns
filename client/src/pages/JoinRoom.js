@@ -139,7 +139,7 @@ function JoinRoom() {
 
                         try {
         
-                            await socket.emit("getPlayersInGame", roomID);
+                            await socket.emit("getPlayersInGame", roomDetails.hostID);
         
                         } catch (error) {
         
@@ -223,12 +223,19 @@ function JoinRoom() {
 
         });
 
-        socket.on("receiveInGame", (inGame) => {
+        socket.on("receiveInGame", (inGame, roomDetails) => {
 
             setInGame(inGame);
 
-        });
+            if (roomDetails) {
 
+                setRoomDetails(roomDetails);
+
+                setIsGameStarted(roomDetails.isGameStarted);
+
+            }
+
+        });
 
         socket.on("newHost", () => {
 
@@ -352,7 +359,7 @@ function JoinRoom() {
 
                 {success && (
 
-                    <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 gap-8 overflow-hidden transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
+                    <div className={`flex flex-none flex-col h-[85vh] bg-slate-50 border rounded-lg p-12 pb-0 gap-8 overflow-auto transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw]" : "w-[35vw]"}`}>
 
                         <div className="flex flex-row h-full w-full gap-6">
 
@@ -422,7 +429,19 @@ function JoinRoom() {
 
                                     <div className="mb-6">
 
-                                        <h1 className="text-sm font-semibold mb-2">{`${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`}</h1>
+                                        <h1 className="text-sm font-semibold mb-2">
+                                            
+                                            {inGame && (
+
+                                                `${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for the next round:`
+
+                                            ) || (
+
+                                                `${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`
+
+                                            )}
+                                        
+                                        </h1>
 
                                         <div className="flex flex-wrap gap-x-3 gap-y-3">
 
@@ -508,36 +527,49 @@ function JoinRoom() {
 
                                             {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
 
-                                                if (inLobby.length < roomDetails.numPlayers) {
+                                                if (!inGame) {
 
-                                                    return (
+                                                    if (inLobby.length < roomDetails.numPlayers) {
 
-                                                        <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
-                                                            <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                            <p>Player {inLobby.length + index + 1}</p>
-                                                        </Badge>
-                            
-                                                    );
+                                                        return (
+
+                                                            <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
+                                                                <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+                                                                <p>Player {inLobby.length + index + 1}</p>
+                                                            </Badge>
+                                
+                                                        );
+                                                    }
+
                                                 }
 
                                             })}
 
+                                            {/* {inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+
+                                                return (
+
+                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
+                                                        <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
+                                                        <p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+                                                    </Badge>
+
+                                                );
+
+                                            })} */}
+
                                             {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
-                                                if (!inGame) {
+                                                return (
 
-                                                    return (
+                                                    <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
+                                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                            <p className="text-slate-900">🤖</p>
+                                                        </div>
+                                                        <p>Bot {index + 1}</p>
+                                                    </Badge>
 
-                                                        <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="bot" key={index}>
-                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                <p className="text-slate-900">🤖</p>
-                                                            </div>
-                                                            <p>Bot {index + 1}</p>
-                                                        </Badge>
-    
-                                                    );
-
-                                                }
+                                                );
 
                                             })}
 
@@ -572,7 +604,7 @@ function JoinRoom() {
 
                                                 })}
 
-                                                {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                                {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
 
                                                     return (
 
@@ -595,7 +627,7 @@ function JoinRoom() {
 
                                 </div>
 
-                                <div className="flex flex-row mt-auto w-full justify-end">
+                                <div className="flex flex-row mt-auto w-full justify-end pt-8 pb-12">
                                     <Button className="w-28" onClick={handleReady} variant={ isReady ? "green": "default" }>{ isReady ? "Ready!" : "Ready Up" }</Button>
                                 </div>
 

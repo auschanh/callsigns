@@ -150,6 +150,8 @@ function Game() {
 
                 setRoomDetails(roomDetails);
 
+				setIsGameStarted(roomDetails.isGameStarted);
+
 				setIsClosedRoom(roomDetails.isClosedRoom);
 
 				setInLobby(othersInLobby);
@@ -162,7 +164,7 @@ function Game() {
 
 						try {
 			
-							await socket.emit("announceGameStart", playing);
+							await socket.emit("announceGameStart", playing, roomDetails);
 			
 						} catch (error) {
 			
@@ -517,7 +519,7 @@ function Game() {
 
 					) || (!isClosedRoom) && (
 
-						<div className="flex flex-col flex-none h-[20vh] pt-10 items-center text-slate-700">
+						<div className="flex flex-col flex-none h-[20vh] pt-[6%] items-center text-slate-700">
 							<p>This game is already in progress.</p>
 							<p>Join the lobby and get ready for the next round!</p>
 							<Button className="mt-auto mb-2" onClick={() => {navigate(`/lobby/${roomID}`)}} variant="default">Join Lobby</Button>

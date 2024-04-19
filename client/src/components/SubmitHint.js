@@ -328,7 +328,7 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
 
                             })}
 
-                            {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                            {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
 
                                 return (
 

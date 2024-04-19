@@ -128,6 +128,7 @@ io.on("connection", (socket) => {
 				hostID: socket.id,
 				numPlayers: numPlayers,
 				aiPlayers: aiPlayers,
+				prevAiPlayers: aiPlayers,
 				isClosedRoom: false,
 				isGameStarted: false,
 				guesser: "",
@@ -305,15 +306,9 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("getPlayersInGame", (roomID) => {
+	socket.on("getPlayersInGame", (hostID) => {
 
-		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
-
-		if (findRoom) {
-
-			socket.to(findRoom.hostID).emit("sendInGame", socket.id);
-
-		}
+		socket.to(hostID).emit("sendInGame", socket.id);
 
 	});
 
@@ -323,9 +318,9 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("announceGameStart", (inGame) => {
+	socket.on("announceGameStart", (inGame, roomDetails) => {
 
-		socket.to(socket.roomID).emit("receiveInGame", inGame);
+		socket.to(socket.roomID).emit("receiveInGame", inGame, roomDetails);
 
 	});
 
@@ -375,7 +370,11 @@ io.on("connection", (socket) => {
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
 
+		console.log(findRoom);
+
 		findRoom.isGameStarted = true;
+		findRoom.prevAiPlayers = findRoom.aiPlayers;
+		findRoom.aiPlayers = 0;
 
 		// get all socketIDs in lobby as strings
 		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];

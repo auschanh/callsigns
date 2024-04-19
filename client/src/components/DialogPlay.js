@@ -34,6 +34,8 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
     const [isRoomCreated, setIsRoomCreated] = useState(isNewHost);
 
+    const [prevAiPlayers, setPrevAiPlayers] = useState();
+
     useEffect(() => {
 
         socket.on("getRoomInfo", (link, roomList, roomID) => {
@@ -60,6 +62,8 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
             });
 
             setIsGameStarted(roomDetails.isGameStarted);
+
+            setPrevAiPlayers(roomDetails.prevAiPlayers);
 
             if (isNewHost) {
 
@@ -130,7 +134,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
                 {gameInfo && (
                         
-                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} prevClosedRoom={prevClosedRoom} />
+                    <Lobby gameInfo={gameInfo} sessionUrl={sessionUrl} previousSlide={previousSlide} prevClosedRoom={prevClosedRoom} prevAiPlayers={prevAiPlayers} />
 
                 )}
 
