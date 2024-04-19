@@ -119,8 +119,57 @@ function App() {
 
 				}
 
-				navigate(`/game/${roomID}`);
+				if (selectedPlayers.includes(playerName)) {
 
+					navigate(`/game/${roomID}`);
+
+				} else if (isHost) {
+
+					(async () => {
+
+						try {
+			
+							await socket.emit("roomCheck", roomID, true);
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+			
+					})();
+					
+				}
+
+			})();
+
+		});
+
+		socket.on("sendGameStart", (roomList, roomDetails) => {
+
+			const playing = selectedPlayers.filter((player) => { return roomList.find(({ playerName }) => { return playerName === player }) });
+
+			setInGame(playing);
+
+			setIsGameStarted(roomDetails.isGameStarted);
+
+			setInLobby(roomList);
+
+			(async () => {
+
+				try {
+
+					// for the host (DialogPlay)
+					await socket.emit("gameInfo", { username: roomDetails.host, roomName: roomDetails.roomName, numPlayers: roomDetails.numPlayers, aiPlayers: roomDetails.aiPlayers }, true, false);
+	
+					await socket.emit("announceGameStart", playing, roomDetails);
+	
+				} catch (error) {
+	
+					throw error;
+	
+				}
+	
 			})();
 
 		});

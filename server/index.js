@@ -109,6 +109,8 @@ io.on("connection", (socket) => {
 
 	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated, isReturnedToLobby) => {
 
+		console.log(username, roomName, numPlayers, aiPlayers);
+
 		socket.username = username;
 
 		socket.isReady = true;
@@ -188,7 +190,7 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("roomCheck", (roomID) => {
+	socket.on("roomCheck", (roomID, isHostExcluded) => {
 
 		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
 
@@ -208,7 +210,15 @@ io.on("connection", (socket) => {
 
 				console.log(roomList);
 
-				socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom, inRoom);
+				if (!isHostExcluded) {
+
+					socket.emit("roomExists", roomList, `http://localhost:3000/lobby/${roomID}`, findRoom, inRoom);
+
+				} else {
+
+					socket.emit("sendGameStart", roomList, findRoom);
+
+				}
 
 			} else {
 
@@ -369,8 +379,6 @@ io.on("connection", (socket) => {
 	socket.on("startGame", (selectedPlayers) => {
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
-
-		console.log(findRoom);
 
 		findRoom.isGameStarted = true;
 		findRoom.prevAiPlayers = findRoom.aiPlayers;
