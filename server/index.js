@@ -403,6 +403,7 @@ io.on("connection", (socket) => {
 
 					findRoom.guesser = "";
 					findRoom.guesserID = "";
+					findRoom.setGuesser = false;
 
 				}
 
@@ -657,6 +658,7 @@ io.on("connection", (socket) => {
 
 					findRoom.guesser = "";
 					findRoom.guesserID = "";
+					findRoom.setGuesser = false;
 
 				}
 

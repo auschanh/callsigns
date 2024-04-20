@@ -104,7 +104,21 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		sendSelected();
 
-	}, [selectedPlayers, sendSelected]);
+		if (!selectedPlayers.includes(guesser)) {
+
+			try {
+
+				socket.emit("selectGuesser", "");
+	
+			} catch (error) {
+	
+				throw error;
+	
+			}
+
+		}
+
+	}, [selectedPlayers]);
 
 	const handleChatExpansion = () => {
 
