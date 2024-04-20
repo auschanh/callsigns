@@ -1009,6 +1009,14 @@ video {
   height: 100vh;
 }
 
+.h-24 {
+  height: 6rem;
+}
+
+.h-12 {
+  height: 3rem;
+}
+
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1788,8 +1796,16 @@ video {
   fill: currentColor;
 }
 
+.fill-white {
+  fill: #fff;
+}
+
 .stroke-slate-900 {
   stroke: #0f172a;
+}
+
+.stroke-white {
+  stroke: #fff;
 }
 
 .stroke-2 {
@@ -2691,6 +2707,10 @@ video {
   background-color: rgb(234 179 8 / var(--tw-bg-opacity));
 }
 
+.hover\:fill-white:hover {
+  fill: #fff;
+}
+
 .hover\:text-slate-50:hover {
   --tw-text-opacity: 1;
   color: rgb(248 250 252 / var(--tw-text-opacity));
@@ -2813,6 +2833,10 @@ video {
 
 .disabled\:opacity-50:disabled {
   opacity: 0.5;
+}
+
+.group:hover .group-hover\:fill-white {
+  fill: #fff;
 }
 
 .group.toaster .group-\[\.toaster\]\:border-slate-200 {

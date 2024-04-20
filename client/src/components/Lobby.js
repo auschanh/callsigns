@@ -9,7 +9,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
-import { Copy, Check, ChevronLeft, MessageSquare, X, CircleUser } from "lucide-react";
+import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlayers }) {
@@ -245,11 +245,19 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	};
 
-	const handleSelectGuesser = async (guesser) => {
+	const handleSelectGuesser = async (newGuesser) => {
 
 		try {
 
-			await socket.emit("selectGuesser", guesser);
+			if (newGuesser !== guesser) {
+
+				await socket.emit("selectGuesser", newGuesser);
+
+			} else {
+
+				await socket.emit("selectGuesser", "");
+
+			}
 
 		} catch (error) {
 
@@ -429,14 +437,30 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												</TooltipProvider>
 											</ContextMenuTrigger>
 											<ContextMenuContent className="p-0 border-0">
-												<ContextMenuItem 
-													disabled={!selectedPlayers.includes(player.playerName)}
-													className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50"
-													onClick={() => {handleSelectGuesser(player.playerName)}}
-												>
-													<CircleUser size={16} />
-													<p>Select as stranded agent</p>
-												</ContextMenuItem>
+												
+												{guesser && guesser === player.playerName && (
+
+													<ContextMenuItem 
+														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
+														onClick={() => {handleSelectGuesser(player.playerName)}}
+													>
+														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
+														<p>Remove as stranded agent</p>
+													</ContextMenuItem>
+													
+												) || (
+
+													<ContextMenuItem 
+														disabled={!selectedPlayers.includes(player.playerName)}
+														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
+														onClick={() => {handleSelectGuesser(player.playerName)}}
+													>
+														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
+														<p>Select as stranded agent</p>
+													</ContextMenuItem>
+
+												)}
+
 												<ContextMenuSeparator className="m-0" />
 												<ContextMenuItem
 													disabled
@@ -504,14 +528,30 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 													</TooltipProvider>
 												</ContextMenuTrigger>
 												<ContextMenuContent className="p-0 border-0">
-													<ContextMenuItem 
-														disabled={!selectedPlayers.includes(player.playerName)}
-														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50"
-														onClick={() => {handleSelectGuesser(player.playerName)}}
-													>
-														<CircleUser size={16} />
-														<p>Select as stranded agent</p>
-													</ContextMenuItem>
+
+													{guesser && guesser === player.playerName && (
+
+														<ContextMenuItem 
+															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
+															onClick={() => {handleSelectGuesser(player.playerName)}}
+														>
+															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
+															<p>Remove as stranded agent</p>
+														</ContextMenuItem>
+														
+													) || (
+
+														<ContextMenuItem 
+															disabled={!selectedPlayers.includes(player.playerName)}
+															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
+															onClick={() => {handleSelectGuesser(player.playerName)}}
+														>
+															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
+															<p>Select as stranded agent</p>
+														</ContextMenuItem>
+
+													)}
+
 													<ContextMenuSeparator className="m-0" />
 													<ContextMenuItem
 														disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
