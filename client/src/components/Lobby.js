@@ -10,6 +10,7 @@ import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Copy, Check, ChevronLeft, MessageSquare, X, CircleUser } from "lucide-react";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlayers }) {
 
@@ -19,7 +20,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	const [inLobby, setInLobby] = useLobbyContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 
@@ -46,6 +47,22 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 			if (selectedPlayers.includes(player.playerName) && !player.isReady) {
 
 				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+
+				if (player.playerName === guesser) {
+
+					console.log("the guesser is not ready");
+
+					try {
+
+						socket.emit("selectGuesser", "");
+
+					} catch (error) {
+
+						throw error;
+
+					}
+
+				}
 
 			}
 
@@ -374,9 +391,19 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																}}
 															>
 																<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-																	<p className="text-slate-900 text-xs font-semibold">
-																		{player.playerName.charAt(0).toUpperCase()}
-																	</p>
+
+																	{guesser && guesser === player.playerName && (
+
+																		<AgentIcon className="aspect-square h-5" />
+
+																	) || (
+
+																		<p className="text-slate-900 text-xs font-semibold">
+																			{player.playerName.charAt(0).toUpperCase()}
+																		</p>
+
+																	)}
+																	
 																</div>
 																<p className="text-xs">{player.playerName}</p>
 															</Button>
@@ -434,9 +461,19 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																	}
 																>
 																	<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-																		<p className="text-slate-900 text-xs font-semibold">
-																			{player.playerName.charAt(0).toUpperCase()}
-																		</p>
+																		
+																		{guesser && guesser === player.playerName && (
+
+																			<AgentIcon className="aspect-square h-5" />
+
+																		) || (
+
+																			<p className="text-slate-900 text-xs font-semibold">
+																				{player.playerName.charAt(0).toUpperCase()}
+																			</p>
+
+																		)}
+
 																	</div>
 																	<p className="text-xs">{player.playerName}</p>
 																</Button>
@@ -634,7 +671,19 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 											variant={"red"}
 										>
 											<div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-												<p className="text-slate-900 text-xs font-semibold">{player.charAt(0).toUpperCase()}</p>
+												
+												{guesser && guesser === player && (
+
+													<AgentIcon className="aspect-square h-5" />
+
+												) || (
+
+													<p className="text-slate-900 text-xs font-semibold">
+														{player.charAt(0).toUpperCase()}
+													</p>
+
+												)}
+
 											</div>
 											<p className="text-xs">{player}</p>
 										</Button>

@@ -14,7 +14,7 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
 
     const hintValidationRef = useRef(null);
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [enterHint, setEnterHint] = enterHintState;
 

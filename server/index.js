@@ -200,7 +200,7 @@ io.on("connection", (socket) => {
 			// get all socketIDs in lobby as strings
 			const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
 
-			const guesserSocket = socketsInLobby.find((socketID) => {
+			const guesserSocketID = socketsInLobby.find((socketID) => {
 
 				// use those strings to get the actual socket objects
 				const foundSocket = io.sockets.sockets.get(socketID);
@@ -209,9 +209,21 @@ io.on("connection", (socket) => {
 
 			});
 
-			findRoom.guesserID = guesserSocket;
+			console.log(guesserSocketID);
 
-			findRoom.setGuesser = true;
+			if (guesserSocketID !== undefined) {
+
+				findRoom.guesserID = guesserSocketID;
+
+				findRoom.setGuesser = true;
+
+			} else {
+
+				findRoom.guesserID = "";
+
+				findRoom.setGuesser = false;
+
+			}
 
 			console.log(findRoom);
 
@@ -479,7 +491,7 @@ io.on("connection", (socket) => {
 
 		} else if (findRoom.setGuesser) {
 
-			console.log(findRoom.guesser + "selected");
+			console.log(findRoom.guesser + " selected");
 			
 			console.log(findRoom);
 

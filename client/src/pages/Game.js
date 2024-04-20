@@ -26,7 +26,7 @@ function Game() {
 
 	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
@@ -149,6 +149,8 @@ function Game() {
 				);
 
                 setRoomDetails(roomDetails);
+
+				setGuesser(roomDetails.guesser);
 
 				setIsGameStarted(roomDetails.isGameStarted);
 

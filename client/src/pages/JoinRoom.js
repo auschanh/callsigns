@@ -18,6 +18,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 function JoinRoom() {
 
@@ -27,7 +28,7 @@ function JoinRoom() {
 
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [username, setUsername] = useState();
 
@@ -109,6 +110,12 @@ function JoinRoom() {
 
                 setRoomDetails(roomDetails);
 
+                if (roomDetails.setGuesser) {
+
+                    setGuesser(roomDetails.guesser);
+
+                }
+
                 if (inRoom) {
 
                     console.log("i'm already in here");
@@ -134,6 +141,8 @@ function JoinRoom() {
                 }
 
                 if (roomDetails.isGameStarted) {
+
+                    setGuesser(roomDetails.guesser);
 
                     (async () => {
 
@@ -221,6 +230,8 @@ function JoinRoom() {
 
             console.log(`The guesser is ${guesser}`);
 
+            setGuesser(guesser);
+
         });
 
         socket.on("isRoomClosed", (isClosedRoom) => {
@@ -234,6 +245,8 @@ function JoinRoom() {
             setInGame(inGame);
 
             if (roomDetails) {
+
+                setGuesser(roomDetails.guesser);
 
                 setRoomDetails(roomDetails);
 
@@ -284,6 +297,8 @@ function JoinRoom() {
 		if (inGame?.length === 0) {
 
 			setInGame();
+            
+            setGuesser();
 
 		}
 
@@ -472,7 +487,19 @@ function JoinRoom() {
                                                                             }
                                                                         >
                                                                             <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                                <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+
+                                                                                {guesser && guesser === player.playerName && (
+
+                                                                                    <AgentIcon className="aspect-square h-5" />
+
+                                                                                ) || (
+
+                                                                                    <p className="text-slate-900 text-xs font-semibold">
+                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                    </p>
+
+                                                                                )}
+
                                                                             </div>
                                                                             <p className="text-xs">{player.playerName}</p>
                                                                         </Button>
@@ -508,7 +535,19 @@ function JoinRoom() {
                                                                             }
                                                                         >
                                                                             <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                                <p className="text-slate-900 text-xs font-semibold">{player.playerName.charAt(0).toUpperCase()}</p>
+
+                                                                                {guesser && guesser === player.playerName && (
+
+                                                                                    <AgentIcon className="aspect-square h-5" />
+
+                                                                                ) || (
+
+                                                                                    <p className="text-slate-900 text-xs font-semibold">
+                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                    </p>
+
+                                                                                )}
+
                                                                             </div>
                                                                             <p className="text-xs">{player.playerName}</p>
                                                                         </Button>
@@ -602,7 +641,19 @@ function JoinRoom() {
                                                             variant={"red"}
                                                         >
                                                             <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                <p className="text-slate-900 text-xs font-semibold">{player.charAt(0).toUpperCase()}</p>
+
+                                                                {guesser && guesser === player && (
+
+                                                                    <AgentIcon className="aspect-square h-5" />
+
+                                                                ) || (
+
+                                                                    <p className="text-slate-900 text-xs font-semibold">
+                                                                        {player.charAt(0).toUpperCase()}
+                                                                    </p>
+
+                                                                )}
+
                                                             </div>
                                                             <p className="text-xs">{player}</p>
                                                         </Button>

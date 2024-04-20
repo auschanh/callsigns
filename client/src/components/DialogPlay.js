@@ -18,7 +18,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
     const [inLobby, setInLobby] = useLobbyContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [currentSlide, setCurrentSlide] = useState(propSlide);
 
@@ -79,6 +79,8 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
             console.log(`The guesser is ${guesser}`);
 
+            setGuesser(guesser);
+
         });
 
         return () => {
@@ -96,6 +98,8 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 		if (inGame?.length === 0) {
 
 			setInGame();
+
+            setGuesser();
 
             (async () => {
 

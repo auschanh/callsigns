@@ -43,6 +43,8 @@ function App() {
 
 	const [isGameStarted, setIsGameStarted] = useState(false);
 
+	const [guesser, setGuesser] = useState();
+
 	const navigate = useNavigate();
 
 	const generateWord = async () => {
@@ -151,6 +153,8 @@ function App() {
 			const playing = selectedPlayers.filter((player) => { return roomList.find(({ playerName }) => { return playerName === player }) });
 
 			setInGame(playing);
+
+			setGuesser(roomDetails.guesser);
 
 			setIsGameStarted(roomDetails.isGameStarted);
 
@@ -283,7 +287,7 @@ function App() {
 
 					<LobbyContext.Provider value={[inLobby, setInLobby]}>
 
-						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]]}>
 
 							<Routes>
 

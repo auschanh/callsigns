@@ -10,7 +10,7 @@ function NewHost() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [playOpen, setPlayOpen] = useState(false);
 
@@ -63,6 +63,8 @@ function NewHost() {
     
                     setRoomDetails(roomDetails);
 
+                    
+                    // ------ needs some work, the dialog doesn't pop up for legit new hosts
                     if (playerName !== undefined) {
 
                         console.log("host returned to lobby");
