@@ -217,6 +217,12 @@ function JoinRoom() {
 
         });
 
+        socket.on("guesserSelected", (guesser) => {
+
+            console.log(`The guesser is ${guesser}`);
+
+        });
+
         socket.on("isRoomClosed", (isClosedRoom) => {
 
             setIsClosedRoom(isClosedRoom);
@@ -263,6 +269,7 @@ function JoinRoom() {
             socket.removeAllListeners("getLobby");
             socket.removeAllListeners("updateRoomInfo");
             socket.removeAllListeners("getSelectedPlayers");
+            socket.removeAllListeners("guesserSelected");
             socket.removeAllListeners("isRoomClosed");
             socket.removeAllListeners("receiveInGame");
             socket.removeAllListeners("newHost");

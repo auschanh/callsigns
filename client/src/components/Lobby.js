@@ -9,7 +9,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
-import { Copy, Check, ChevronLeft, MessageSquare, X } from "lucide-react";
+import { Copy, Check, ChevronLeft, MessageSquare, X, CircleUser } from "lucide-react";
 
 function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlayers }) {
 
@@ -214,6 +214,20 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	};
 
+	const handleSelectGuesser = async (guesser) => {
+
+		try {
+
+			await socket.emit("selectGuesser", guesser);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+	};
+
 	const startGame = async () => {
 
 		try {
@@ -322,8 +336,17 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 					<div className="mb-6">
 
 						<h1 className="text-sm font-semibold mb-2">
-							Select {gameInfo.numPlayers}{" "}
-							{gameInfo.numPlayers === 1 ? "player" : "players"} for this round:
+
+							{inGame && (
+
+								`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for the next round:`
+
+							) || (
+
+								`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for this round:`
+
+							)}
+							
 						</h1>
 
 						<div className="flex flex-wrap gap-x-3 gap-y-3">
@@ -365,9 +388,18 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												</TooltipProvider>
 											</ContextMenuTrigger>
 											<ContextMenuContent className="p-0 border-0">
+												<ContextMenuItem 
+													disabled={!selectedPlayers.includes(player.playerName)}
+													className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50"
+													onClick={() => {handleSelectGuesser(player.playerName)}}
+												>
+													<CircleUser size={16} />
+													<p>Select as stranded agent</p>
+												</ContextMenuItem>
+												<ContextMenuSeparator className="m-0" />
 												<ContextMenuItem
 													disabled
-													className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+													className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-red-500 focus:text-slate-50"
 												>
 													<X size={16} />
 													<p>Host cannot be removed from Lobby</p>
@@ -421,9 +453,18 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 													</TooltipProvider>
 												</ContextMenuTrigger>
 												<ContextMenuContent className="p-0 border-0">
+													<ContextMenuItem 
+														disabled={!selectedPlayers.includes(player.playerName)}
+														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50"
+														onClick={() => {handleSelectGuesser(player.playerName)}}
+													>
+														<CircleUser size={16} />
+														<p>Select as stranded agent</p>
+													</ContextMenuItem>
+													<ContextMenuSeparator className="m-0" />
 													<ContextMenuItem
 														disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
-														className="cursor-pointer gap-3 pr-4 focus:bg-red-500 focus:text-slate-50"
+														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-red-500 focus:text-slate-50"
 														onClick={() => {
 															handleRemovePlayer(`player-${player.playerName}`);
 														}}

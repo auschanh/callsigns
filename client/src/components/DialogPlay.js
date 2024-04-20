@@ -75,10 +75,17 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
         });
 
+        socket.on("guesserSelected", (guesser) => {
+
+            console.log(`The guesser is ${guesser}`);
+
+        });
+
         return () => {
 
             socket.removeAllListeners("getRoomInfo");
             socket.removeAllListeners("updateRoomInfo");
+            socket.removeAllListeners("guesserSelected");
 
         }
 

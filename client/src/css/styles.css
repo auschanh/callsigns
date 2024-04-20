@@ -1954,6 +1954,10 @@ video {
   padding-left: 0.5rem;
 }
 
+.pl-3 {
+  padding-left: 0.75rem;
+}
+
 .pl-4 {
   padding-left: 1rem;
 }
@@ -2707,6 +2711,11 @@ video {
 
 .hover\:opacity-80:hover {
   opacity: 0.8;
+}
+
+.focus\:bg-blue-900:focus {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 58 138 / var(--tw-bg-opacity));
 }
 
 .focus\:bg-red-500:focus {

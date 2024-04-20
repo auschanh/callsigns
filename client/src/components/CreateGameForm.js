@@ -106,7 +106,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 	
 			}
 	
-			if (!form.getValues("roomName"))	{
+			if (!form.getValues("roomName")) {
 	
 				form.setValue("roomName", gameInfo.roomName);
 	
@@ -281,7 +281,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 					name="aiPlayers"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="flex flex-row justify-between items-center mb-4">
+							<FormLabel className="flex flex-row justify-between items-center">
 								<div>AI Players</div>
 								<Switch 
 										className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"

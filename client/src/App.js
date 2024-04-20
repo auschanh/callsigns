@@ -145,6 +145,7 @@ function App() {
 
 		});
 
+		// for host only
 		socket.on("sendGameStart", (roomList, roomDetails) => {
 
 			const playing = selectedPlayers.filter((player) => { return roomList.find(({ playerName }) => { return playerName === player }) });
@@ -250,6 +251,7 @@ function App() {
 		return () => {
 
 			socket.removeAllListeners("redirectGame");
+			socket.removeAllListeners("sendGameStart");
 			socket.removeAllListeners("receiveCallsign");
 			socket.removeAllListeners("receiveMessage");
 			socket.removeAllListeners("getRoomList");

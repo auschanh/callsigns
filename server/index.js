@@ -109,8 +109,6 @@ io.on("connection", (socket) => {
 
 	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers }, isRoomCreated, isReturnedToLobby) => {
 
-		console.log(username, roomName, numPlayers, aiPlayers);
-
 		socket.username = username;
 
 		socket.isReady = true;
@@ -134,7 +132,8 @@ io.on("connection", (socket) => {
 				isClosedRoom: false,
 				isGameStarted: false,
 				guesser: "",
-				guesserID: ""
+				guesserID: "",
+				setGuesser: false
 			});
 
 			socket.emit("getRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
@@ -187,6 +186,42 @@ io.on("connection", (socket) => {
 		}
 
 		console.log(findRoom);
+
+	});
+
+	socket.on("selectGuesser", (guesser) => {
+
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
+
+		if (findRoom) {
+
+			findRoom.guesser = guesser;
+
+			// get all socketIDs in lobby as strings
+			const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
+
+			const guesserSocket = socketsInLobby.find((socketID) => {
+
+				// use those strings to get the actual socket objects
+				const foundSocket = io.sockets.sockets.get(socketID);
+
+				return foundSocket.username === guesser;
+
+			});
+
+			findRoom.guesserID = guesserSocket;
+
+			findRoom.setGuesser = true;
+
+			console.log(findRoom);
+
+			io.to(socket.roomID).emit("guesserSelected", guesser);
+
+		} else {
+
+			console.log("unable to find room");
+			
+		}
 
 	});
 
@@ -350,6 +385,17 @@ io.on("connection", (socket) => {
 
 				console.log(getPlayersInLobby(socket.roomID));
 
+				const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
+
+				if (player === findRoom.guesser) {
+
+					findRoom.guesser = "";
+					findRoom.guesserID = "";
+
+				}
+
+				console.log(findRoom);
+
 				io.to(socket.roomID).emit("leftRoom", player);
 
 				return true;
@@ -377,6 +423,8 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("startGame", (selectedPlayers) => {
+
+		console.log(selectedPlayers);
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
 
@@ -418,6 +466,10 @@ io.on("connection", (socket) => {
 		// choose a guesser
 		if (findRoom.guesser === "" && findRoom.guesserID === "") {
 
+			console.log("none selected");
+
+			console.log(findRoom);
+
 			const index = Math.floor(Math.random() * selectedPlayers.length);
 
 			const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
@@ -425,9 +477,30 @@ io.on("connection", (socket) => {
 			findRoom.guesser = guesser.username;
 			findRoom.guesserID = guesser.socketID;
 
+		} else if (findRoom.setGuesser) {
+
+			console.log(findRoom.guesser + "selected");
+			
+			console.log(findRoom);
+
+			findRoom.setGuesser = false;
+
+			if (!selectedPlayers.includes(findRoom.guesser)) {
+
+				const index = Math.floor(Math.random() * selectedPlayers.length);
+
+				const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+				findRoom.guesser = guesser.username;
+				findRoom.guesserID = guesser.socketID;
+
+			}
+
 		} else {
 
 			const prevGuesserIndex = selectedPlayers.findIndex((playerName) => { return playerName === findRoom.guesser });
+
+			console.log(prevGuesserIndex);
 
 			if (prevGuesserIndex) {
 
@@ -439,7 +512,15 @@ io.on("connection", (socket) => {
 					findRoom.guesser = currentGuesser.username;
 					findRoom.guesserID = currentGuesser.socketID;
 
+					console.log("previous guesser: " + selectedPlayers[prevGuesserIndex]);
+
+					console.log("current guesser: " + currentGuesser.username);
+
+					console.log(findRoom);
+
 				} else {
+
+					console.log("currentGuesser fail");
 
 					const index = Math.floor(Math.random() * selectedPlayers.length);
 
@@ -451,6 +532,8 @@ io.on("connection", (socket) => {
 				}
 
 			} else {
+
+				console.log("prevGuesser fail");
 
 				const index = Math.floor(Math.random() * selectedPlayers.length);
 
@@ -557,6 +640,13 @@ io.on("connection", (socket) => {
 				// ---------------------------------------------------------
 
 				const findRoom = roomLookup.find(({ roomID }) => { return roomID === room });
+
+				if (socket.username === findRoom.guesser) {
+
+					findRoom.guesser = "";
+					findRoom.guesserID = "";
+
+				}
 
 				// if you're the host
 				if (findRoom && findRoom.hostID === socket.id) {
