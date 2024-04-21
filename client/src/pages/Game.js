@@ -51,6 +51,8 @@ const Game = function (props) {
 
 	const [isVoted, setIsVoted] = useState();
 
+	const [voteList, setVoteList] = useState(isVoted?.filter(player => player.voted === true));
+
 	const [currentIndex, setCurrentIndex] = useState(0);
 
 	const [currentRound, setCurrentRound] = useState(0);

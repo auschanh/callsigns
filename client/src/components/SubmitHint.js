@@ -5,9 +5,9 @@ import { Label } from './ui/label';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
-import pluralize from 'pluralize';
+import { Progress } from "./ui/progress";
 
-const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord }) => {
+const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord, isVoted }) => {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -233,8 +233,20 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                     <div className="flex flex-col flex-none items-center justify-center w-full h-full gap-12">
 
                         <div className="w-[50%] bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 p-8 rounded-lg text-black">
-                            
-                            <form
+                            { playerName === roomDetails.guesser ?
+                                <>
+                                <p className='mb-2'> {submissions.filter(vote => vote.hint).length} Agents have given their hints. </p>
+                                <Progress 
+                                    value={
+                                        ((submissions.filter(vote => vote.hint && playerName === roomDetails.guesser)).length 
+                                        / (submissions.length-1)) * 100
+                                    }
+                                    max={100}
+                                    />
+                                </>
+                            :
+                            /* render hint component if not guesser */
+                            (<form
                                 name="exampleForm"
                                 onSubmit={handleSubmit}
                                 className="flex flex-col items-center w-full font-sans pt-2"
@@ -272,7 +284,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                                 <p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}></p>
 
                             </form>
-
+                            )}
                         </div>
 
                         <div className="flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4">
@@ -371,7 +383,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                         </div>
                         
                     </div>
-
+                        
                 )}
 
             </div>
