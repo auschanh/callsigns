@@ -104,20 +104,6 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		sendSelected();
 
-		if (!selectedPlayers.includes(guesser)) {
-
-			try {
-
-				socket.emit("selectGuesser", "");
-	
-			} catch (error) {
-	
-				throw error;
-	
-			}
-
-		}
-
 	}, [selectedPlayers]);
 
 	const handleChatExpansion = () => {
@@ -185,6 +171,20 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 			} else {
 
 				setSelectedPlayers(selectedPlayers.filter((value) => { return value !== player.playerName }));
+
+				if (player.playerName === guesser) {
+
+					try {
+
+						socket.emit("selectGuesser", "");
+			
+					} catch (error) {
+			
+						throw error;
+			
+					}
+
+				}
 
 			}
 
@@ -374,7 +374,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 					<div className="mb-6">
 
-						<h1 className="text-sm font-semibold mb-2">
+						<h1 className="text-sm font-semibold mb-4">
 
 							{inGame && (
 
@@ -387,6 +387,8 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 							)}
 							
 						</h1>
+
+						<h2 className="mb-2 leading-none text-xs font-normal">Right-click for more options</h2>
 
 						<div className="flex flex-wrap gap-x-3 gap-y-3">
 

@@ -140,7 +140,8 @@ function JoinRoom() {
 
                 }
 
-                if (roomDetails.isGameStarted) {
+                // just for late joiners
+                if (roomDetails.isGameStarted && playerName === undefined) {
 
                     setGuesser(roomDetails.guesser);
 
