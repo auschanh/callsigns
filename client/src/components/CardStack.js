@@ -37,7 +37,8 @@ const CardStack = ({ cards, currentIndex, handleNext }) => {
 						style={{
 
 							transform: `translateY(${(index - currentIndex) * 85}vh)`,
-							zIndex: index === currentIndex ? "1" : "0"
+							zIndex: index === currentIndex ? "1" : "0",
+							opacity: index === currentIndex? "100" : "0"
 						}}
 					>
 

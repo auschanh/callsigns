@@ -381,7 +381,13 @@ const Game = function (props) {
 			phase: "Generate CallSign Phase",
 			content: 
 
-				<SelectHint resultsState={[results, setResults]} roomDetails={roomDetails} playerName={playerName} />
+				<SelectHint 
+				resultsState={[results, setResults]} 
+				submissions={submissions}
+				roomDetails={roomDetails} 
+				playerName={playerName} 
+				isVoted={isVoted}
+				/>
 
 		},
 		{
