@@ -286,7 +286,6 @@ function Game() {
     }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted]);
 
 	// consolidate into just inGame
-	// remove hints from voting when players exit?
 	useEffect(() => {
 
 		setSubmissions(

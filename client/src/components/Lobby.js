@@ -267,6 +267,32 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	};
 
+	const selectAll = () => {
+
+		setSelectedPlayers(
+
+			inLobby.reduce((result, player) => {
+
+				if (player.isReady) {
+
+					result.push(player.playerName);
+
+				}
+
+				return result;
+
+			}, [])
+
+		);
+
+	}
+
+	const deselectAll = () => {
+
+		setSelectedPlayers([]);
+
+	}
+
 	const startGame = async () => {
 
 		try {
@@ -374,19 +400,45 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 					<div className="mb-6">
 
-						<h1 className="text-sm font-semibold mb-4">
+						<div className="flex flex-row flex-none">
 
-							{inGame && (
+							<h1 className="text-sm font-semibold mb-4">
 
-								`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for the next round:`
+								{inGame && (
 
-							) || (
+									`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for the next round:`
 
-								`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for this round:`
+								) || (
 
-							)}
-							
-						</h1>
+									`Select ${gameInfo.numPlayers} ${gameInfo.numPlayers === 1 ? "player" : "players"} for this round:`
+
+								)}
+								
+							</h1>
+
+							<Button 
+								className="rounded-full px-2 py-3 w-24 h-4 ml-auto text-xs"
+								variant="border"
+								onClick={selectedPlayers.length === 0 ? selectAll : selectedPlayers.length === inLobby.reduce((accumulator, currentValue) => { if (currentValue.isReady) { return accumulator + 1 } else { return accumulator + 0 }  }, 0) ? deselectAll : selectAll }
+							>
+
+								{selectedPlayers.length === 0 && (
+		
+									<>Select All</>
+		
+								) || selectedPlayers.length === inLobby.reduce((accumulator, currentValue) => { if (currentValue.isReady) { return accumulator + 1 } else { return accumulator + 0 }  }, 0) && (
+		
+									<>Deselect All</>
+		
+								) || (
+		
+									<>Select All</>
+		
+								)}
+		
+							</Button>
+
+						</div>
 
 						<h2 className="mb-2 leading-none text-xs font-normal">Right-click for more options</h2>
 
@@ -771,10 +823,10 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 				</div>
 
-				<div className="flex flex-row mt-auto pb-10 w-full justify-end">
+				<div className="flex flex-row mt-auto pb-10 w-full justify-end gap-3">
 
 					<Button
-						className="w-25 mt-12"
+						className="w-28 mt-12"
 						onClick={startGame}
 						disabled={isGameStarted || selectedPlayers.length !== gameInfo.numPlayers}
 					>

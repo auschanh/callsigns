@@ -9,6 +9,9 @@ import SocketContext from "./contexts/SocketContext";
 import MessageContext from "./contexts/MessageContext";
 import LobbyContext from "./contexts/LobbyContext";
 import GameInfoContext from "./contexts/GameInfoContext";
+import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner";
+import { TriangleAlert, Info } from "lucide-react";
 import styles from "./css/tailwindStylesLiterals";
 
 import axios from "axios";
@@ -242,13 +245,58 @@ function App() {
 
 			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 
+			if (user !== playerName && inGame?.includes(playerName)) {
+
+				toast(
+
+					user === guesser && inGame.includes(user) ? "Your guesser, " + user + ", has disconnected." : user + " has disconnected.", {
+						unstyled: true,
+						classNames: {
+							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser && inGame.includes(user) ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
+							title: 'ml-5 max-w-32 text-slate-900 text-xs',
+							actionButton: 'inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"',
+						},
+						action: {
+							label: "Return to Lobby",
+							onClick: () => console.log("Undo"),
+						},
+						icon: <>{user === guesser && inGame.includes(user) && (<TriangleAlert className="ml-1" size={20} />) || (<Info className="ml-1" size={20} />)}</>,
+						duration: 5000,
+						dismissible: true,
+					}
+				);
+			}
+
 		});
 
-		socket.on("notifyReturnToLobby", (playerName) => {
+		socket.on("notifyReturnToLobby", (user) => {
 
-			setInGame(inGame?.filter((player) => { return player !== playerName }));
+			setInGame(inGame?.filter((player) => { return player !== user }));
 
-			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== playerName }));
+			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
+
+			if (user !== playerName && inGame?.includes(playerName)) {
+
+				toast(
+
+					user === guesser ? "Your guesser, " + user + ", is back in the lobby." : user + " is back in the lobby.", {
+						unstyled: true,
+						classNames: {
+							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
+							title: 'ml-5 max-w-32 text-slate-900 text-xs',
+							actionButton: 'inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"',
+						},
+						action: {
+							label: "Return to Lobby",
+							onClick: () => console.log("Undo"),
+						},
+						icon: <>{user === guesser && inGame.includes(user) && (<TriangleAlert className="ml-1" size={20} />) || (<Info className="ml-1" size={20} />)}</>,
+						duration: 5000,
+						dismissible: true,
+					}
+				);
+
+			}
 
 		});
 
@@ -289,6 +337,8 @@ function App() {
 
 						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]]}>
 
+							<Toaster />
+							
 							<Routes>
 
 								<Route exact path="/" element={<Home />} />
