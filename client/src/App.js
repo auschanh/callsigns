@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, Redirect, useLocation, useNavigate, useParams } from "react-router-dom";
 import "./css/styles.css";
+import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "./components/ui/alert-dialog";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
 import JoinRoom from "./pages/JoinRoom";
@@ -47,6 +48,8 @@ function App() {
 	const [isGameStarted, setIsGameStarted] = useState(false);
 
 	const [guesser, setGuesser] = useState();
+
+	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -254,11 +257,11 @@ function App() {
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser && inGame.includes(user) ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
 							title: 'ml-5 max-w-32 text-slate-900 text-xs',
-							actionButton: 'inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"',
+							actionButton: `inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90`,
 						},
 						action: {
 							label: "Return to Lobby",
-							onClick: () => console.log("Undo"),
+							onClick: () => { setIsAlertOpen(true); },
 						},
 						icon: <>{user === guesser && inGame.includes(user) && (<TriangleAlert className="ml-1" size={20} />) || (<Info className="ml-1" size={20} />)}</>,
 						duration: 5000,
@@ -284,17 +287,33 @@ function App() {
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
 							title: 'ml-5 max-w-32 text-slate-900 text-xs',
-							actionButton: 'inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"',
+							actionButton: `inline-flex items-center justify-center px-4 py-2 whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90`,
 						},
 						action: {
 							label: "Return to Lobby",
-							onClick: () => console.log("Undo"),
+							onClick:  () => { setIsAlertOpen(true); },
 						},
 						icon: <>{user === guesser && inGame.includes(user) && (<TriangleAlert className="ml-1" size={20} />) || (<Info className="ml-1" size={20} />)}</>,
 						duration: 5000,
 						dismissible: true,
 					}
 				);
+
+			}
+
+		});
+
+		socket.on("navigateLobby", (roomID, host) => {
+
+			toast.dismiss();
+
+			if (playerName === host) {
+
+				navigate(`/newhost/${roomID}`);
+
+			} else {
+
+				navigate(`/lobby/${roomID}`);
 
 			}
 
@@ -310,6 +329,7 @@ function App() {
 			socket.removeAllListeners("sendInGame");
 			socket.removeAllListeners("leftRoom");
 			socket.removeAllListeners("notifyReturnToLobby");
+			socket.removeAllListeners("navigateLobby");
 
 		}
 
@@ -324,6 +344,20 @@ function App() {
         }
 
     }, [chatExpanded]);
+
+	const handleReturnLobby = async () => {
+
+		try {
+
+			await socket.emit("returnToLobby", null, playerName);
+
+		} catch (error) {
+
+			throw error;
+
+		}
+
+	}
 
 	return (
 
@@ -352,6 +386,22 @@ function App() {
 								<Route path="*" element={<Navigate replace to="/" />} />
 
 							</Routes>
+
+							<AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+								<AlertDialogContent className="space-y-4">
+
+									<AlertDialogHeader>
+										<AlertDialogTitle>Are you sure you want to return to lobby?</AlertDialogTitle>
+										<AlertDialogDescription>You won't be able to come back to this game and your progress will be lost.</AlertDialogDescription>
+									</AlertDialogHeader>
+									
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction onClick={handleReturnLobby}>Return to Lobby</AlertDialogAction>
+									</AlertDialogFooter>
+
+								</AlertDialogContent>
+							</AlertDialog>
 
 						</GameInfoContext.Provider>
 					

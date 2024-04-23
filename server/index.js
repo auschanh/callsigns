@@ -439,7 +439,7 @@ io.on("connection", (socket) => {
 
 		console.log(selectedPlayers);
 
-		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID});
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
 
 		findRoom.isGameStarted = true;
 		findRoom.prevAiPlayers = findRoom.aiPlayers;
@@ -598,7 +598,19 @@ io.on("connection", (socket) => {
 
 		console.log(`${playerName} is returning to lobby`);
 
-		io.to(roomID).emit("notifyReturnToLobby", playerName);
+		if (roomID === null) {
+
+			const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
+
+			io.to(socket.roomID).emit("notifyReturnToLobby", playerName);
+
+			socket.emit("navigateLobby", socket.roomID, findRoom.host);
+
+		} else {
+
+			io.to(roomID).emit("notifyReturnToLobby", playerName);
+
+		}
 
 	});
 

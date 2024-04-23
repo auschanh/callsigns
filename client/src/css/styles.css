@@ -771,12 +771,20 @@ video {
   margin-bottom: 2rem;
 }
 
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
 .ml-2 {
   margin-left: 0.5rem;
 }
 
 .ml-4 {
   margin-left: 1rem;
+}
+
+.ml-5 {
+  margin-left: 1.25rem;
 }
 
 .ml-6 {
@@ -845,18 +853,6 @@ video {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mr-8 {
-  margin-right: 2rem;
-}
-
-.ml-1 {
-  margin-left: 0.25rem;
-}
-
-.ml-5 {
-  margin-left: 1.25rem;
 }
 
 .box-border {
@@ -961,10 +957,6 @@ video {
 
 .h-\[20vh\] {
   height: 20vh;
-}
-
-.h-\[30vh\] {
-  height: 30vh;
 }
 
 .h-\[55\%\] {
@@ -1195,6 +1187,10 @@ video {
   min-width: var(--radix-select-trigger-width);
 }
 
+.max-w-32 {
+  max-width: 8rem;
+}
+
 .max-w-40 {
   max-width: 10rem;
 }
@@ -1213,22 +1209,6 @@ video {
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-10 {
-  max-width: 2.5rem;
-}
-
-.max-w-36 {
-  max-width: 9rem;
-}
-
-.max-w-24 {
-  max-width: 6rem;
-}
-
-.max-w-32 {
-  max-width: 8rem;
 }
 
 .flex-1 {
@@ -1547,11 +1527,6 @@ video {
   border-color: rgb(22 101 52 / var(--tw-border-opacity));
 }
 
-.border-red-200 {
-  --tw-border-opacity: 1;
-  border-color: rgb(254 202 202 / var(--tw-border-opacity));
-}
-
 .border-red-500 {
   --tw-border-opacity: 1;
   border-color: rgb(239 68 68 / var(--tw-border-opacity));
@@ -1589,21 +1564,6 @@ video {
 
 .border-transparent {
   border-color: transparent;
-}
-
-.border-red-900 {
-  --tw-border-opacity: 1;
-  border-color: rgb(127 29 29 / var(--tw-border-opacity));
-}
-
-.border-amber-900 {
-  --tw-border-opacity: 1;
-  border-color: rgb(120 53 15 / var(--tw-border-opacity));
-}
-
-.border-amber-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(217 119 6 / var(--tw-border-opacity));
 }
 
 .border-b-slate-900 {
@@ -1663,16 +1623,6 @@ video {
 .bg-indigo-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(79 70 229 / var(--tw-bg-opacity));
-}
-
-.bg-red-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
-}
-
-.bg-red-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
 }
 
 .bg-red-500 {
@@ -1738,11 +1688,6 @@ video {
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
 }
 
-.bg-slate-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
-}
-
 .bg-slate-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity));
@@ -1760,11 +1705,6 @@ video {
 .bg-yellow-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(250 204 21 / var(--tw-bg-opacity));
-}
-
-.bg-amber-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(217 119 6 / var(--tw-bg-opacity));
 }
 
 .bg-opacity-50 {
