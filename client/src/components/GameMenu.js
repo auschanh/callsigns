@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Switch } from "../components/ui/switch";
+import { toast } from "sonner";
 import { User, Users, Copy, Check, LockKeyhole } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
@@ -95,6 +96,8 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
         try {
 
             await socket.emit("returnToLobby", roomDetails.roomID, playerName);
+
+            toast.dismiss();
 
             if (playerName === roomDetails.host) {
 
