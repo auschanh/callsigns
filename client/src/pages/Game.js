@@ -398,8 +398,10 @@ const Game = function (props) {
 				<RevealHint 
 				resultsState={[results, setResults]} 
 				roomDetails={roomDetails} 
-				playerName={playerName}
-				guessState={[guess, setGuess]} 
+				guessState={[guess, setGuess]}
+				validateWord={validateWord}
+				stemmerWord={stemmerWord}
+				singularizeWord={singularizeWord} 
 				/>
 
 
