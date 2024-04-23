@@ -58,7 +58,7 @@ const Game = function (props) {
 	const [currentRound, setCurrentRound] = useState(0);
 
 	// state for words
-	const [guess, setGuess] = useState("");
+	const [guess, setGuess] = useState("callsign");
 
 	const [clicked, setClicked] = useState(false);
 
@@ -395,7 +395,12 @@ const Game = function (props) {
 			phase: "Agents Hint Phase",
 			content: 
 			
-				<RevealHint resultsState={[results, setResults]} />
+				<RevealHint 
+				resultsState={[results, setResults]} 
+				roomDetails={roomDetails} 
+				playerName={playerName}
+				guessState={[guess, setGuess]} 
+				/>
 
 
 		}

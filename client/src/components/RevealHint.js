@@ -1,12 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+import { Input } from "../components/ui/input";
+import { useSocketContext } from "../contexts/SocketContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X } from "lucide-react";
 
-const RevealHint = ({ resultsState }) => {
+const RevealHint = ({ resultsState, playerName, roomDetails, guessState }) => {
 
+    const [socket, setSocket] = useSocketContext();
     const [results, setResults] = resultsState;
+    const [guess, setGuess] = guessState;
+
+    const handleChange =  (e) => {
+        e.preventDefault();
+        const newGuess = e.target.value;
+        setGuess(newGuess);
+        // setCorrectGuess(false);
+        socket.emit("sendGuess", roomDetails.roomID, playerName, newGuess);
+       
+    };
+
+    // when guess changes, update to render for all users
+   
+    useEffect(() => {
+        // receive the broadcast signal
+        const handleReceiveGuess = (playerName, guess) => {
+            setGuess(guess);
+        }
+        socket.on("receiveGuess", handleReceiveGuess);
+
+        return () => {
+            // cleanup function
+            socket.off("receiveGuess", handleReceiveGuess);
+        }
+
+    }, [socket, setGuess])
 
     return (
 
@@ -17,7 +47,6 @@ const RevealHint = ({ resultsState }) => {
                 <Label className="mb-12 text-lg leading-none">Your hints have been revealed!</Label>
 
                 <div className="flex flex-row flex-wrap justify-center gap-4">
-
                     <TooltipProvider>                      
 
                         {results.map((result, index) => {
@@ -64,7 +93,32 @@ const RevealHint = ({ resultsState }) => {
                 </div>
 
                 <h1 className="text-lg text-center font-medium leading-none mt-16">Now it's up to the stranded agent to figure out their callsign...</h1>
+                <div className="pt-16 items-center justify-center flex flex-col gap-2">
 
+                    <div className={`${guess ?  `block` : 'invisible'} text-4xl mb-4 text-green-600`}>
+                        {!guess ? 'callsign' : guess}
+                    </div>
+
+                    <Label htmlFor="guess">Guess the word</Label>
+                    <div className='flex gap-2'>
+                        { playerName === roomDetails.guesser && 
+                        (
+                        <>
+                            <Input
+                                id="guess"
+                                tabIndex="0"
+                                value={guess}
+                                placeholder="guess"
+                                onChange={handleChange}
+                            />
+                            <Button variant="green" htmlFor="guess" tabIndex="0">    
+                                Guess
+                            </Button>
+                        </>
+                        )}
+                    </div>
+                </div>
+                
             </div>
 
         </div>
