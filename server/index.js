@@ -435,7 +435,7 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("startGame", (selectedPlayers) => {
+	socket.on("startGame", (selectedPlayers, joinOrder) => {
 
 		console.log(selectedPlayers);
 
@@ -511,13 +511,15 @@ io.on("connection", (socket) => {
 
 		} else {
 
-			const prevGuesserIndex = selectedPlayers.findIndex((playerName) => { return playerName === findRoom.guesser });
+			const selectedInOrder = joinOrder.filter((playerName) => { return selectedPlayers.includes(playerName) });
+
+			const prevGuesserIndex = selectedInOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
 			console.log(prevGuesserIndex);
 
-			if (prevGuesserIndex) {
+			if (prevGuesserIndex !== -1) {
 
-				const currentGuesser = usernames.find(({ username }) => { return username === selectedPlayers[(prevGuesserIndex + 1) % selectedPlayers.length] });
+				const currentGuesser = usernames.find(({ username }) => { return username === selectedInOrder[(prevGuesserIndex + 1) % selectedInOrder.length] });
 
 				if (currentGuesser) {
 
@@ -525,7 +527,7 @@ io.on("connection", (socket) => {
 					findRoom.guesser = currentGuesser.username;
 					findRoom.guesserID = currentGuesser.socketID;
 
-					console.log("previous guesser: " + selectedPlayers[prevGuesserIndex]);
+					console.log("previous guesser: " + selectedInOrder[prevGuesserIndex]);
 
 					console.log("current guesser: " + currentGuesser.username);
 
@@ -548,9 +550,17 @@ io.on("connection", (socket) => {
 
 				console.log("prevGuesser fail");
 
-				const index = Math.floor(Math.random() * selectedPlayers.length);
+				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-				const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+				let offset = 1;
+
+				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
+
+					offset += 1;
+
+				}
+
+				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
 
 				findRoom.guesser = guesser.username;
 				findRoom.guesserID = guesser.socketID;

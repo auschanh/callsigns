@@ -295,9 +295,11 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	const startGame = async () => {
 
+		const joinOrder = inLobby.map((player) => { return player.playerName });
+
 		try {
 
-			await socket.emit("startGame", selectedPlayers);
+			await socket.emit("startGame", selectedPlayers, joinOrder);
 
 		} catch (error) {
 
