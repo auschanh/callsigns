@@ -641,7 +641,11 @@ io.on("connection", (socket) => {
 			console.log("could not find room");
 
 		}
+	});
+	// update guesser live guess for all users, listen for sendGuess
 
+	socket.on("sendGuess", (roomID, playerName, guess) => {
+		io.to(roomID).emit("receiveGuess", playerName, guess);
 	});
 
 	socket.on("disconnecting", () => {

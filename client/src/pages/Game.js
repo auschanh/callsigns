@@ -19,6 +19,8 @@ import { useMessageContext } from "../contexts/MessageContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { MessageSquare } from "lucide-react";
+import { stemmer } from "stemmer";
+import pluralize from "pluralize";
 
 function Game() {
 	
@@ -48,7 +50,20 @@ function Game() {
 
 	const [isVoted, setIsVoted] = useState();
 
+	const [voteList, setVoteList] = useState(isVoted?.filter(player => player.voted === true));
+
 	const [currentIndex, setCurrentIndex] = useState(0);
+
+	const [currentRound, setCurrentRound] = useState(0);
+
+	// state for words
+	const [guess, setGuess] = useState("callsign");
+
+	const [clicked, setClicked] = useState(false);
+
+	const [correctGuess, setCorrectGuess] = useState(null);
+
+	const [errMsg, setErrMsg] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -358,18 +373,26 @@ function Game() {
 
 	}, [isVoted]);
 
-	const _handleNext = (currentIndex) => {
-		setCurrentIndex(currentIndex + 1);
-	};
+	useEffect(() => {
+		if(currentIndex === 0){
+			setCurrentRound(currentRound+1);
+		}
+	}, [currentIndex])
 
-	const _handleComplete = () => {};
+	const validateWord = (w) => {
+		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
+	}
+
+	const stemmerWord = (w) => {
+		return stemmer(w);
+	}
+
+	const singularizeWord = (w) => {
+		return pluralize.singular(w);
+	}
 
 	const handleNext = () => {
 		setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
-	};
-
-	const _handleIndexChange = (index) => {
-		setCurrentIndex(index);
 	};
 
 	const cards = [
@@ -386,7 +409,15 @@ function Game() {
 
 			content:  
 
-				<SubmitHint enterHintState={[enterHint, setEnterHint]} roomDetails={roomDetails} hintState={[hint, setHint]} submissionsState={[submissions, setSubmissions]} />
+				<SubmitHint 
+				enterHintState={[enterHint, setEnterHint]} 
+				roomDetails={roomDetails} 
+				hintState={[hint, setHint]} 
+				submissionsState={[submissions, setSubmissions]} 
+				validateWord={validateWord}
+				stemmerWord={stemmerWord}
+				singularizeWord={singularizeWord}
+				/>
 				
 		},
 		{
@@ -394,7 +425,13 @@ function Game() {
 			phase: "Decide which hints are too similar or illegal",
 			content: 
 
-				<SelectHint resultsState={[results, setResults]} roomDetails={roomDetails} playerName={playerName} />
+				<SelectHint 
+				resultsState={[results, setResults]} 
+				submissions={submissions}
+				roomDetails={roomDetails} 
+				playerName={playerName} 
+				isVoted={isVoted}
+				/>
 
 		},
 		{
@@ -408,7 +445,14 @@ function Game() {
 
 			content: 
 			
-				<RevealHint resultsState={[results, setResults]} />
+				<RevealHint 
+				resultsState={[results, setResults]} 
+				roomDetails={roomDetails} 
+				guessState={[guess, setGuess]}
+				validateWord={validateWord}
+				stemmerWord={stemmerWord}
+				singularizeWord={singularizeWord} 
+				/>
 
 
 		}
@@ -423,7 +467,10 @@ function Game() {
 				<div className="relative h-screen w-screen flex flex-col flex-none items-center justify-center overflow-hidden bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%">
 
 					<div className="absolute left-5 z-[50]">
-						<Slider onChange={_handleIndexChange} currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
+						<div className="text-white mt-6">
+							Round {currentRound}/4
+						</div>
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />

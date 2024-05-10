@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { useSocketContext } from "../contexts/SocketContext";
-import { Check, Trash2, X, RotateCcw } from "lucide-react";
+import { Check, Ellipsis, Trash2, X, RotateCcw } from "lucide-react";
+import { Progress } from "./ui/progress";
 
-function SelectHint({ resultsState, roomDetails, playerName }) {
+const SelectHint = ({ resultsState, roomDetails, playerName, isVoted, submissions }) => {
 
-    const [results, setResults] = resultsState;
+    const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
     const [socket, setSocket] = useSocketContext();
     
@@ -141,13 +142,61 @@ function SelectHint({ resultsState, roomDetails, playerName }) {
     }
 
     return (
-
         <div className="flex flex-none w-full h-full justify-center items-center">
 
             <div className="w-full py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
                 <div className="flex flex-col w-full items-center">
+                    { // if player is the guesser load progress component 
+                        playerName === roomDetails.guesser ?
+                        <>
+                            <p className='mb-2'> {isVoted.filter(player => player.voted).length} Agents have voted to to eliminate hints. </p>
+                            <Progress
+                                value={(isVoted.filter(player => player.voted && playerName === roomDetails.guesser)).length / (results.length-1) * 100}
+                                max={100}
+                            /> 
+                            {/* render badges for player vote status */}
+                            <div className="flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4">
+                                {isVoted?.map((player, index) => {
+                                    if (player.playerName !== playerName) {
+                                        return (
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                                variant={`${player.voted !== false ? "green" : "grey"}`}
+                                            >
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                    {player.voted !== false && (
+                                                        <Check className="text-slate-900" size={14} />
+                                                    ) || (
+                                                        <Ellipsis className="text-slate-900" size={14} />
+                                                    )}
+                                                </div>
+                                                <p className="text-xs">{player.playerName}</p>
+                                            </Button>
+                                        );
+                                    }
+                                    })}
 
+                                    {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                        return (
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                                variant="green"
+                                            >
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                    <Check className="text-slate-900" size={14} />
+                                                </div>
+                                                <p className="text-xs">Bot {index + 1}</p>
+                                            </Button>
+                                        );
+                                    })}
+                            </div>
+                        </>
+                        
+                   : ( /* load voting screen if not the guesser */
+                   <>
                     <Label className="mb-12 text-lg leading-none">Select the hints that are too similar or illegal:</Label>
 
                     <div className="flex flex-row flex-wrap justify-center gap-10">
@@ -181,7 +230,7 @@ function SelectHint({ resultsState, roomDetails, playerName }) {
 
                     </div>
 
-                </div>
+                
 
                 <div className="flex flex-row justify-center gap-4 mt-16">
                     <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
@@ -230,11 +279,14 @@ function SelectHint({ resultsState, roomDetails, playerName }) {
 
                     </Button>
                 </div>
-
+                
+                
+                </>
+                )}
+                </div>
             </div>
 
         </div>
-
     );
 
 }

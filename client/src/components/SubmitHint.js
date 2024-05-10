@@ -5,8 +5,9 @@ import { Label } from './ui/label';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
+import { Progress } from "./ui/progress";
 
-function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }) {
+const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord, isVoted }) => {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -96,6 +97,9 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
 
 	const handleSubmit = async (event) => {
 
+        const checkHint = hint[0].toLowerCase().trim(); // clean up user's input
+        const cleanedCallSign = callsign.toLowerCase().trim()
+        const stemmedHint = stemmerWord(checkHint);
         event.preventDefault();
 
         if (hint[1]) {
@@ -109,9 +113,26 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
 			hintInputRef.current.classList.add("border-2");
             hintInputRef.current.classList.remove("border-slate-400");
             hintInputRef.current.classList.add("border-red-500");
-            hintValidationRef.current.innerText = "Please enter a one-word hint."
+            hintValidationRef.current.innerText = "Please enter a hint"
 
-		} else if (hint[0].toLowerCase() === callsign.toLowerCase()) {
+		} 
+        else if (checkHint.includes(cleanedCallSign)) {
+
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot contain the CallSign"
+            
+       	}
+        else if (validateWord(stemmedHint)) {
+
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot contain spaces, numbers or special characters"
+            
+       	}
+        else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
             hintInputRef.current.classList.add("border-2");
             hintInputRef.current.classList.remove("border-slate-400");
@@ -212,8 +233,20 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
                     <div className="flex flex-col flex-none items-center justify-center w-full h-full gap-12">
 
                         <div className="w-[50%] bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 p-8 rounded-lg text-black">
-
-                            <form
+                            { playerName === roomDetails.guesser ?
+                                <>
+                                <p className='mb-2'> {submissions.filter(vote => vote.hint).length} Agents have given their hints. </p>
+                                <Progress 
+                                    value={
+                                        ((submissions.filter(vote => vote.hint && playerName === roomDetails.guesser)).length 
+                                        / (submissions.length-1)) * 100
+                                    }
+                                    max={100}
+                                    />
+                                </>
+                            :
+                            /* render hint component if not guesser */
+                            (<form
                                 name="exampleForm"
                                 onSubmit={handleSubmit}
                                 className="flex flex-col items-center w-full font-sans pt-2"
@@ -251,7 +284,7 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
                                 <p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}></p>
 
                             </form>
-
+                            )}
                         </div>
 
                         <div className="flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4">
@@ -350,7 +383,7 @@ function SubmitHint({ enterHintState, roomDetails, hintState, submissionsState }
                         </div>
                         
                     </div>
-
+                        
                 )}
 
             </div>
