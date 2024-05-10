@@ -21,9 +21,10 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
         const newGuess = e.target.value;
         setGuess(newGuess);
         // setCorrectGuess(false);
-        socket.emit("sendGuess", roomDetails.roomID, playerName, newGuess);
+        socket.emit("sendGuess", roomDetails.roomID, playerName, newGuess); // send live input of guesser to socket server
     };
 
+    // when guesser submits guess
     const checkGuess = (e) => {
         e.preventDefault();        
         const checkGuess = guess.toLowerCase().trim(); // cleanup the user input
@@ -64,8 +65,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
             guessInputRef.current.classList.add("border-slate-400");
             guessValidationRef.current.innerText = "";
         }
-
-
     }
 
     // when guess changes, update to render for all users
@@ -75,7 +74,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
             setGuess(guess);
         }
 
-        socket.on("receiveGuess", handleReceiveGuess);
+        socket.on("receiveGuess", handleReceiveGuess); 
 
         return () => {
             // cleanup function
