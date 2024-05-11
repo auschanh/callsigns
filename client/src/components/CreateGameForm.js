@@ -7,6 +7,8 @@ import { z } from "zod";
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Slider } from "./ui/slider";
 import { Input } from "./ui/input";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Switch } from "./ui/switch";
@@ -38,7 +40,13 @@ const formSchema = z.object({
 
 		message: "Enter number of AI players."
 
-	})
+	}),
+
+	numGuesses: z.number().array().optional(),
+
+	numRounds: z.number().array().optional(),
+
+	timeLimit: z.number().array().optional(),
 
 });
 
@@ -183,172 +191,78 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 	return (
 
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full pb-10">
-				<FormField
-					defaultValue={''}
-					control={form.control}
-					name="username"
-					render={({ field }) => (
-						<FormItem className="mb-4">
-							<FormLabel>Username</FormLabel>
-							<FormControl>
-								<Input
-									placeholder={"Enter Username"}
-									{...field}
-									onChange={handleInputChange}
-									id="userName"
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+		<div className="flex flex-col flex-none h-full">
 
-				<FormField
-					defaultValue={''}
-					control={form.control}
-					name="roomName"
-					render={({ field }) => (
-						<FormItem className="mb-4">
-							<FormLabel>Room Name</FormLabel>
-							<FormControl>
-								<Input 
-									placeholder={"Enter Room Name"} 
-									{...field} 
-									onChange={handleInputChange}
-									id="roomName"
-									onFocus={(event) => event.target.select()}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+			<Tabs defaultValue="roomSettings" className="mb-12 h-full">
 
-				<FormField
-					defaultValue={0}
-					control={form.control}
-					name="numPlayers"
-					render={({ field }) => (
-						<FormItem className="mb-6">
-							<FormLabel>Number of Players</FormLabel>
-							<FormControl>
-								<RadioGroup
-									onValueChange={field.onChange}
-									defaultValue={field.value}
-									className="flex flex-row gap-4"
-								>
-									{Array.from({ length: 7 }, (_, index) => {
-										return (
-											<FormItem
-												key={index + 1}
-												className="flex items-center"
+				<TabsList className="w-full px-2 py-2 bg-slate-50 mb-2">
+					<TabsTrigger value="roomSettings" className="w-full text-xs">Room Settings</TabsTrigger>
+					<TabsTrigger value="additionalSettings" className="w-full text-xs">Additional Settings</TabsTrigger>
+				</TabsList>
+
+				<Form {...form} className="h-full">
+
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+
+						<TabsContent value="roomSettings" className="h-full">
+
+							<FormField
+								defaultValue={''}
+								control={form.control}
+								name="username"
+								render={({ field }) => (
+									<FormItem className="mb-4">
+										<FormLabel>Username</FormLabel>
+										<FormControl>
+											<Input
+												autoFocus
+												placeholder={"Enter Username"}
+												{...field}
+												onChange={handleInputChange}
+												id="userName"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								defaultValue={''}
+								control={form.control}
+								name="roomName"
+								render={({ field }) => (
+									<FormItem className="mb-4">
+										<FormLabel>Room Name</FormLabel>
+										<FormControl>
+											<Input 
+												placeholder={"Enter Room Name"} 
+												{...field} 
+												onChange={handleInputChange}
+												id="roomName"
+												onFocus={(event) => event.target.select()}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								defaultValue={0}
+								control={form.control}
+								name="numPlayers"
+								render={({ field }) => (
+									<FormItem className="mb-6">
+										<FormLabel>Number of Players</FormLabel>
+										<FormControl>
+											<RadioGroup
+												onValueChange={field.onChange}
+												defaultValue={field.value}
+												className="flex flex-row gap-4"
 											>
-												<FormLabel
-													className={`
-														cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
-														border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
-														duration-300
-														${field.value === index + 1
-															? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
-															: ""
-														}
-													`}
-												>
-													<FormControl>
-														<RadioGroupItem
-															value={index + 1}
-															className="invisble h-0 w-0 border-none"
-															onClick={() => {handlePlayerCount(index + 1)}}
-														/>
-													</FormControl>
-													{index + 1}
-												</FormLabel>
-											</FormItem>
-										);
-									})}
-								</RadioGroup>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					defaultValue={0}
-					control={form.control}
-					name="aiPlayers"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="flex flex-row justify-between items-center">
-								<div>AI Players</div>
-								<Switch 
-										className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
-										checked={isAiPlayers}
-										onCheckedChange={() => {
-
-											if (playerCount < 3) {
-
-												return;
-
-											}
-											
-											setIsAiPlayers(!isAiPlayers); 
-											
-											if (isAiPlayers) {
-
-												form.setValue("aiPlayers", 0);
-
-											}								
-											
-										}}
-								/>
-							</FormLabel>
-							<FormControl>
-								<RadioGroup
-									onValueChange={field.onChange}
-									defaultValue={field.value}
-									className="flex flex-row gap-4"
-								>
-
-									{isAiPlayers && 
-
-										Array.from({ length: 6 }, (_, index) => {
-
-											if (index + 1 <= (7 - playerCount)) {
-
-												if (index + 1 === 1 && playerCount === 1) {
-
+												{Array.from({ length: 7 }, (_, index) => {
 													return (
-
-														<FormItem
-															key={index + 1}
-															className="flex items-center"
-														>
-															<FormLabel
-																className={`
-																	h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
-																	border border-slate-200 bg-slate-500/50 text-slate-50/30 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
-																`}
-															>
-																<FormControl>
-																	<RadioGroupItem
-																		value={index + 1}
-																		className="invisble h-0 w-0 border-none"
-																		disabled
-																	/>
-																</FormControl>
-																{index + 1}
-															</FormLabel>
-														</FormItem>
-
-													);
-
-												} else {
-
-													return (
-
 														<FormItem
 															key={index + 1}
 															className="flex items-center"
@@ -368,69 +282,268 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 																	<RadioGroupItem
 																		value={index + 1}
 																		className="invisble h-0 w-0 border-none"
-																		onClick={() => {
-																			
-																			if (form.getValues("aiPlayers") === 0 
-																					|| (playerCount === 1 && form.getValues("aiPlayers") === 2) 
-																					|| (playerCount === 2 && form.getValues("aiPlayers") === 1)
-																			) {
-	
-																				form.setValue("aiPlayers", index + 1);
-
-																			}
-																		}}
+																		onClick={() => {handlePlayerCount(index + 1)}}
 																	/>
 																</FormControl>
 																{index + 1}
 															</FormLabel>
 														</FormItem>
-		
 													);
+												})}
+											</RadioGroup>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
+							<FormField
+								defaultValue={0}
+								control={form.control}
+								name="aiPlayers"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="flex flex-row justify-between items-center">
+											<div>AI Players</div>
+											<Switch 
+													className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
+													checked={isAiPlayers}
+													onCheckedChange={() => {
+
+														if (playerCount < 3) {
+
+															return;
+
+														}
+														
+														setIsAiPlayers(!isAiPlayers); 
+														
+														if (isAiPlayers) {
+
+															form.setValue("aiPlayers", 0);
+
+														}								
+														
+													}}
+											/>
+										</FormLabel>
+										<FormControl>
+											<RadioGroup
+												onValueChange={field.onChange}
+												defaultValue={field.value}
+												className="flex flex-row gap-4"
+											>
+
+												{isAiPlayers && 
+
+													Array.from({ length: 6 }, (_, index) => {
+
+														if (index + 1 <= (7 - playerCount)) {
+
+															if (index + 1 === 1 && playerCount === 1) {
+
+																return (
+
+																	<FormItem
+																		key={index + 1}
+																		className="flex items-center"
+																	>
+																		<FormLabel
+																			className={`
+																				h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																				border border-slate-200 bg-slate-500/50 text-slate-50/30 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+																			`}
+																		>
+																			<FormControl>
+																				<RadioGroupItem
+																					value={index + 1}
+																					className="invisble h-0 w-0 border-none"
+																					disabled
+																				/>
+																			</FormControl>
+																			{index + 1}
+																		</FormLabel>
+																	</FormItem>
+
+																);
+
+															} else {
+
+																return (
+
+																	<FormItem
+																		key={index + 1}
+																		className="flex items-center"
+																	>
+																		<FormLabel
+																			className={`
+																				cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																				border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+																				duration-300
+																				${field.value === index + 1
+																					? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
+																					: ""
+																				}
+																			`}
+																		>
+																			<FormControl>
+																				<RadioGroupItem
+																					value={index + 1}
+																					className="invisble h-0 w-0 border-none"
+																					onClick={() => {
+																						
+																						if (form.getValues("aiPlayers") === 0 
+																								|| (playerCount === 1 && form.getValues("aiPlayers") === 2) 
+																								|| (playerCount === 2 && form.getValues("aiPlayers") === 1)
+																						) {
+				
+																							form.setValue("aiPlayers", index + 1);
+
+																						}
+																					}}
+																				/>
+																			</FormControl>
+																			{index + 1}
+																		</FormLabel>
+																	</FormItem>
+					
+																);
+
+															}
+
+														} else {
+
+															return (
+
+																<FormItem
+																	key={index + 1}
+																	className="flex items-center"
+																>
+																	<FormLabel
+																		className={`
+																			h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																			border border-slate-200 bg-slate-500/50 text-slate-50/30 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+																		`}
+																	>
+																		<FormControl>
+																			<RadioGroupItem
+																				value={index + 1}
+																				className="invisble h-0 w-0 border-none"
+																				disabled
+																			/>
+																		</FormControl>
+																		{index + 1}
+																	</FormLabel>
+																</FormItem>
+				
+															);
+
+														}
+													})
 												}
+												
+											</RadioGroup>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-											} else {
+						</TabsContent>
 
-												return (
+						<TabsContent value="additionalSettings" className="h-full pt-2">
 
-													<FormItem
-														key={index + 1}
-														className="flex items-center"
-													>
-														<FormLabel
-															className={`
-																h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
-																border border-slate-200 bg-slate-500/50 text-slate-50/30 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
-															`}
-														>
-															<FormControl>
-																<RadioGroupItem
-																	value={index + 1}
-																	className="invisble h-0 w-0 border-none"
-																	disabled
-																/>
-															</FormControl>
-															{index + 1}
-														</FormLabel>
-													</FormItem>
-	
-												);
+							<FormField
+								defaultValue={[0]}
+								control={form.control}
+								name="numGuesses"
+								render={({ field }) => (
+									<FormItem className="space-y-4 cursor-pointer mb-6">
 
-											}
-										})
-									}
-									
-								</RadioGroup>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+										<div className="flex flex-row justify-between">
+											<FormLabel>Number of Guesses:</FormLabel>
+											<p className="text-sm leading-none">{Number(field.value) + 1 !== 11 ? Number(field.value) + 1 : "Unlimited"}</p>
+										</div>
 
-				<Button className="flex w-48 self-center mt-auto" type="submit">Submit</Button>
+										<FormControl>
+											<Slider
+												defaultValue={[0]}
+												max={10}
+												step={1}
+												onValueChange={field.onChange}
+												value={field.value ? field.value : [0]}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-			</form>
-		</Form>
+							<FormField
+								defaultValue={[10]}
+								control={form.control}
+								name="numRounds"
+								render={({ field }) => (
+									<FormItem className="space-y-4 cursor-pointer mb-6">
+
+										<div className="flex flex-row justify-between">
+											<FormLabel>Number of Rounds:</FormLabel>
+											<p className="text-sm leading-none">{Number(field.value) + 1 !== 11 ? Number(field.value) + 1 : "Unlimited"}</p>
+										</div>
+
+										<FormControl>
+											<Slider
+												defaultValue={[10]}
+												max={10}
+												step={1}
+												onValueChange={field.onChange}
+												value={field.value ? field.value : [10]}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								defaultValue={[120]}
+								control={form.control}
+								name="timeLimit"
+								render={({ field }) => (
+									<FormItem className="space-y-4 cursor-pointer mb-6">
+
+										<div className="flex flex-row justify-between">
+											<FormLabel>Timer:</FormLabel>
+											<p className="text-sm leading-none">
+												{Number(field.value) + 15 !== 135 ? ((Math.floor((Number(field.value) + 15) / 60)) === 0 ? "" : ((Math.floor((Number(field.value) + 15) / 60)) + "m ")) + (((Number(field.value) + 15) % 60) + "s") : "Off"}
+											</p>
+										</div>
+
+										<FormControl>
+											<Slider
+												defaultValue={[120]}
+												max={120}
+												step={15}
+												onValueChange={field.onChange}
+												value={field.value ? field.value : [120]}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+						</TabsContent>
+
+						<Button className="flex w-48 self-center mt-auto mb-10" type="submit">Submit</Button>
+
+					</form>
+
+				</Form>
+				
+			</Tabs>
+
+		</div>
 
 	);
 

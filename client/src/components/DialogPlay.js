@@ -57,7 +57,10 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
                 username: roomDetails.host,
                 roomName: roomDetails.roomName,
                 numPlayers: roomDetails.numPlayers,
-                aiPlayers: roomDetails.aiPlayers
+                aiPlayers: roomDetails.aiPlayers,
+                numGuesses: roomDetails.numGuesses,
+                numRounds: roomDetails.numRounds,
+                timeLimit: roomDetails.timeLimit,
 
             });
 
@@ -161,7 +164,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
                 <Button className={tailwindStyles}>{triggerName}</Button>
             </DialogTrigger>
 
-            <DialogContent className={`flex flex-none flex-col h-[85vh] top-[7.5%] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw] left-[20%]" : "w-[35vw] left-[32.5%]"}`} hideClose={isNewHost}>
+            <DialogContent className={`flex flex-none flex-col h-[90vh] top-[5%] p-10 overflow-hidden gap-8 transition-all ease-in-out duration-500 ${chatExpanded ? "w-[60vw] left-[20%]" : "w-[35vw] left-[32.5%]"}`} hideClose={isNewHost}>
 
                 <DialogHeader>
                     <DialogTitle>Create A Room</DialogTitle>
