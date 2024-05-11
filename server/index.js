@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
 
 	getSocketInfo();
 
-	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers, numGuesses, numRounds, timeLimit }, isRoomCreated, isReturnedToLobby) => {
+	socket.on("gameInfo", ({ username, roomName, numPlayers, aiPlayers, numGuesses, numRounds, timeLimit, keepScore }, isRoomCreated, isReturnedToLobby) => {
 
 		socket.username = username;
 
@@ -129,9 +129,10 @@ io.on("connection", (socket) => {
 				numPlayers: numPlayers,
 				aiPlayers: aiPlayers,
 				prevAiPlayers: aiPlayers,
-				numGuesses: numGuesses ? numGuesses[0] + 1 : 1,
-				numRounds: numRounds ? numRounds[0] + 1 : 11,
-				timeLimit: timeLimit ? timeLimit[0] + 15 : 135,
+				numGuesses: numGuesses,
+				numRounds: numRounds,
+				timeLimit: timeLimit,
+				keepScore: keepScore,
 				isClosedRoom: false,
 				isGameStarted: false,
 				guesser: "",
@@ -151,9 +152,10 @@ io.on("connection", (socket) => {
 				findRoom.roomName = roomName;
 				findRoom.numPlayers = numPlayers;
 				findRoom.aiPlayers = aiPlayers;
-				findRoom.numGuesses = numGuesses ? numGuesses[0] + 1 : 1;
-				findRoom.numRounds = numRounds ? numRounds[0] + 1 : 11;
-				findRoom.timeLimit = timeLimit ? timeLimit[0] + 15 : 135;
+				findRoom.numGuesses = numGuesses;
+				findRoom.numRounds = numRounds;
+				findRoom.timeLimit = timeLimit;
+				findRoom.keepScore = keepScore;
 
 				const roomList = getPlayersInLobby(socket.roomID);
 

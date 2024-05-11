@@ -61,6 +61,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
                 numGuesses: roomDetails.numGuesses,
                 numRounds: roomDetails.numRounds,
                 timeLimit: roomDetails.timeLimit,
+                keepScore: roomDetails.keepScore,
 
             });
 

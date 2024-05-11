@@ -48,6 +48,8 @@ const formSchema = z.object({
 
 	timeLimit: z.number().array().optional(),
 
+	keepScore: z.boolean().optional(),
+
 });
 
 function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
@@ -84,13 +86,23 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
 
-		console.log(values);
+		const formattedValues = {
 
-		setGameInfo(values);
+			...values, 
+			numGuesses: values.numGuesses? values.numGuesses[0] + 1 : 1,
+			numRounds: values.numRounds? values.numRounds[0] + 1 : 11,
+			timeLimit: values.timeLimit? values.timeLimit[0] : 0,
+			keepScore: values.keepScore? values.keepScore : false,
+
+		}
+
+		console.log(formattedValues);
+
+		setGameInfo(formattedValues);
 
 		try {
 
-			socket.emit("gameInfo", values, isRoomCreated);
+			socket.emit("gameInfo", formattedValues, isRoomCreated);
 
 		} catch (error) {
 
@@ -195,7 +207,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 			<Tabs defaultValue="roomSettings" className="mb-12 h-full">
 
-				<TabsList className="w-full px-2 py-2 bg-slate-50 mb-2">
+				<TabsList className="w-full px-2 py-2 bg-slate-50 mb-2 gap-2">
 					<TabsTrigger value="roomSettings" className="w-full text-xs">Room Settings</TabsTrigger>
 					<TabsTrigger value="additionalSettings" className="w-full text-xs">Additional Settings</TabsTrigger>
 				</TabsList>
@@ -458,7 +470,8 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 								control={form.control}
 								name="numGuesses"
 								render={({ field }) => (
-									<FormItem className="space-y-4 cursor-pointer mb-6">
+
+									<FormItem className="space-y-4 cursor-pointer mb-8">
 
 										<div className="flex flex-row justify-between">
 											<FormLabel>Number of Guesses:</FormLabel>
@@ -484,7 +497,8 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 								control={form.control}
 								name="numRounds"
 								render={({ field }) => (
-									<FormItem className="space-y-4 cursor-pointer mb-6">
+
+									<FormItem className="space-y-4 cursor-pointer mb-8">
 
 										<div className="flex flex-row justify-between">
 											<FormLabel>Number of Rounds:</FormLabel>
@@ -506,29 +520,56 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 							/>
 
 							<FormField
-								defaultValue={[120]}
+								defaultValue={[0]}
 								control={form.control}
 								name="timeLimit"
 								render={({ field }) => (
-									<FormItem className="space-y-4 cursor-pointer mb-6">
+
+									<FormItem className="space-y-4 cursor-pointer mb-8">
 
 										<div className="flex flex-row justify-between">
 											<FormLabel>Timer:</FormLabel>
 											<p className="text-sm leading-none">
-												{Number(field.value) + 15 !== 135 ? ((Math.floor((Number(field.value) + 15) / 60)) === 0 ? "" : ((Math.floor((Number(field.value) + 15) / 60)) + "m ")) + (((Number(field.value) + 15) % 60) + "s") : "Off"}
+												{Number(field.value) !== 0 ? ((Math.floor(Number(field.value) / 60)) === 0 ? "" : ((Math.floor(Number(field.value) / 60)) + "m ")) + ((Number(field.value) % 60) + "s") : "Off"}
 											</p>
 										</div>
 
 										<FormControl>
 											<Slider
-												defaultValue={[120]}
+												defaultValue={[0]}
 												max={120}
 												step={15}
 												onValueChange={field.onChange}
-												value={field.value ? field.value : [120]}
+												value={field.value ? field.value : [0]}
 											/>
 										</FormControl>
 										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								defaultValue={false}
+								control={form.control}
+								name="keepScore"
+								render={({ field }) => (
+
+									<FormItem className="space-y-0 cursor-pointer mt-10 mb-6 flex flex-none flex-row justify-between items-center">
+
+										<FormLabel>Keep Score:</FormLabel>
+
+										<FormControl>
+											
+											<Switch
+												className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-slate-400"
+												checked={field.value}
+												onCheckedChange={field.onChange}	
+											/>
+
+										</FormControl>
+
+										<FormMessage />
+
 									</FormItem>
 								)}
 							/>
