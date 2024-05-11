@@ -648,6 +648,11 @@ io.on("connection", (socket) => {
 		io.to(roomID).emit("receiveGuess", playerName, guess);
 	});
 
+	// guesser submitted a valid guess
+	socket.on("submitGuess", (roomID, playerName, guess, result) => {
+		io.to(roomID).emit("receiveSubmitGuess", result);
+	});
+
 	socket.on("disconnecting", () => {
 
 		const leavingRooms = [...socket.rooms];

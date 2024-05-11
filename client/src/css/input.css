@@ -102,3 +102,17 @@
         transform: scale(1.5);
     }
 }
+
+@keyframes blink-out {
+  0%, 25% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 0;
+  }
+}
+
+#countdown {
+  animation: blink-out 1s ease-out forwards infinite;
+}
