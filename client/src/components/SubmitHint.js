@@ -201,7 +201,16 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                         {intro2 && (
 
                             <>
-                                <p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
+                                {playerName === guesser && (
+
+                                    <p>{`% Receiving connection request ...`}</p>
+
+                                ) || (
+
+                                    <p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
+
+                                )}
+                                
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>

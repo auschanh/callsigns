@@ -374,9 +374,13 @@ function Game() {
 	}, [isVoted]);
 
 	useEffect(() => {
-		if(currentIndex === 0){
-			setCurrentRound(currentRound+1);
+
+		if (currentIndex === 0) {
+
+			setCurrentRound(currentRound + 1);
+
 		}
+
 	}, [currentIndex])
 
 	const validateWord = (w) => {
@@ -410,13 +414,13 @@ function Game() {
 			content:  
 
 				<SubmitHint 
-				enterHintState={[enterHint, setEnterHint]} 
-				roomDetails={roomDetails} 
-				hintState={[hint, setHint]} 
-				submissionsState={[submissions, setSubmissions]} 
-				validateWord={validateWord}
-				stemmerWord={stemmerWord}
-				singularizeWord={singularizeWord}
+					enterHintState={[enterHint, setEnterHint]} 
+					roomDetails={roomDetails} 
+					hintState={[hint, setHint]} 
+					submissionsState={[submissions, setSubmissions]} 
+					validateWord={validateWord}
+					stemmerWord={stemmerWord}
+					singularizeWord={singularizeWord}
 				/>
 				
 		},
@@ -426,11 +430,11 @@ function Game() {
 			content: 
 
 				<SelectHint 
-				resultsState={[results, setResults]} 
-				submissions={submissions}
-				roomDetails={roomDetails} 
-				playerName={playerName} 
-				isVoted={isVoted}
+					resultsState={[results, setResults]} 
+					submissions={submissions}
+					roomDetails={roomDetails} 
+					playerName={playerName} 
+					isVoted={isVoted}
 				/>
 
 		},
@@ -446,14 +450,13 @@ function Game() {
 			content: 
 			
 				<RevealHint 
-				resultsState={[results, setResults]} 
-				roomDetails={roomDetails} 
-				guessState={[guess, setGuess]}
-				validateWord={validateWord}
-				stemmerWord={stemmerWord}
-				singularizeWord={singularizeWord} 
+					resultsState={[results, setResults]} 
+					roomDetails={roomDetails} 
+					guessState={[guess, setGuess]}
+					validateWord={validateWord}
+					stemmerWord={stemmerWord}
+					singularizeWord={singularizeWord} 
 				/>
-
 
 		}
 	];
@@ -466,11 +469,51 @@ function Game() {
 
 				<div className="relative h-screen w-screen flex flex-col flex-none items-center justify-center overflow-hidden bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%">
 
-					<div className="absolute left-5 z-[50]">
-						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
-						<div className="text-white mt-6">
-							Round {currentRound}/4
+					<div className="absolute top-[4%] left-[3%] w-full h-full">
+
+						<div className="flex flex-none flex-row flex-wrap items-center gap-1 w-[13%] h-[2%] overflow-hidden">
+
+							<p className="leading-none text-xs text-slate-400 font-medium mr-1">Round:</p>
+
+							{currentRound <= 10 && (
+
+								<>
+
+									{Array.from({ length: currentRound }, (_, index) => {
+
+										return (
+	
+											<div key={index} className="aspect-square h-2 rounded-full bg-green-500" />
+	
+										)
+	
+									})}
+	
+									{roomDetails.numRounds < 11 && Array.from({ length: roomDetails.numRounds - currentRound }, (_, index) => {
+	
+										return (
+	
+											<div key={index} className="aspect-square h-2 rounded-full bg-green-900/90" />
+	
+										)
+	
+									})}
+
+
+								</>
+
+							) || (
+
+								<p className="leading-none text-xs text-slate-400 font-medium">{currentRound}</p>
+
+							)}
+
 						</div>
+
+					</div>
+
+					<div className="absolute left-[2%] z-[50]">
+						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
 					</div>
 
 					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />

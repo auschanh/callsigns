@@ -210,7 +210,11 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
                     </div>
 
-                    <Chat username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} />
+                    {chatExpanded && (
+
+                        <Chat username={gameInfo?.username} roomName={gameInfo?.roomName} roomID={roomID} />
+
+                    )}
 
                 </div>
 
