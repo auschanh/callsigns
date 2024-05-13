@@ -18,7 +18,8 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, TriangleAlert } from "lucide-react";
+import { ReactComponent as HiddenIcon } from "../assets/noun-hidden-5642408.svg";
 import { stemmer } from "stemmer";
 import pluralize from "pluralize";
 
@@ -57,7 +58,7 @@ function Game() {
 	const [currentRound, setCurrentRound] = useState(0);
 
 	// state for words
-	const [guess, setGuess] = useState("callsign");
+	const [guess, setGuess] = useState("");
 
 	const [clicked, setClicked] = useState(false);
 
@@ -337,7 +338,7 @@ function Game() {
 
 	useEffect(() => {
 
-		if (submissions?.every((submission) => { return submission.hint !== ""})) {
+		if (submissions?.filter((submission) => { return submission.playerName !== guesser }).every((submission) => { return submission.hint !== "" })) {
 
 			setCurrentIndex(1);
 
@@ -347,7 +348,7 @@ function Game() {
 
 	useEffect(() => {
 
-		if (isVoted?.every((player) => { return player.voted === true })) {
+		if (isVoted?.filter((player) => { return player.playerName !== guesser }).every((player) => { return player.voted === true })) {
 
 			setResults(
 
@@ -542,7 +543,18 @@ function Game() {
 						<div className="flex flex-col items-center">
 							<Label className="text-xs text-slate-300">Callsign</Label>
 							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-amber-400 hover:bg-amber-400/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
-								<p className="text-sm text-center">{callsign}</p>
+								
+								{playerName !== guesser && (
+
+									<p className="text-sm text-center">{callsign}</p>
+
+								) || (
+
+									<HiddenIcon className="aspect-square w-5" />
+									// <p className="text-sm text-center">?</p>
+
+								)}
+								
 							</div>
 						</div>
 
