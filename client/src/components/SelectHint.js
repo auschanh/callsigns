@@ -142,29 +142,40 @@ const SelectHint = ({ resultsState, roomDetails, playerName, isVoted, submission
     }
 
     return (
+
         <div className="flex flex-none w-full h-full justify-center items-center">
 
             <div className="w-full py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
                 <div className="flex flex-col w-full items-center">
-                    { // if player is the guesser load progress component 
-                        playerName === roomDetails.guesser ?
+
+                    {/* if player is the guesser load progress component  */}
+
+                    {playerName === roomDetails.guesser && (
+
                         <>
-                            <p className='mb-2'> {isVoted.filter(player => player.voted).length} Agents have voted to to eliminate hints. </p>
+                            <p className="mb-6">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
+
                             <Progress
                                 value={(isVoted.filter(player => player.voted && playerName === roomDetails.guesser)).length / (results.length-1) * 100}
                                 max={100}
                             /> 
+
                             {/* render badges for player vote status */}
                             <div className="flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4">
+
                                 {isVoted?.map((player, index) => {
+                                    
                                     if (player.playerName !== playerName) {
+
                                         return (
+
                                             <Button
                                                 key={index}
                                                 className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
                                                 variant={`${player.voted !== false ? "green" : "grey"}`}
                                             >
+
                                                 <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                     {player.voted !== false && (
                                                         <Check className="text-slate-900" size={14} />
@@ -172,118 +183,141 @@ const SelectHint = ({ resultsState, roomDetails, playerName, isVoted, submission
                                                         <Ellipsis className="text-slate-900" size={14} />
                                                     )}
                                                 </div>
+
                                                 <p className="text-xs">{player.playerName}</p>
+
                                             </Button>
                                         );
                                     }
-                                    })}
 
-                                    {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
-                                        return (
-                                            <Button
-                                                key={index}
-                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                                variant="green"
-                                            >
-                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                    <Check className="text-slate-900" size={14} />
-                                                </div>
-                                                <p className="text-xs">Bot {index + 1}</p>
-                                            </Button>
-                                        );
-                                    })}
+                                })}
+
+                                {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+
+                                    return (
+
+                                        <Button
+                                            key={index}
+                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                            variant="green"
+                                        >
+
+                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                <Check className="text-slate-900" size={14} />
+                                            </div>
+
+                                            <p className="text-xs">Bot {index + 1}</p>
+
+                                        </Button>
+
+                                    );
+
+                                })}
+
                             </div>
+
                         </>
                         
-                   : ( /* load voting screen if not the guesser */
-                   <>
-                    <Label className="mb-12 text-lg leading-none">Select the hints that are too similar or illegal:</Label>
+                    ) || ( 
+                        
+                        /* load voting screen if not the guesser */
+                    
+                        <>
 
-                    <div className="flex flex-row flex-wrap justify-center gap-10">
+                            <Label className="mb-12 text-lg leading-none">Select the hints that are too similar or illegal:</Label>
 
-                        {results.map((result, index) => {
+                            <div className="flex flex-row flex-wrap justify-center gap-10">
 
-                            return (
+                                {results.map((result, index) => {
 
-                                <div key={index} className="flex flex-col min-w-36 items-center gap-2">
-                                    <Label className="text-sm">{result.playerName}</Label>
-                                    <div className="w-full relative">
+                                    if (result.playerName !== roomDetails.guesser) {
 
-                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
-                                            <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
-                                        </div>
+                                        return (
 
-                                        <Button 
-                                            onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
-                                            variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
-                                            className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
-                                            disabled={voted}
-                                        >
-                                            {result.hint}
-                                        </Button>
-                                    </div>
-                                </div>
+                                            <div key={index} className="flex flex-col min-w-36 items-center gap-2">
+                                                <Label className="text-sm">{result.playerName}</Label>
+                                                <div className="w-full relative">
+    
+                                                    <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
+                                                        <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
+                                                    </div>
+    
+                                                    <Button 
+                                                        onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
+                                                        variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
+                                                        className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
+                                                        disabled={voted}
+                                                    >
+                                                        {result.hint}
+                                                    </Button>
+                                                </div>
+                                            </div>
+    
+                                        );
 
-                            );
+                                    }
 
-                        })}
+                                })}
 
-                    </div>
+                            </div>
 
-                
+                            <div className="flex flex-row justify-center gap-4 mt-16">
 
-                <div className="flex flex-row justify-center gap-4 mt-16">
-                    <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
 
-                        {voted && (
+                                    {voted && (
 
-                            <>
-                                <Check size={16} className="mr-2" />
-                                Vote Recorded
-                            </>
+                                        <>
+                                            <Check size={16} className="mr-2" />
+                                            Vote Recorded
+                                        </>
 
-                        ) || (
+                                    ) || (
 
-                            <>
-                                <Trash2 size={16} className="mr-2" />
-                                Vote to Remove
-                            </>
+                                        <>
+                                            <Trash2 size={16} className="mr-2" />
+                                            Vote to Remove
+                                        </>
 
-                        )}
+                                    )}
 
-                    </Button>
-                    <Button onClick={(isNoneSelected && !voted) ? () => {setVoted(true); setIsVoteSubmitted(true);} : voted ? handleCancel : handleClearSelection} variant={(isNoneSelected && !voted) ? "green" : voted ? "default" : "blue"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                </Button>
 
-                        {(isNoneSelected && !voted) && (
+                                <Button onClick={(isNoneSelected && !voted) ? () => {setVoted(true); setIsVoteSubmitted(true);} : voted ? handleCancel : handleClearSelection} variant={(isNoneSelected && !voted) ? "green" : voted ? "default" : "blue"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
 
-                            <>
-                                <Check size={16} className="mr-2" />
-                                Looks Good!
-                            </>
+                                    {(isNoneSelected && !voted) && (
 
-                        ) || voted && (
+                                        <>
+                                            <Check size={16} className="mr-2" />
+                                            Looks Good!
+                                        </>
 
-                            <>
-                                <X size={16} className="mr-2" />
-                                Cancel Selection
-                            </>
+                                    ) || voted && (
 
-                        ) || (
+                                        <>
+                                            <X size={16} className="mr-2" />
+                                            Cancel Selection
+                                        </>
 
-                            <>
-                                <RotateCcw size={16} className="mr-2" />
-                                Clear Selection
-                            </>
+                                    ) || (
 
-                        )}
+                                        <>
+                                            <RotateCcw size={16} className="mr-2" />
+                                            Clear Selection
+                                        </>
 
-                    </Button>
+                                    )}
+
+                                </Button>
+
+                            </div>
+                    
+                        </>
+
+                    )}
+
                 </div>
-                
-                
-                </>
-                )}
-                </div>
+
             </div>
 
         </div>
