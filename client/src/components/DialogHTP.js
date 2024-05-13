@@ -417,7 +417,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                         
                                         ) || (
 
-                                            <Tooltip>
+                                            <Tooltip delayDuration={0}>
                                                 <TooltipTrigger asChild>
                                                     <Button className="flex mt-2 p-2 w-full max-w-sm justify-center" variant="redNoHover">
                                                         <X size={16} />                                                        

@@ -156,7 +156,7 @@ function Chat({ username, roomName, roomID }) {
             <div className={`flex flex-row items-center mb-1 px-4 py-2 h-[10%] bg-slate-200/70 border-solid border-b border-slate-400`}>
 
                 <TooltipProvider>                      
-                    <Tooltip>
+                    <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
 
                             {inLobby?.some((player) => { return (player.playerName !== username && player.isReady) }) && (

@@ -403,7 +403,7 @@ function JoinRoom() {
                                 {username && (
 
                                     <TooltipProvider>                      
-                                        <Tooltip>
+                                        <Tooltip delayDuration={0}>
                                             <div className="py-2 w-fit">
                                                 <h1 className="text-xl font-extralight">{`Welcome `}
                                                     <TooltipTrigger asChild>
@@ -477,7 +477,7 @@ function JoinRoom() {
                                                         return (
 
                                                             <TooltipProvider key={index}>                      
-                                                                <Tooltip>
+                                                                <Tooltip delayDuration={0}>
                                                                     <TooltipTrigger asChild>
                                                                         <Button 
                                                                             className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer`}
@@ -522,7 +522,7 @@ function JoinRoom() {
                                                         return (
 
                                                             <TooltipProvider key={index}>                      
-                                                                <Tooltip>
+                                                                <Tooltip delayDuration={0}>
                                                                     <TooltipTrigger asChild>
                                                                         <Button
                                                                             className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"

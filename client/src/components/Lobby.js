@@ -348,7 +348,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 					{gameInfo && (
 						<TooltipProvider>
-							<Tooltip>
+							<Tooltip delayDuration={0}>
 								<div className="py-2 w-fit mb-6">
 									<h1 className="text-xl font-extralight">
 										{`Welcome `}
@@ -455,7 +455,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 										<ContextMenu key={index}>
 											<ContextMenuTrigger>
 												<TooltipProvider>
-													<Tooltip>
+													<Tooltip delayDuration={0}>
 														<TooltipTrigger asChild>
 															<Button
 																className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
@@ -539,7 +539,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 											<ContextMenu key={index}>
 												<ContextMenuTrigger>
 													<TooltipProvider>
-														<Tooltip>
+														<Tooltip delayDuration={0}>
 															<TooltipTrigger asChild>
 																<Button
 																	className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
