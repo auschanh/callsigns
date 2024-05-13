@@ -53,11 +53,15 @@ function NewHost() {
                     console.log("room loaded");
     
                     const prevGameInfo = {
-    
+
                         username: roomDetails.host,
                         roomName: roomDetails.roomName,
                         numPlayers: roomDetails.numPlayers,
-                        aiPlayers: roomDetails.aiPlayers
+                        aiPlayers: roomDetails.aiPlayers,
+                        numGuesses: roomDetails.numGuesses,
+                        numRounds: roomDetails.numRounds,
+                        timeLimit: roomDetails.timeLimit,
+                        keepScore: roomDetails.keepScore,
     
                     }
     
