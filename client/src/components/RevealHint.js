@@ -7,7 +7,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, guessCorrectState, validateWord, stemmerWord, singularizeWord }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, guessState, guessCorrectState, validateWord, stemmerWord, singularizeWord }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
@@ -16,14 +16,17 @@ const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, 
     const [guess, setGuess] = guessState;
     const [correctGuess, setCorrectGuess] = guessCorrectState;
     const [submitted, setSubmitted] = useState(false);
+    const [validate, setValidate] = useState(false);
     const [submissionText1, setSubmissionText1] = useState(false);
     const [submissionText2, setSubmissionText2] = useState(false);
     const [submissionText3, setSubmissionText3] = useState(false);
     const [submissionText4, setSubmissionText4] = useState(false);
-
+    const [submissionText5, setSubmissionText5] = useState(false);
     // const [countDown, setCountDown] = useState(10);
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
+    const scoreBtnRef = useRef();
+    const nextRoundBtnRef = useRef();
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -84,11 +87,12 @@ const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, 
     useEffect(() => {
         if(currentIndex == 2) {
             setSubmitted(false);
+            setValidate(false);
             setSubmissionText1(false);
             setSubmissionText2(false);
             setSubmissionText3(false);
             setSubmissionText4(false);
-
+            setSubmissionText5(false);
         }
     }, [currentIndex])
 
@@ -99,9 +103,25 @@ const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, 
             setTimeout(() => setSubmissionText2(true), 3500);
             setTimeout(() => setSubmissionText3(true), 4500);
             setTimeout(() => setSubmissionText4(true), 5500);
+            setTimeout(() => {
+                setValidate(true);
+                setSubmitted(false);
+            }, 8500);
         }
         
     }, [submitted])
+
+
+    // useEffect(() => {
+    //     if(validate === true) {
+    //         setTimeout(() => {
+    //             console.log('in validate statement')
+    //             scoreBtnRef.current.classList.add('validate');
+    //             nextRoundBtnRef.current.classList.add('validate');
+    //         }, 2500);
+    //     }
+
+    // }, [validate])
 
     // useEffect(() => {
     //     countDown > 0 && setTimeout(() => setCountDown(countDown - 1), 1000);
@@ -145,7 +165,7 @@ const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, 
         <div className="flex flex-none w-full h-full justify-center items-center">
           
 
-            <div className={`flex flex-col items-center w-full py-12 px-24 ${submitted ? 'bg-transparent' : 'bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100'} border border-solid border-slate-400 rounded-lg`}>
+            <div className={`flex flex-col items-center w-full py-12 px-24 ${(submitted || validate) ? 'bg-transparent' : 'bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100'} border border-solid border-slate-400 rounded-lg`}>
                   {submitted && (
                     <div className='h-full flex flex-none flex-col text-green-600 font-mono text-xs transition-all ease-in-out duration-500 w-full'>
                         { submissionText1 && (
@@ -173,11 +193,35 @@ const RevealHint = ({ resultsState, roomDetails, currentIndexState, guessState, 
                                 <p id="countdown">{`% AUTHENTICATING...`}</p>
                             </>
                         )}
+                        {/* { submissionText5 && (
+                            <>
+                                <p className='text-4xl'>{`${correctGuess ? 'VALID CALLSIGN' : 'INVALID CALLSIGN'}`}</p>
+                            </>
+                        )} */}
 
                      </div>
                  )}
+                 {!submitted && validate && (
+                    <div className='h-full flex flex-none flex-col font-mono text-xs transition-all ease-in-out duration-500 w-full text-center'>
+                        <p className={`text-7xl validate ${correctGuess ? 'text-green-600' : 'text-red-600'}`}>{`${correctGuess ? 'VALID CALLSIGN' : 'INVALID CALLSIGN'}`}</p>
+                        <div className={`text-center mt-20 flex gap-4 mx-auto`}>
+                            <Button ref={scoreBtnRef} 
+                            variant="outline" 
+                            className={`transition-all ease-in-out duration-500`}>
+                                Scores
+                            </Button>
+                            <Button ref={nextRoundBtnRef} 
+                            variant="outline" 
+                            className={`transition-all ease-in-out duration-500`}
+                            onClick={handleNext}
+                            >
+                                Next Round
+                            </Button>
+                        </div>
+                    </div>
+                 )}
                  
-                 {!submitted && (
+                 {!submitted && !validate && (
                     <>
                         <Label className="mb-12 text-lg leading-none">Your hints have been revealed!</Label>
                         <div className="flex flex-row flex-wrap justify-center gap-4">
