@@ -241,11 +241,11 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                     <div className="flex flex-col flex-none items-center justify-center w-full h-full gap-12">
 
-                        <div className="w-[50%] bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 p-8 rounded-lg text-black">
+                        <div className="w-full bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 py-12 px-24 rounded-lg text-black">
 
                             {playerName === guesser && (
 
-                                <>
+                                <div className="mb-8">
                                     <p className="mb-6 text-center">{submissions.filter(vote => vote.hint).length} {submissions.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
 
                                     <Progress 
@@ -256,7 +256,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                                         max={100}
                                     />
 
-                                </>
+                                </div>
                             
                             ) || (
 
@@ -302,100 +302,100 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                             )}
 
-                        </div>
+                            <div className="flex flex-row flex-none flex-wrap justify-center w-full mt-6 px-24 gap-4">
 
-                        <div className="flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4">
+                                {submissions?.map((submission, index) => {
 
-                            {submissions?.map((submission, index) => {
+                                    if (submission.playerName === playerName && playerName !== guesser) {
 
-                                if (submission.playerName === playerName && playerName !== guesser) {
+                                        return (
+
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                                variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                            >
+
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+
+                                                    {submission.hint !== "" && (
+
+                                                        <Check className="text-slate-900" size={14} />
+
+                                                    ) || (
+
+                                                        <Ellipsis className="text-slate-900" size={14} />
+
+                                                    )}
+
+                                                </div>
+
+                                                <p className="text-xs">{submission.playerName}</p>
+                                                
+                                            </Button>
+
+                                        );
+
+                                    }
+
+                                })}
+
+                                {submissions?.map((submission, index) => {
+
+                                    if (submission.playerName !== playerName && submission.playerName !== guesser) {
+
+                                        return (
+
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                                variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                            >
+        
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+        
+                                                    {submission.hint !== "" && (
+        
+                                                        <Check className="text-slate-900" size={14} />
+        
+                                                    ) || (
+        
+                                                        <Ellipsis className="text-slate-900" size={14} />
+        
+                                                    )}
+        
+                                                </div>
+        
+                                                <p className="text-xs">{submission.playerName}</p>
+                                                
+                                            </Button>
+        
+                                        );
+
+                                    }
+
+                                })}
+
+                                {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
 
                                     return (
 
                                         <Button
                                             key={index}
                                             className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                            variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                            variant="green"
                                         >
-
                                             <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-
-                                                {submission.hint !== "" && (
-
-                                                    <Check className="text-slate-900" size={14} />
-
-                                                ) || (
-
-                                                    <Ellipsis className="text-slate-900" size={14} />
-
-                                                )}
-
+                                                <Check className="text-slate-900" size={14} />
                                             </div>
-
-                                            <p className="text-xs">{submission.playerName}</p>
-                                            
+                                            <p className="text-xs">Bot {index + 1}</p>
                                         </Button>
 
                                     );
 
-                                }
+                                })}
 
-                            })}
-
-                            {submissions?.map((submission, index) => {
-
-                                if (submission.playerName !== playerName && submission.playerName !== guesser) {
-
-                                    return (
-
-                                        <Button
-                                            key={index}
-                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                            variant={`${submission.hint !== "" ? "green" : "grey"}`}
-                                        >
-    
-                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-    
-                                                {submission.hint !== "" && (
-    
-                                                    <Check className="text-slate-900" size={14} />
-    
-                                                ) || (
-    
-                                                    <Ellipsis className="text-slate-900" size={14} />
-    
-                                                )}
-    
-                                            </div>
-    
-                                            <p className="text-xs">{submission.playerName}</p>
-                                            
-                                        </Button>
-    
-                                    );
-
-                                }
-
-                            })}
-
-                            {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
-
-                                return (
-
-                                    <Button
-                                        key={index}
-                                        className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                        variant="green"
-                                    >
-                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                            <Check className="text-slate-900" size={14} />
-                                        </div>
-                                        <p className="text-xs">Bot {index + 1}</p>
-                                    </Button>
-
-                                );
-
-                            })}
+                            </div>
 
                         </div>
                         
