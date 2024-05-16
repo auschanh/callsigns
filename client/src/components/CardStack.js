@@ -1,6 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-function CardStack({ cards, currentIndex, handleNext }) {
+function CardStack({ cards, currentIndex, handleNext, timeLimitReached, showErrorState, startFade }) {
+
+	const errorRef = useRef(null);
+
+	const [showError, setShowError] = showErrorState;
 
 	useEffect(() => {
 
@@ -21,6 +25,30 @@ function CardStack({ cards, currentIndex, handleNext }) {
         return () => document.removeEventListener("keydown", listenForKeydown);
 
 	}, []);
+
+	useEffect(() => {
+
+		setShowError(false);
+
+		if (errorRef.current) {
+
+			clearInterval(errorRef.current);
+
+		}
+
+		if (timeLimitReached) {
+
+			errorRef.current = setInterval(() => {
+
+				setShowError(prev => !prev);
+
+				console.log("still running");
+	
+			}, 1000);
+
+		}
+
+	}, [timeLimitReached]);
 
 	return (
 
@@ -43,10 +71,40 @@ function CardStack({ cards, currentIndex, handleNext }) {
 					>
 
 						<div
-							className={`h-full w-full card-body box-border flex transition-0.5s shadow-0_0_30px_0_rgba(0,0,0,0.3) p-16 rounded-3xl`}
+							className={`h-full w-full`}
 						>
 
-							{card.content}
+							<div className={`w-full transition-all ease-in-out duration-500 ${timeLimitReached ? "invisible opacity-5" : "h-full"} ${startFade ? "invisible opacity-5" : ""}`}>
+
+								{!timeLimitReached && (
+
+									<div className={`h-full w-full card-body box-border flex shadow-0_0_30px_0_rgba(0,0,0,0.3) p-16 rounded-3xl`}>
+
+										{card.content}
+
+									</div>
+
+								)}
+
+							</div>
+
+							<div className={`w-full transition-all ease-in-out duration-500 ${timeLimitReached ? "h-full" : "invisible opacity-5"}`}>
+
+								{timeLimitReached && (
+
+									<div className={`flex flex-none w-full h-full justify-center items-center`}>
+
+										<div className={`relative py-12 px-24 bg-gradient-to-tr from-red-600 via-red-700 to-red-600 border border-solid border-red-600 rounded-lg shadow-[0_0_20px_red] transition-all duration-200 ${showError ? "" : "invisible opacity-5"}`}>
+
+											<h1 className="text-slate-50 font-mono font-extrabold text-center text-3xl">CONNECTION TIMED OUT</h1>
+
+										</div>
+
+									</div>
+
+								)}
+								
+							</div>
 
 						</div>
 

@@ -64,7 +64,11 @@ function Game() {
 
 	const [correctGuess, setCorrectGuess] = useState(null);
 
-	const [errMsg, setErrMsg] = useState(false);
+	const [startFade, setStartFade] = useState(false);
+
+	const [timeLimitReached, setTimeLimitReached] = useState(false);
+
+	const [showError, setShowError] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -338,7 +342,13 @@ function Game() {
 
 	useEffect(() => {
 
-		if (submissions?.filter((submission) => { return submission.playerName !== guesser }).every((submission) => { return submission.hint !== "" })) {
+		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
+
+		console.log(excludeGuesser);
+
+		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
+
+			console.log("set current index: 1");
 
 			setCurrentIndex(1);
 
@@ -348,7 +358,11 @@ function Game() {
 
 	useEffect(() => {
 
-		if (isVoted?.filter((player) => { return player.playerName !== guesser }).every((player) => { return player.voted === true })) {
+		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
+
+		console.log(excludeGuesser);
+
+		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
 			setResults(
 
@@ -368,6 +382,8 @@ function Game() {
 
 			);
 
+			console.log("set current index: 2");
+
 			setCurrentIndex(2);
 
 		}
@@ -382,7 +398,23 @@ function Game() {
 
 		}
 
-	}, [currentIndex])
+	}, [currentIndex]);
+
+	useEffect(() => {
+
+		if (timeLimitReached) {
+
+			handleNext();
+
+			setTimeout(() => {
+
+				setTimeLimitReached(false);
+
+			}, 7000);
+
+		}
+
+	}, [timeLimitReached]);
 
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
@@ -422,6 +454,9 @@ function Game() {
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord}
+					currentIndex={currentIndex}
+					setTimeLimitReached={setTimeLimitReached}
+					setStartFade={setStartFade}
 				/>
 				
 		},
@@ -436,6 +471,9 @@ function Game() {
 					roomDetails={roomDetails} 
 					playerName={playerName} 
 					isVoted={isVoted}
+					currentIndex={currentIndex}
+					setTimeLimitReached={setTimeLimitReached}
+					setStartFade={setStartFade}
 				/>
 
 		},
@@ -457,6 +495,9 @@ function Game() {
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord} 
+					currentIndex={currentIndex}
+					setTimeLimitReached={setTimeLimitReached}
+					setStartFade={setStartFade}
 				/>
 
 		}
@@ -582,11 +623,16 @@ function Game() {
 					<div>
 
 						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "invisible opacity-5" : ""}`} />
-						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"}`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"} ${startFade ? "invisible opacity-5" : ""} ${timeLimitReached ? "invisible opacity-5" : ""}`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-all ease-in-out duration-500 ${enterHint ? "" : "invisible opacity-5"} ${timeLimitReached ? "" : "invisible opacity-5"} ${startFade ? "border-stone-800" : ""} ${showError ? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b]" : "border-stone-800" }`} />
 						
-						<CardStack cards={cards} 
+						<CardStack 
+							cards={cards} 
 							currentIndex={currentIndex} 
 							handleNext={handleNext}
+							timeLimitReached={timeLimitReached}
+							showErrorState={[showError, setShowError]}
+							startFade={startFade}
 						/>
 
 					</div>

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Input } from "../components/ui/input";
+import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemmerWord, singularizeWord }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -135,8 +136,14 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className="flex flex-col items-center w-full py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+            <div className="flex flex-col items-center w-full relative py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
+                {roomDetails.timeLimit !== 0 && currentIndex === 2 && (
+
+                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+
+                )}
+                
                 <Label className="mb-12 text-lg leading-none">Your hints have been revealed!</Label>
 
                 <div className="flex flex-row flex-wrap justify-center gap-4">
@@ -220,9 +227,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                             <h1 className="text-lg text-center font-medium leading-none">
 
-                                {remainingGuesses === roomDetails.numGuesses && (
+                                {remainingGuesses === roomDetails.numGuesses && remainingGuesses !== 1 && (
 
                                     <>You have {remainingGuesses} chances to figure out your callsign!</>
+
+                                ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses === 1 && (
+
+                                    <>You have just 1 chance to figure out your callsign!</>
 
                                 ) || remainingGuesses > 1 && (
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+import { Progress } from "./ui/progress";
+import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
 import { Check, Ellipsis, Trash2, X, RotateCcw } from "lucide-react";
-import { Progress } from "./ui/progress";
 
-const SelectHint = ({ resultsState, roomDetails, playerName, isVoted, submissions }) => {
+const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade }) => {
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
@@ -145,7 +146,13 @@ const SelectHint = ({ resultsState, roomDetails, playerName, isVoted, submission
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className="w-full py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+            <div className="w-full relative py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+
+                {roomDetails.timeLimit !== 0 && currentIndex === 1 && (
+
+                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+
+                )}
 
                 <div className="flex flex-col w-full items-center">
 

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Progress } from "./ui/progress";
+import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
-import { Progress } from "./ui/progress";
 
-const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord, isVoted }) => {
+const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade }) => {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -241,7 +242,13 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                     <div className="flex flex-col flex-none items-center justify-center w-full h-full gap-12">
 
-                        <div className="w-full bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 py-12 px-24 rounded-lg text-black">
+                        <div className="w-full relative bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 py-12 px-24 rounded-lg text-black">
+
+                            {roomDetails.timeLimit !== 0 && currentIndex === 0 && (
+
+                                <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+
+                            )}
 
                             {playerName === guesser && (
 
@@ -260,45 +267,45 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                             
                             ) || (
 
-                            /* render hint component if not guesser */
-                            <form
-                                name="exampleForm"
-                                onSubmit={handleSubmit}
-                                className="flex flex-col items-center w-full font-sans pt-2"
-                            >
+                                /* render hint component if not guesser */
+                                <form
+                                    name="exampleForm"
+                                    onSubmit={handleSubmit}
+                                    className="flex flex-col items-center w-full font-sans pt-2"
+                                >
 
-                                <Label htmlFor="example" className="mb-3">Enter your one-word hint:</Label>
+                                    <Label htmlFor="example" className="mb-3">Enter your one-word hint:</Label>
 
-                                <div className="flex flex-row w-full justify-center items-end">
+                                    <div className="flex flex-row w-full justify-center items-end">
 
-                                    <Input
-                                        autoComplete="off"
-                                        className="flex h-10 max-w-64 border border-solid border-slate-400"
-                                        type="text" 
-                                        id="example"
-                                        name="hint" 
-                                        value={hint[0]}
-                                        onChange={handleChange}
-                                        disabled={hint[1]}
-                                        ref={hintInputRef}
-                                    />
+                                        <Input
+                                            autoComplete="off"
+                                            className="flex h-10 max-w-64 border border-solid border-slate-400"
+                                            type="text" 
+                                            id="example"
+                                            name="hint" 
+                                            value={hint[0]}
+                                            onChange={handleChange}
+                                            disabled={hint[1]}
+                                            ref={hintInputRef}
+                                        />
 
-                                    <Button 
-                                        className={`ml-2 w-24 ${hint[1] ? "hover:bg-slate-500" : ""}`}
-                                        variant={hint[1] ? "green" : "default"} 
-                                        type="button"
-                                        onClick={hint[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}
-                                        onMouseEnter={() => {setIsUndo(true)}}
-                                        onMouseLeave={() => {setIsUndo(false)}}
-                                    >
-                                        {hint[1] ? (isUndo ? "Undo" : "Submitted") : "Submit"}
-                                    </Button>
+                                        <Button 
+                                            className={`ml-2 w-24 ${hint[1] ? "hover:bg-slate-500" : ""}`}
+                                            variant={hint[1] ? "green" : "default"} 
+                                            type="button"
+                                            onClick={hint[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}
+                                            onMouseEnter={() => {setIsUndo(true)}}
+                                            onMouseLeave={() => {setIsUndo(false)}}
+                                        >
+                                            {hint[1] ? (isUndo ? "Undo" : "Submitted") : "Submit"}
+                                        </Button>
 
-                                </div>
+                                    </div>
 
-                                <p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}></p>
+                                    <p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}></p>
 
-                            </form>
+                                </form>
 
                             )}
 
