@@ -623,8 +623,8 @@ function Game() {
 					<div>
 
 						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "invisible opacity-5" : ""}`} />
-						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"} ${startFade ? "invisible opacity-5" : ""} ${timeLimitReached ? "invisible opacity-5" : ""}`} />
-						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-all ease-in-out duration-500 ${enterHint ? "" : "invisible opacity-5"} ${timeLimitReached ? "" : "invisible opacity-5"} ${startFade ? "border-stone-800" : ""} ${showError ? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b]" : "border-stone-800" }`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 ${enterHint ? "" : "invisible opacity-5"} ${startFade ? "invisible opacity-5" : timeLimitReached ? "invisible opacity-5" : ""}`} />
+						<div className={`pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-all ease-in-out duration-300 ${enterHint ? "" : "invisible opacity-5"} ${startFade ? "border-stone-800" : timeLimitReached ? "border-stone-800" : "invisible opacity-5"} ${showError ? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b]" : "border-stone-800" }`} />
 						
 						<CardStack 
 							cards={cards} 

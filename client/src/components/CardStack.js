@@ -94,7 +94,7 @@ function CardStack({ cards, currentIndex, handleNext, timeLimitReached, showErro
 
 									<div className={`flex flex-none w-full h-full justify-center items-center`}>
 
-										<div className={`relative py-12 px-24 bg-gradient-to-tr from-red-600 via-red-700 to-red-600 border border-solid border-red-600 rounded-lg shadow-[0_0_20px_red] transition-all duration-200 ${showError ? "" : "invisible opacity-5"}`}>
+										<div className={`relative py-12 px-24 bg-gradient-to-tr from-red-600 via-red-700 to-red-600 border border-solid border-red-600 rounded-lg shadow-[0_0_20px_red] transition-all ease-in-out duration-500 ${showError ? "" : "invisible opacity-5"}`}>
 
 											<h1 className="text-slate-50 font-mono font-extrabold text-center text-3xl">CONNECTION TIMED OUT</h1>
 
