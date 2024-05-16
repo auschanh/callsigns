@@ -344,8 +344,6 @@ function Game() {
 
 		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
 
-		console.log(excludeGuesser);
-
 		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
 			console.log("set current index: 1");
@@ -359,8 +357,6 @@ function Game() {
 	useEffect(() => {
 
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
-
-		console.log(excludeGuesser);
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
@@ -406,11 +402,17 @@ function Game() {
 
 			setTimeout(() => {
 
-				setTimeLimitReached(false);
+				setTimeLimitReached(undefined);
 
-				handleNext();				
+				handleNext();
 
 			}, 7000);
+
+			setTimeout(() => {
+
+				setTimeLimitReached(false);
+
+			}, 7200);
 
 		}
 
