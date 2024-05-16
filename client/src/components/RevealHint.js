@@ -140,7 +140,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                 {roomDetails.timeLimit !== 0 && currentIndex === 2 && (
 
-                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} slideIndex={2} />
 
                 )}
                 

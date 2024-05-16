@@ -150,7 +150,7 @@ const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVote
 
                 {roomDetails.timeLimit !== 0 && currentIndex === 1 && (
 
-                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+                    <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} slideIndex={1} />
 
                 )}
 

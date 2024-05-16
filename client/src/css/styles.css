@@ -2514,10 +2514,6 @@ video {
   transition-duration: 700ms;
 }
 
-.duration-100 {
-  transition-duration: 100ms;
-}
-
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -2584,10 +2580,6 @@ video {
 
 .duration-700 {
   animation-duration: 700ms;
-}
-
-.duration-100 {
-  animation-duration: 100ms;
 }
 
 .ease-in-out {

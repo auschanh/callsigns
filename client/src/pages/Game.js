@@ -404,11 +404,11 @@ function Game() {
 
 		if (timeLimitReached) {
 
-			handleNext();
-
 			setTimeout(() => {
 
 				setTimeLimitReached(false);
+
+				handleNext();				
 
 			}, 7000);
 

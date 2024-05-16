@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-function Timer({ timeLimit, setTimeLimitReached, setStartFade }) {
+function Timer({ timeLimit, setTimeLimitReached, setStartFade, slideIndex }) {
 
     const [timeRemaining, setTimeRemaining] = useState("0:00");
 
@@ -52,6 +52,8 @@ function Timer({ timeLimit, setTimeLimitReached, setStartFade }) {
 
         } else {
 
+            console.log("stop timer" + slideIndex);
+
             setTimeLimitReached(true);
 
             setStartFade(false);
@@ -92,7 +94,19 @@ function Timer({ timeLimit, setTimeLimitReached, setStartFade }) {
 
     useEffect(() => {
 
+        console.log("start timer" + slideIndex);
+
         resetTimer(setTimer());
+
+        return () => {
+
+            if (timerIntervalRef.current) {
+    
+                clearInterval(timerIntervalRef.current);
+    
+            }
+
+        }
 
     }, []);
 

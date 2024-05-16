@@ -246,7 +246,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                             {roomDetails.timeLimit !== 0 && currentIndex === 0 && (
 
-                                <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} />
+                                <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} slideIndex={0} />
 
                             )}
 
