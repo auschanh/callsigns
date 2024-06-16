@@ -8,13 +8,14 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
-    const [remainingGuesses, setRemainingGuesses] = useState(roomDetails.numGuesses);
+    const [correctGuess, setCorrectGuess] = correctGuessState;
+    const [remainingGuesses, setRemainingGuesses] = numGuessesState;
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
 
@@ -22,8 +23,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
         e.preventDefault();
         const newGuess = e.target.value;
         setGuess(newGuess);
-        // setCorrectGuess(false);
-        socket.emit("sendGuess", roomDetails.roomID, playerName, newGuess); // send live input of guesser to socket server
+        socket.emit("sendGuess", roomDetails.roomID, newGuess); // send live input of guesser to socket server
     };
 
     // when guesser submits guess
@@ -86,6 +86,8 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
             }, 500);
 
+            socket.emit("sendValidGuess", roomDetails.roomID, true);
+
         } else if(singularizeWord(stemmedGuess) !== singularizeWord(stemmerWord(cleanedCallSign))) {
 
             guessInputRef.current.classList.add("border-red-500");
@@ -108,7 +110,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
             }, 500);
 
-            setRemainingGuesses(prev => prev - 1);
+            if (remainingGuesses !== 11) {
+
+                setRemainingGuesses(prev => prev - 1);
+
+                socket.emit("sendValidGuess", roomDetails.roomID, false);
+
+            }
 
         } else {
 
@@ -119,17 +127,23 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
     // when guess changes, update to render for all users
     useEffect(() => {
+
         // receive the broadcast signal
-        const handleReceiveGuess = (playerName, guess) => {
+        const handleReceiveGuess = (guess) => {
+
             setGuess(guess);
+
         }
 
-        socket.on("receiveGuess", handleReceiveGuess); 
+        socket.on("receiveGuess", handleReceiveGuess);
 
         return () => {
+
             // cleanup function
-            socket.off("receiveGuess", handleReceiveGuess);
+            socket.removeAllListeners("receiveGuess");
+
         }
+
     }, [socket, setGuess])
 
     return (
@@ -207,10 +221,36 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                     <>
                         <h1 className="text-lg text-center font-medium leading-none mt-16">
-                            Now it's up to <span className="font-bold">{guesser}</span> to figure out their callsign:
+
+                            {remainingGuesses === 11 && (
+
+                                <>Now it's up to <span className="font-bold">{guesser}</span> to figure out their callsign!</>
+
+                            ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses !== 1 && (
+
+                                <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances to figure out their callsign:</>
+
+                            ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses === 1 && (
+
+                                <><span className="font-bold">{guesser}</span> has just 1 chance to figure out their callsign:</>
+
+                            ) || remainingGuesses > 1 && (
+
+                                <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances remaining to figure out their callsign:</>
+
+                            ) || remainingGuesses === 1 && (
+
+                                <><span className="font-bold">{guesser}</span> has 1 last chance to figure out their callsign:</>
+
+                            ) || remainingGuesses <= 0 && (
+
+                                <><span className="font-bold">{guesser}</span> was unable to authenticate with HQ.</>
+
+                            )}
+                            
                         </h1>
 
-                        <p className={`text-3xl text-slate-800 font-light font-mono mt-10 mb-4`}>
+                        <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess ? "text-green-600" : "text-slate-800"}`}>
                             {guess === "" ? '...' : guess}
                         </p>
                     </>
@@ -227,7 +267,11 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                             <h1 className="text-lg text-center font-medium leading-none">
 
-                                {remainingGuesses === roomDetails.numGuesses && remainingGuesses !== 1 && (
+                                {remainingGuesses === 11 && (
+
+                                    <>Now it's up to you to figure out your callsign!</>
+
+                                ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses !== 1 && (
 
                                     <>You have {remainingGuesses} chances to figure out your callsign!</>
 
@@ -239,10 +283,14 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                                     <>You have {remainingGuesses} chances remaining to figure out your callsign!</>
 
-                                ) || remainingGuesses <= 1 && (
+                                ) || remainingGuesses === 1 && (
 
                                     <>Last chance to figure out your callsign!</>
 
+                                ) || remainingGuesses <= 0 && (
+
+                                    <>You were unable to authenticate with HQ.</>
+    
                                 )}
                                 
                             </h1>

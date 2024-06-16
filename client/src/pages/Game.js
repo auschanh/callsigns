@@ -62,7 +62,9 @@ function Game() {
 
 	const [clicked, setClicked] = useState(false);
 
-	const [correctGuess, setCorrectGuess] = useState(null);
+	const [correctGuess, setCorrectGuess] = useState(false);
+
+	const [remainingGuesses, setRemainingGuesses] = useState();
 
 	const [startFade, setStartFade] = useState(false);
 
@@ -169,6 +171,8 @@ function Game() {
 				);
 
                 setRoomDetails(roomDetails);
+
+				setRemainingGuesses(roomDetails.numGuesses);
 
 				setGuesser(roomDetails.guesser);
 
@@ -293,6 +297,20 @@ function Game() {
 			
 		});
 
+		socket.on("receiveGuessResult", (isCorrect) => {
+
+            if (isCorrect) {
+
+                setCorrectGuess(true);
+
+            } else {
+
+                setRemainingGuesses(prev => prev - 1);
+
+            }
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -300,6 +318,7 @@ function Game() {
 			socket.removeAllListeners("isRoomClosed");
 			socket.removeAllListeners("receiveHint");
 			socket.removeAllListeners("receiveVote");
+			socket.removeAllListeners("receiveGuessResult");
             
         }
 
@@ -500,6 +519,8 @@ function Game() {
 					currentIndex={currentIndex}
 					setTimeLimitReached={setTimeLimitReached}
 					setStartFade={setStartFade}
+					correctGuessState={[correctGuess, setCorrectGuess]}
+					numGuessesState={[remainingGuesses, setRemainingGuesses]}
 				/>
 
 		}

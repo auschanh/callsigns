@@ -650,10 +650,16 @@ io.on("connection", (socket) => {
 
 		}
 	});
-	// update guesser live guess for all users, listen for sendGuess
 
-	socket.on("sendGuess", (roomID, playerName, guess) => {
-		io.to(roomID).emit("receiveGuess", playerName, guess);
+	// update guesser live guess for all users, listen for sendGuess
+	socket.on("sendGuess", (roomID, guess) => {
+		socket.to(roomID).emit("receiveGuess", guess);
+	});
+
+	socket.on("sendValidGuess", (roomID, isCorrect) => {
+
+		socket.to(roomID).emit("receiveGuessResult", isCorrect);
+
 	});
 
 	socket.on("disconnecting", () => {
