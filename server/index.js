@@ -452,19 +452,19 @@ io.on("connection", (socket) => {
 		findRoom.isGameStarted = true;
 		findRoom.prevAiPlayers = findRoom.aiPlayers;
 
-		if (findRoom.numPlayers === 1) {
+		// if (findRoom.numPlayers === 1) {
 
-			findRoom.aiPlayers = 2;
+		// 	findRoom.aiPlayers = 2;
 
-		} else if (findRoom.numPlayers === 2) {
+		// } else if (findRoom.numPlayers === 2) {
 
-			findRoom.aiPlayers = 1;
+		// 	findRoom.aiPlayers = 1;
 
-		} else {
+		// } else {
 
-			findRoom.aiPlayers = 0;
+		// 	findRoom.aiPlayers = 0;
 
-		}
+		// }
 
 		// get all socketIDs in lobby as strings
 		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
