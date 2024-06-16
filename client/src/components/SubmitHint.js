@@ -116,29 +116,26 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
             hintInputRef.current.classList.add("border-red-500");
             hintValidationRef.current.innerText = "Please enter a hint"
 
-		} 
-        else if (checkHint.includes(cleanedCallSign)) {
+        } else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
+
+         hintInputRef.current.classList.add("border-2");
+         hintInputRef.current.classList.remove("border-slate-400");
+         hintInputRef.current.classList.add("border-red-500");
+         hintValidationRef.current.innerText = "Your hint cannot be the callsign!"
+
+		} else if (checkHint.includes(cleanedCallSign)) {
 
             hintInputRef.current.classList.add("border-2");
             hintInputRef.current.classList.remove("border-slate-400");
             hintInputRef.current.classList.add("border-red-500");
-            hintValidationRef.current.innerText = "Your hint cannot contain the CallSign"
+            hintValidationRef.current.innerText = "Your hint cannot contain the callsign!"
             
-       	}
-        else if (validateWord(stemmedHint)) {
+       	} else if (validateWord(stemmedHint)) {
 
             hintInputRef.current.classList.add("border-2");
             hintInputRef.current.classList.remove("border-slate-400");
             hintInputRef.current.classList.add("border-red-500");
-            hintValidationRef.current.innerText = "Your hint cannot contain spaces, numbers or special characters"
-            
-       	}
-        else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
-
-            hintInputRef.current.classList.add("border-2");
-            hintInputRef.current.classList.remove("border-slate-400");
-            hintInputRef.current.classList.add("border-red-500");
-            hintValidationRef.current.innerText = "Your hint cannot be the mystery word!"
+            hintValidationRef.current.innerText = "Your hint cannot contain spaces, numbers or special characters!"
             
        	} else {
 
