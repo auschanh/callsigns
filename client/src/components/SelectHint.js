@@ -4,7 +4,7 @@ import { Label } from './ui/label';
 import { Progress } from "./ui/progress";
 import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
-import { Check, Ellipsis, Trash2, X, RotateCcw } from "lucide-react";
+import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-react";
 
 const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade }) => {
 
@@ -235,87 +235,126 @@ const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVote
 
                             <div className="flex flex-row flex-wrap justify-center gap-10">
 
-                                {results.map((result, index) => {
+                                {results.some((result) => { return result.hint !== "" }) && (
+                                
+                                    results.map((result, index) => {
 
-                                    if (result.playerName !== roomDetails.guesser) {
+                                        if (result.playerName !== roomDetails.guesser && result.hint !== "") {
 
-                                        return (
+                                            return (
 
-                                            <div key={index} className="flex flex-col min-w-36 items-center gap-2">
-                                                <Label className="text-sm">{result.playerName}</Label>
-                                                <div className="w-full relative">
-    
-                                                    <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
-                                                        <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
+                                                <div key={index} className="flex flex-col min-w-36 items-center gap-2">
+                                                    <Label className="text-sm">{result.playerName}</Label>
+                                                    <div className="w-full relative">
+        
+                                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
+                                                            <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
+                                                        </div>
+        
+                                                        <Button 
+                                                            onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
+                                                            variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
+                                                            className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
+                                                            disabled={voted}
+                                                        >
+                                                            {result.hint}
+                                                        </Button>
                                                     </div>
-    
-                                                    <Button 
-                                                        onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
-                                                        variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
-                                                        className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
-                                                        disabled={voted}
-                                                    >
-                                                        {result.hint}
-                                                    </Button>
                                                 </div>
-                                            </div>
-    
-                                        );
+        
+                                            );
 
-                                    }
+                                        }
 
-                                })}
+                                    })
+
+                                ) || (
+
+                                    <h1 className="mt-6 text-lg text-center font-mono text-red-600">
+                                        ERROR: No valid hints were transmitted in time!
+                                    </h1>
+
+                                )}
 
                             </div>
 
                             <div className="flex flex-row justify-center gap-4 mt-16">
 
-                                <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                {results.some((result) => { return result.hint !== "" }) && (
 
-                                    {voted && (
+                                    <>
 
-                                        <>
-                                            <Check size={16} className="mr-2" />
-                                            Vote Recorded
-                                        </>
+                                        <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
 
-                                    ) || (
+                                            {voted && (
 
-                                        <>
-                                            <Trash2 size={16} className="mr-2" />
-                                            Vote to Remove
-                                        </>
+                                                <>
+                                                    <Check size={16} className="mr-2" />
+                                                    Vote Recorded
+                                                </>
 
-                                    )}
+                                            ) || (
 
-                                </Button>
+                                                <>
+                                                    <Trash2 size={16} className="mr-2" />
+                                                    Vote to Remove
+                                                </>
 
-                                <Button onClick={(isNoneSelected && !voted) ? () => {setVoted(true); setIsVoteSubmitted(true);} : voted ? handleCancel : handleClearSelection} variant={(isNoneSelected && !voted) ? "green" : voted ? "default" : "blue"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                            )}
 
-                                    {(isNoneSelected && !voted) && (
+                                        </Button>
 
-                                        <>
-                                            <Check size={16} className="mr-2" />
-                                            Looks Good!
-                                        </>
+                                        <Button onClick={(isNoneSelected && !voted) ? () => {setVoted(true); setIsVoteSubmitted(true);} : voted ? handleCancel : handleClearSelection} variant={(isNoneSelected && !voted) ? "green" : voted ? "default" : "blue"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
 
-                                    ) || voted && (
+                                            {(isNoneSelected && !voted) && (
 
-                                        <>
-                                            <X size={16} className="mr-2" />
-                                            Cancel Selection
-                                        </>
+                                                <>
+                                                    <Check size={16} className="mr-2" />
+                                                    Looks Good!
+                                                </>
 
-                                    ) || (
+                                            ) || voted && (
 
-                                        <>
-                                            <RotateCcw size={16} className="mr-2" />
-                                            Clear Selection
-                                        </>
+                                                <>
+                                                    <X size={16} className="mr-2" />
+                                                    Cancel Selection
+                                                </>
 
-                                    )}
+                                            ) || (
 
-                                </Button>
+                                                <>
+                                                    <RotateCcw size={16} className="mr-2" />
+                                                    Clear Selection
+                                                </>
+
+                                            )}
+
+                                        </Button>
+
+                                    </>
+
+                                ) || (
+
+                                    <Button 
+                                        onClick={() => { setVoted(true); setIsVoteSubmitted(true); }} 
+                                        variant={ voted ? "disabled" : "green" } 
+                                        className={`flex flex-row w-44 transition-all ease-in-out duration-150`}
+                                        disabled={voted}
+                                    >
+
+                                        <div className="flex flex-row flex-none justify-center w-full">
+                                            
+                                            <h1 className="ml-4">Continue</h1>
+
+                                            <div>
+                                                <ChevronRight size={20} className="ml-2" />
+                                            </div>
+                                            
+                                        </div>
+
+                                    </Button>
+
+                                )}
 
                             </div>
                     

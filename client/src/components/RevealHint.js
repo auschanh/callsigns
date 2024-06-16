@@ -164,54 +164,64 @@ const RevealHint = ({ resultsState, roomDetails, guessState, validateWord, stemm
 
                     <TooltipProvider>                    
 
-                        {results.map((result, index) => {
+                        {results.some((result) => { return result.hint !== "" }) && (
+                        
+                            results.map((result, index) => {
 
-                            if (result.playerName !== guesser) {
+                                if (result.playerName !== guesser && result.hint !== "") {
 
-                                return (
+                                    return (
 
-                                    <div key={index} className="flex flex-col min-w-36 items-center gap-2">
-                                        <Label className="text-sm">{result.playerName}</Label>
-    
-                                        {result.visible && (
-                                        
-                                            <Button 
-                                                variant="green" 
-                                                className="flex p-2 w-full max-w-sm justify-center" 
-                                            >
-                                                {result.hint}
-    
-                                            </Button>
-                                        
-                                        
-                                        ) || playerName !== guesser && (
-    
-                                            <Tooltip delayDuration={0}>
-                                                <TooltipTrigger asChild>
-                                                    <Button className="flex p-2 w-full max-w-sm justify-center" variant="red">
-                                                        <X size={16} />                                                        
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{result.hint}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-    
-                                        ) || (
+                                        <div key={index} className="flex flex-col min-w-36 items-center gap-2">
+                                            <Label className="text-sm">{result.playerName}</Label>
+        
+                                            {result.visible && (
+                                            
+                                                <Button 
+                                                    variant="green" 
+                                                    className="flex p-2 w-full max-w-sm justify-center" 
+                                                >
+                                                    {result.hint}
+        
+                                                </Button>
+                                            
+                                            
+                                            ) || playerName !== guesser && (
+        
+                                                <Tooltip delayDuration={0}>
+                                                    <TooltipTrigger asChild>
+                                                        <Button className="flex p-2 w-full max-w-sm justify-center" variant="red">
+                                                            <X size={16} />                                                        
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{result.hint}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+        
+                                            ) || (
 
-                                            <Button className="flex p-2 w-full max-w-sm justify-center" variant="red">
-                                                <X size={16} />                                                        
-                                            </Button>
+                                                <Button className="flex p-2 w-full max-w-sm justify-center" variant="red">
+                                                    <X size={16} />                                                        
+                                                </Button>
 
-                                        )}
-    
-                                    </div>
-    
-                                );
+                                            )}
+        
+                                        </div>
+        
+                                    );
 
-                            }
+                                }
 
-                        })}
+                            })
+
+                        ) || (
+
+                            <h1 className="mt-6 text-lg text-center font-mono text-red-600">
+                                ERROR: No valid hints were transmitted in time!
+                            </h1>
+
+                        )}
 
                     </TooltipProvider>
 
