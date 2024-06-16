@@ -143,6 +143,30 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 				form.setValue("aiPlayers", gameInfo.aiPlayers);
 	
 			}
+
+			if (!form.getValues("numGuesses")) {
+
+				form.setValue("numGuesses", [gameInfo.numGuesses - 1]);
+
+			}
+
+			if (!form.getValues("numRounds")) {
+
+				form.setValue("numRounds", [gameInfo.numRounds - 1]);
+
+			}
+
+			if (!form.getValues("timeLimit")) {
+
+				form.setValue("timeLimit", [gameInfo.timeLimit]);
+
+			}
+
+			if (!form.getValues("keepScore")) {
+
+				form.setValue("keepScore", gameInfo.keepScore);
+
+			}
 	
 			if (playerCount === undefined) {
 	
@@ -480,7 +504,6 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 										<FormControl>
 											<Slider
-												defaultValue={[0]}
 												max={10}
 												step={1}
 												onValueChange={field.onChange}
@@ -507,7 +530,6 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 										<FormControl>
 											<Slider
-												defaultValue={[10]}
 												max={10}
 												step={1}
 												onValueChange={field.onChange}
@@ -536,7 +558,6 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 
 										<FormControl>
 											<Slider
-												defaultValue={[0]}
 												max={120}
 												step={15}
 												onValueChange={field.onChange}
