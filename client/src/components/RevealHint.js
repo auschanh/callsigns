@@ -5,12 +5,13 @@ import { Input } from "../components/ui/input";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
-import { X } from "lucide-react";
+import { X, Check, Ellipsis } from "lucide-react";
 
 const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, guessState, guessCorrectState, validateWord, stemmerWord, singularizeWord }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting]] = useGameInfoContext();
+    const [readyNextRound, setReadyNextRound] = useState([])
     const currentIndex = currentIndexState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
@@ -22,7 +23,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
     const [submissionText3, setSubmissionText3] = useState(false);
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
-    // const [countDown, setCountDown] = useState(10);
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
     const scoreBtnRef = useRef();
@@ -82,7 +82,33 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
             guessValidationRef.current.innerText = "";
         }
     }
-   
+    // next steps, implement so all users can see the toggle
+    // right now only the guesser can see the toggled buttons
+    // make toggle only for that player
+    const readyToggle = (e, playerObj) => {
+        e.preventDefault();
+        setReadyNextRound(prevState => {
+            if (Array.isArray(prevState)) {
+                return prevState.map(player => 
+                    player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
+                )
+            } else {
+                return prevState;
+            }
+        });
+    };
+
+    // setup ready state for next round
+    useEffect(() => {
+        const readyForNextRound = [];
+        inGame.forEach(player => readyForNextRound.push({
+            readyNext: true,
+            playerName: player
+        }));
+        setReadyNextRound(readyForNextRound);
+    }, [inGame])
+
+
     // render normal page whenever you visit the RevealHint card each round
     useEffect(() => {
         if(currentIndex == 2) {
@@ -110,23 +136,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
         }
         
     }, [submitted])
-
-
-    // useEffect(() => {
-    //     if(validate === true) {
-    //         setTimeout(() => {
-    //             console.log('in validate statement')
-    //             scoreBtnRef.current.classList.add('validate');
-    //             nextRoundBtnRef.current.classList.add('validate');
-    //         }, 2500);
-    //     }
-
-    // }, [validate])
-
-    // useEffect(() => {
-    //     countDown > 0 && setTimeout(() => setCountDown(countDown - 1), 1000);
-    // }, [countDown])
-
 
     // render live guess to all users
     useEffect(() => {
@@ -167,7 +176,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
 
             <div className={`flex flex-col items-center w-full py-12 px-24 ${(submitted || validate) ? 'bg-transparent' : 'bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100'} border border-solid border-slate-400 rounded-lg`}>
                   {submitted && (
-                    <div className='h-full flex flex-none flex-col text-green-600 font-mono text-xs transition-all ease-in-out duration-500 w-full'>
+                    <div className='h-full flex flex-none flex-col text-green-600 font-mono text-base transition-all ease-in-out duration-500 w-full'>
                         { submissionText1 && (
                             <>
                                 <p>{`% Encrypting CALLSIGN...`}</p>
@@ -217,7 +226,34 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
                             >
                                 Next Round
                             </Button>
+                            
                         </div>
+                        <div className='flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4'>
+                        {console.log("readyNextRound: ", readyNextRound)};
+                        {readyNextRound.map((playerObj, index) => {
+                            console.log("This is playerObj.readyNext ", playerObj.readyNext);
+                            console.log("This is playerObj.readyNext flipped ", !playerObj.readyNext);
+
+                                return (
+                                    <Button
+                                        key={index}
+                                        className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                        variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                        onClick={e => readyToggle(e, playerObj)}
+                                    >
+                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                            {playerObj.readyNext && (
+                                                <Check className="text-slate-900" size={14} />
+                                            ) || (
+                                                <Ellipsis className="text-slate-900" size={14} />
+                                            )}
+                                        </div>
+                                        <p className="text-xs">{playerObj.playerName}</p>
+                                    </Button>
+                                )
+                            })}
+                        </div>
+                        
                     </div>
                  )}
                  
