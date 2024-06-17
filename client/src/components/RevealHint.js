@@ -82,27 +82,32 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
             guessValidationRef.current.innerText = "";
         }
     }
-    // next steps, implement so all users can see the toggle
-    // right now only the guesser can see the toggled buttons
-    // make toggle only for that player
+
+   
     const readyToggle = (e, playerObj) => {
         e.preventDefault();
-        setReadyNextRound(prevState => {
-            if (Array.isArray(prevState)) {
-                return prevState.map(player => 
-                    player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
-                )
-            } else {
-                return prevState;
-            }
-        });
+        
+        // checks if player is toggling their own ready button or not, returns out of readyToggle if not
+        if (playerObj.playerName !== playerName) return;
+
+        let tempReadyNextRound = readyNextRound;
+        let newTempReadyNextRound;
+
+        if (Array.isArray(tempReadyNextRound)) {
+            newTempReadyNextRound = tempReadyNextRound.map(player => 
+                player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
+            )
+        } 
+        
+        tempReadyNextRound = newTempReadyNextRound;
+        socket.emit("sendToggle", roomDetails.roomID, tempReadyNextRound);
     };
 
     // setup ready state for next round
     useEffect(() => {
         const readyForNextRound = [];
         inGame.forEach(player => readyForNextRound.push({
-            readyNext: true,
+            readyNext: false,
             playerName: player
         }));
         setReadyNextRound(readyForNextRound);
@@ -156,7 +161,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
     // guesser submission for all users
     useEffect(() => {
         const handleReceiveSubmitGuess = (result) => {
-            // console.log('user guessed something')
             setCorrectGuess(result);
             setSubmitted(true);
         }
@@ -167,6 +171,20 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
             socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
         }
     }, [socket, setCorrectGuess])
+
+    // update toggle for all users
+    useEffect(() => {
+        const handleReadyToggle = (ready) => {
+            setReadyNextRound(ready);
+        }
+
+        socket.on("receiveToggle", handleReadyToggle);
+
+        return () => {
+            socket.off("receiveToggle", handleReadyToggle);
+        }
+
+    }, [socket, setReadyNextRound])
 
 
     return (
@@ -229,11 +247,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
                             
                         </div>
                         <div className='flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4'>
-                        {console.log("readyNextRound: ", readyNextRound)};
                         {readyNextRound.map((playerObj, index) => {
-                            console.log("This is playerObj.readyNext ", playerObj.readyNext);
-                            console.log("This is playerObj.readyNext flipped ", !playerObj.readyNext);
-
                                 return (
                                     <Button
                                         key={index}
