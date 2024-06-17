@@ -667,6 +667,10 @@ io.on("connection", (socket) => {
 		io.to(roomID).emit("receiveSubmitGuess", result);
 	});
 
+	socket.on("sendToggle", (roomID, ready) => {
+		io.to(roomID).emit("receiveToggle", ready);
+	});
+
 	socket.on("disconnecting", () => {
 
 		const leavingRooms = [...socket.rooms];
