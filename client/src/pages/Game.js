@@ -512,7 +512,10 @@ function Game() {
 				<RevealHint 
 					resultsState={[results, setResults]} 
 					roomDetails={roomDetails} 
+					handleNext={handleNext} 
+					currentIndexState={currentIndex}
 					guessState={[guess, setGuess]}
+					guessCorrectState={[correctGuess, setCorrectGuess]}
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord} 

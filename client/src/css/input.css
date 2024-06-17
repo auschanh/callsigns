@@ -102,3 +102,31 @@
         transform: scale(1.5);
     }
 }
+
+@keyframes blink-out {
+  0%, 25% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  0%, 25% {
+    opacity: 0;
+  }
+  
+  100% {
+    opacity: 1;
+  }
+}
+
+.validate {
+  animation: fade-in 2s ease-in-out forwards;
+}
+
+#countdown {
+  animation: blink-out 1s ease-out forwards infinite;
+}
