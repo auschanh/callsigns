@@ -72,6 +72,8 @@ function Game() {
 
 	const [showError, setShowError] = useState(false);
 
+	const [submitted, setSubmitted] = useState(false);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -297,18 +299,13 @@ function Game() {
 			
 		});
 
-
-
-
-
-
-
-
 		socket.on("receiveSubmitGuess", (isCorrect) => {
 
             if (isCorrect) {
 
                 setCorrectGuess(true);
+
+				setSubmitted(true);
 
             } else {
 
@@ -317,16 +314,6 @@ function Game() {
             }
 
         });
-
-
-
-
-
-
-
-
-
-
 
         return () => {
 
@@ -531,6 +518,7 @@ function Game() {
 					roomDetails={roomDetails} 
 					handleNext={handleNext} 
 					guessState={[guess, setGuess]}
+					submittedState={[submitted, setSubmitted]}
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord} 

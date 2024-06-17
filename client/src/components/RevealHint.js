@@ -8,7 +8,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -17,7 +17,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validat
     const [guess, setGuess] = guessState;
     const [correctGuess, setCorrectGuess] = correctGuessState;
     const [remainingGuesses, setRemainingGuesses] = numGuessesState;
-    const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = submittedState;
     const [validate, setValidate] = useState(false);
     const [submissionText1, setSubmissionText1] = useState(false);
     const [submissionText2, setSubmissionText2] = useState(false);
@@ -98,19 +98,17 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validat
         } else if (singularizeWord(stemmedGuess) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
             guessInputRef.current.classList.add("border-green-500");
-            guessInputRef.current.classList.add("shadow-[0_0_20px_5px_#22c55e]");
+            // guessInputRef.current.classList.add("shadow-[0_0_20px_5px_#22c55e]");
             guessValidationRef.current.classList.add("text-green-600");
             guessValidationRef.current.innerText = "% You got the callsign!";
 
-            setTimeout(() => {
+            // setTimeout(() => {
 
-                guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_#22c55e]");
+            //     guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_#22c55e]");
 
-            }, 500);
+            // }, 500);
 
             socket.emit("submitGuess", roomDetails.roomID, true);
-
-            // socket.emit("sendValidGuess", roomDetails.roomID, true);
 
         } else if (singularizeWord(stemmedGuess) !== singularizeWord(stemmerWord(cleanedCallSign))) {
 
@@ -122,25 +120,23 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validat
 
                 guessValidationRef.current.innerText = "% ERROR: Incorrect credentials, please try again.";
 
+                setTimeout(() => {
+
+                    guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_red]");
+    
+                }, 500);
+
             } else {
 
                 guessValidationRef.current.innerText = "% ABORT: Unable to authenticate. Session terminated.";
 
             }
-            
-            // setTimeout(() => {
-
-            //     guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_red]");
-
-            // }, 500);
 
             if (remainingGuesses !== 11) {
 
-                setRemainingGuesses(prev => prev - 1);
+                // setRemainingGuesses(prev => prev - 1);
 
                 socket.emit("submitGuess", roomDetails.roomID, false);
-
-                // socket.emit("sendValidGuess", roomDetails.roomID, false);
 
             }
 
@@ -258,7 +254,9 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validat
         socket.on("receiveToggle", handleReadyToggle);
 
         return () => {
+
             socket.off("receiveToggle", handleReadyToggle);
+
         }
 
     }, [socket, setReadyNextRound]);

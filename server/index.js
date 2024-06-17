@@ -659,7 +659,7 @@ io.on("connection", (socket) => {
 	// guesser submitted a valid guess
 	socket.on("submitGuess", (roomID, isCorrect) => {
 
-		socket.to(roomID).emit("receiveSubmitGuess", isCorrect);
+		io.to(roomID).emit("receiveSubmitGuess", isCorrect);
 
 	});
 
