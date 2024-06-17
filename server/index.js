@@ -656,15 +656,11 @@ io.on("connection", (socket) => {
 		socket.to(roomID).emit("receiveGuess", guess);
 	});
 
-	socket.on("sendValidGuess", (roomID, isCorrect) => {
-
-		socket.to(roomID).emit("receiveGuessResult", isCorrect);
-
-	});
-
 	// guesser submitted a valid guess
-	socket.on("submitGuess", (roomID, playerName, guess, result) => {
-		io.to(roomID).emit("receiveSubmitGuess", result);
+	socket.on("submitGuess", (roomID, isCorrect) => {
+
+		socket.to(roomID).emit("receiveSubmitGuess", isCorrect);
+
 	});
 
 	socket.on("sendToggle", (roomID, ready) => {

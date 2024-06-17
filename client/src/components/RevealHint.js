@@ -8,16 +8,14 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, guessState, guessCorrectState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
     const [readyNextRound, setReadyNextRound] = useState([])
-    const currentIndex = currentIndexState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
-    // const [correctGuess, setCorrectGuess] = correctGuessState;
-    const [correctGuess, setCorrectGuess] = guessCorrectState;
+    const [correctGuess, setCorrectGuess] = correctGuessState;
     const [remainingGuesses, setRemainingGuesses] = numGuessesState;
     const [submitted, setSubmitted] = useState(false);
     const [validate, setValidate] = useState(false);
@@ -31,6 +29,16 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
     const guessValidationRef = useRef(null);
     const scoreBtnRef = useRef();
     const nextRoundBtnRef = useRef();
+
+    useEffect(() => {
+
+        if (remainingGuesses === 0) {
+
+            setSubmitted(true);
+
+        }
+
+    }, [remainingGuesses]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -100,9 +108,9 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
 
             }, 500);
 
-            // socket.emit("submitGuess", roomDetails.roomID, playerName, checkGuess, true);
+            socket.emit("submitGuess", roomDetails.roomID, true);
 
-            socket.emit("sendValidGuess", roomDetails.roomID, true);
+            // socket.emit("sendValidGuess", roomDetails.roomID, true);
 
         } else if (singularizeWord(stemmedGuess) !== singularizeWord(stemmerWord(cleanedCallSign))) {
 
@@ -120,19 +128,19 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
 
             }
             
-            setTimeout(() => {
+            // setTimeout(() => {
 
-                guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_red]");
+            //     guessInputRef.current.classList.remove("shadow-[0_0_20px_5px_red]");
 
-            }, 500);
+            // }, 500);
 
             if (remainingGuesses !== 11) {
 
                 setRemainingGuesses(prev => prev - 1);
 
-                // socket.emit("submitGuess", roomDetails.roomID, playerName, checkGuess, false);
+                socket.emit("submitGuess", roomDetails.roomID, false);
 
-                socket.emit("sendValidGuess", roomDetails.roomID, false);
+                // socket.emit("sendValidGuess", roomDetails.roomID, false);
 
             }
 
@@ -224,24 +232,27 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
     }, [socket, setGuess])
 
 
-    // guesser submission for all users
-    useEffect(() => {
-        const handleReceiveSubmitGuess = (result) => {
-            setCorrectGuess(result);
-            setSubmitted(true);
-        }
+    // // guesser submission for all users
+    // useEffect(() => {
+    //     const handleReceiveSubmitGuess = (result) => {
+    //         setCorrectGuess(result);
+    //         setSubmitted(true);
+    //     }
 
-        socket.on("receiveSubmitGuess", handleReceiveSubmitGuess); 
+    //     socket.on("receiveSubmitGuess", handleReceiveSubmitGuess); 
 
-        return () => {
-            socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
-        }
-    }, [socket, setCorrectGuess])
+    //     return () => {
+    //         socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
+    //     }
+    // }, [socket, setCorrectGuess])
 
     // update toggle for all users
     useEffect(() => {
+
         const handleReadyToggle = (ready) => {
+
             setReadyNextRound(ready);
+
         }
 
         socket.on("receiveToggle", handleReadyToggle);
@@ -250,7 +261,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
             socket.off("receiveToggle", handleReadyToggle);
         }
 
-    }, [socket, setReadyNextRound])
+    }, [socket, setReadyNextRound]);
 
 
     return (
@@ -307,6 +318,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
 
                      </div>
                  )}
+
                  {!submitted && validate && (
                     <div className='h-full flex flex-none flex-col font-mono text-xs transition-all ease-in-out duration-500 w-full text-center'>
                         <p className={`text-7xl validate ${correctGuess ? 'text-green-600' : 'text-red-600'}`}>{`${correctGuess ? 'VALID CALLSIGN' : 'INVALID CALLSIGN'}`}</p>
@@ -541,8 +553,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, currentIndexState, 
                                             tabIndex="0" 
                                             className="w-36 font-mono" 
                                             variant="default"
-                                            type="button"
-                                            onClick={checkGuess} 
+                                            type="submit"
+                                            // onClick={checkGuess} 
                                             // ref={guessInputRef} 
                                         >    
                                             Authenticate

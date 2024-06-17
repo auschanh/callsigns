@@ -297,7 +297,14 @@ function Game() {
 			
 		});
 
-		socket.on("receiveGuessResult", (isCorrect) => {
+
+
+
+
+
+
+
+		socket.on("receiveSubmitGuess", (isCorrect) => {
 
             if (isCorrect) {
 
@@ -311,6 +318,16 @@ function Game() {
 
         });
 
+
+
+
+
+
+
+
+
+
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -318,7 +335,7 @@ function Game() {
 			socket.removeAllListeners("isRoomClosed");
 			socket.removeAllListeners("receiveHint");
 			socket.removeAllListeners("receiveVote");
-			socket.removeAllListeners("receiveGuessResult");
+			socket.removeAllListeners("receiveSubmitGuess");
             
         }
 
@@ -513,9 +530,7 @@ function Game() {
 					resultsState={[results, setResults]} 
 					roomDetails={roomDetails} 
 					handleNext={handleNext} 
-					currentIndexState={currentIndex}
 					guessState={[guess, setGuess]}
-					guessCorrectState={[correctGuess, setCorrectGuess]}
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord} 
