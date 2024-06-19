@@ -670,7 +670,25 @@ function Game() {
 
 					<div>
 
-						{/* intro green border */}
+						<div className={`
+							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-all ease-in-out ${
+								(!enterHint || submitted) 
+									? "shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 duration-1000" 
+									: !validate 
+										? (showError 
+											? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] duration-300" 
+											: (startFade || timeLimitReached) 
+												? "border-stone-800 duration-300" 
+												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
+										) : correctGuess 
+											? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-1000" 
+											: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-1000"
+							}
+						`} />
+
+						{/* 
+						
+						// intro green border
 						<div 
 							className={`
 								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
@@ -679,7 +697,7 @@ function Game() {
 							`} 
 						/>
 
-						{/* default border */}
+						// default border
 						<div 
 							className={`
 								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
@@ -690,7 +708,7 @@ function Game() {
 							`} 
 						/>
 
-						{/* time expired border */}
+						// time expired border
 						<div 
 							className={`
 								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
@@ -701,7 +719,7 @@ function Game() {
 							`} 
 						/>
 
-						{/* end round animation border */}
+						// end round animation border
 						<div 
 							className={`
 								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
@@ -710,14 +728,16 @@ function Game() {
 							`} 
 						/>
 
-						{/* end round screen border */}
+						// end round screen border
 						<div 
 							className={`
 								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
 								transition-[opacity,_visibility] ease-in-out duration-1000 
 								${!validate ? "invisible opacity-5" : correctGuess ? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500" : "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500"}
 							`} 
-						/>
+						/> 
+						
+						*/}
 						
 						<CardStack 
 							cards={cards} 
