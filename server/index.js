@@ -663,8 +663,8 @@ io.on("connection", (socket) => {
 
 	});
 
-	socket.on("sendToggle", (roomID, ready) => {
-		io.to(roomID).emit("receiveToggle", ready);
+	socket.on("sendToggle", (roomID, readyState) => {
+		io.to(roomID).emit("receiveToggle", readyState);
 	});
 
 	socket.on("disconnecting", () => {

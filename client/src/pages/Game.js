@@ -387,7 +387,7 @@ function Game() {
 
 				results.map((result) => {
 
-					if (result.count >= (Math.floor(isVoted.length / 2) + 1)) {
+					if (result.count >= (Math.floor(excludeGuesser.length / 2) + 1)) {
 
 						return {...result, visible: false};
 
@@ -421,7 +421,7 @@ function Game() {
 
 	useEffect(() => {
 
-		if (timeLimitReached) {
+		if (timeLimitReached && currentIndex % cards.length !== 2) {
 
 			setTimeout(() => {
 
@@ -437,9 +437,25 @@ function Game() {
 
 			}, 7200);
 
+		} else if (timeLimitReached && currentIndex % cards.length === 2) {
+
+			setTimeLimitReached(false);
+
+			setSubmitted(true);
+
 		}
 
 	}, [timeLimitReached]);
+
+	useEffect(() => {
+
+        if (remainingGuesses === 0) {
+
+            setSubmitted(true);
+
+        }
+
+    }, [remainingGuesses]);
 
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
