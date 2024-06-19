@@ -8,7 +8,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -18,7 +18,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [correctGuess, setCorrectGuess] = correctGuessState;
     const [remainingGuesses, setRemainingGuesses] = numGuessesState;
     const [submitted, setSubmitted] = submittedState;
-    const [validate, setValidate] = useState(false);
+    const [validate, setValidate] = validateState;
     const [submissionText1, setSubmissionText1] = useState(false);
     const [submissionText2, setSubmissionText2] = useState(false);
     const [submissionText3, setSubmissionText3] = useState(false);
@@ -309,7 +309,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className={`flex flex-none flex-col justify-center items-center w-full transition-all ease-in-out duration-500 ${(submitted || validate) ? 'bg-transparent h-full text-green-600 font-mono text-xs' : ''}`}>
+            <div className={`h-full flex flex-none flex-col justify-center items-center w-full transition-all ease-in-out duration-500`}>
     
                 {submitted && (
 
@@ -324,7 +324,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                         )}
                         { submissionText2 && (
                             <>
-                                <p>{`% Signalling friendly agents: ${selectedPlayers}`}</p>
+                                <p>{`% Signalling friendly agents:${selectedPlayers.map((player) => { return ` ${player}`})}`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -348,9 +348,9 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                     </div>
 
-                 )}
+                )}
 
-                 {!submitted && validate && (
+                {!submitted && validate && (
 
                     <div className='h-[40vh] flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
 
@@ -443,7 +443,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                     </div>
 
-                 )}
+                )}
 
                 {!submitted && !validate && (
 
