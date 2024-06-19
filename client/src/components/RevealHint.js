@@ -24,21 +24,135 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [submissionText3, setSubmissionText3] = useState(false);
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
+    const [showReadyState, setShowReadyState] = useState(false);
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
-    const scoreBtnRef = useRef();
-    const nextRoundBtnRef = useRef();
+    const scoreBtnRef = useRef(null);
+    const nextRoundBtnRef = useRef(null);
 
     useEffect(() => {
 
-        if (remainingGuesses === 0) {
+        // receive the broadcast signal
+        socket.on("receiveGuess", (guess) => {
 
-            setSubmitted(true);
+            // render live guess to all users
+            setGuess(guess);
+
+        });
+
+        // update toggle for all users
+        socket.on("receiveToggle", (readyState) => {
+
+            setReadyNextRound(readyState);
+
+            if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
+
+                console.log("TRIGGER NEXT ROUND");
+
+            }
+
+        });
+
+        // cleanup function
+        return () => {
+
+            socket.removeAllListeners("receiveGuess");
+            socket.removeAllListeners("receiveToggle");
 
         }
 
-    }, [remainingGuesses]);
+    }, [socket]);
+
+    // setup ready state for next round
+    useEffect(() => {
+
+        setReadyNextRound(
+
+            inGame.map((player) => {
+
+                return ({
+
+                    playerName: player,
+                    readyNext: false
+
+                });
+
+            })
+
+        );
+
+        // const readyForNextRound = [];
+        // inGame.forEach(player => readyForNextRound.push({
+        //     readyNext: false,
+        //     playerName: player
+        // }));
+        // setReadyNextRound(readyForNextRound);
+
+    }, [inGame]);
+
+    // // render normal page whenever you visit the RevealHint card each round
+    // useEffect(() => {
+    //     if(currentIndex == 2) {
+    //         setSubmitted(false);
+    //         setValidate(false);
+    //         setSubmissionText1(false);
+    //         setSubmissionText2(false);
+    //         setSubmissionText3(false);
+    //         setSubmissionText4(false);
+    //         setSubmissionText5(false);
+    //     }
+    // }, [currentIndex])
+
+    useEffect(() => {
+
+        if (submitted === true) {
+
+            setTimeout(() => setSubmissionText1(true), 500);
+
+            setTimeout(() => setSubmissionText2(true), 1000);
+
+            setTimeout(() => setSubmissionText3(true), 2000);
+
+            setTimeout(() => setSubmissionText4(true), 3000);
+
+            setTimeout(() => {
+
+                setValidate(true);
+                setSubmitted(false);
+
+            }, 6000);
+        }
+        
+    }, [submitted]);
+
+    // // guesser submission for all users
+    // useEffect(() => {
+    //     const handleReceiveSubmitGuess = (result) => {
+    //         setCorrectGuess(result);
+    //         setSubmitted(true);
+    //     }
+
+    //     socket.on("receiveSubmitGuess", handleReceiveSubmitGuess); 
+
+    //     return () => {
+    //         socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
+    //     }
+    // }, [socket, setCorrectGuess]);
+
+    useEffect(() => {
+
+        if (submitted === false && validate === true) {
+
+            setTimeout(() => {
+
+                setShowReadyState(true);
+
+            }, 2000);
+
+        }
+
+    }, [submitted, validate]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -134,8 +248,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
             if (remainingGuesses !== 11) {
 
-                // setRemainingGuesses(prev => prev - 1);
-
                 socket.emit("submitGuess", roomDetails.roomID, false);
 
             }
@@ -147,142 +259,62 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
     }
 
-   
-    const readyToggle = (e, playerObj) => {
-        e.preventDefault();
+    // const readyToggle = (e, playerObj) => {
+    //     e.preventDefault();
         
-        // checks if player is toggling their own ready button or not, returns out of readyToggle if not
-        if (playerObj.playerName !== playerName) return;
+    //     // checks if player is toggling their own ready button or not, returns out of readyToggle if not
+    //     if (playerObj.playerName !== playerName) return;
 
-        let tempReadyNextRound = readyNextRound;
-        let newTempReadyNextRound;
+    //     let tempReadyNextRound = readyNextRound;
+    //     let newTempReadyNextRound;
 
-        if (Array.isArray(tempReadyNextRound)) {
-            newTempReadyNextRound = tempReadyNextRound.map(player => 
-                player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
-            )
-        } 
+    //     if (Array.isArray(tempReadyNextRound)) {
+    //         newTempReadyNextRound = tempReadyNextRound.map(player => 
+    //             player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
+    //         )
+    //     } 
         
-        tempReadyNextRound = newTempReadyNextRound;
-        socket.emit("sendToggle", roomDetails.roomID, tempReadyNextRound);
-    };
+    //     tempReadyNextRound = newTempReadyNextRound;
+    //     socket.emit("sendToggle", roomDetails.roomID, tempReadyNextRound);
+    // };
 
-    // setup ready state for next round
-    useEffect(() => {
-        const readyForNextRound = [];
-        inGame.forEach(player => readyForNextRound.push({
-            readyNext: false,
-            playerName: player
-        }));
-        setReadyNextRound(readyForNextRound);
-    }, [inGame])
+    const toggleReady = () => {
 
+        const readyState = readyNextRound.map((player) => {
 
-    // render normal page whenever you visit the RevealHint card each round
-    useEffect(() => {
-        if(currentIndex == 2) {
-            setSubmitted(false);
-            setValidate(false);
-            setSubmissionText1(false);
-            setSubmissionText2(false);
-            setSubmissionText3(false);
-            setSubmissionText4(false);
-            setSubmissionText5(false);
-        }
-    }, [currentIndex])
+            return (
+            
+                player.playerName === playerName ? 
+            
+                    ({
 
+                        ...player,
+                        readyNext: !player.readyNext
 
-    useEffect(() => {
-        if(submitted === true) {
-            setTimeout(() => setSubmissionText1(true), 2500);
-            setTimeout(() => setSubmissionText2(true), 3500);
-            setTimeout(() => setSubmissionText3(true), 4500);
-            setTimeout(() => setSubmissionText4(true), 5500);
-            setTimeout(() => {
-                setValidate(true);
-                setSubmitted(false);
-            }, 8500);
-        }
-        
-    }, [submitted])
+                    })
 
-    // render live guess to all users
-    useEffect(() => {
+                :
 
-        // receive the broadcast signal
-        const handleReceiveGuess = (guess) => {
+                    player
 
-            setGuess(guess);
+            );
 
-        }
+        });
 
-        socket.on("receiveGuess", handleReceiveGuess);
+        socket.emit("sendToggle", roomDetails.roomID, readyState);
 
-        return () => {
-
-            // cleanup function
-            socket.removeAllListeners("receiveGuess");
-
-        }
-
-    }, [socket, setGuess])
-
-
-    // // guesser submission for all users
-    // useEffect(() => {
-    //     const handleReceiveSubmitGuess = (result) => {
-    //         setCorrectGuess(result);
-    //         setSubmitted(true);
-    //     }
-
-    //     socket.on("receiveSubmitGuess", handleReceiveSubmitGuess); 
-
-    //     return () => {
-    //         socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
-    //     }
-    // }, [socket, setCorrectGuess])
-
-    // update toggle for all users
-    useEffect(() => {
-
-        const handleReadyToggle = (ready) => {
-
-            setReadyNextRound(ready);
-
-        }
-
-        socket.on("receiveToggle", handleReadyToggle);
-
-        return () => {
-
-            socket.off("receiveToggle", handleReadyToggle);
-
-        }
-
-    }, [socket, setReadyNextRound]);
-
+    }
 
     return (
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-
-
-
-
-
-
-            {/* <div className={`flex flex-col items-center w-full relative py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg`}> */}
-
-            <div className={`flex flex-col items-center w-full relative py-12 px-24 ${(submitted || validate) ? 'bg-transparent' : 'bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100'} border border-solid border-slate-400 rounded-lg`}>
-
-            
+            <div className={`flex flex-none flex-col justify-center items-center w-full transition-all ease-in-out duration-500 ${(submitted || validate) ? 'bg-transparent h-full text-green-600 font-mono text-xs' : ''}`}>
     
-
-
-
                 {submitted && (
-                    <div className='h-full flex flex-none flex-col text-green-600 font-mono text-base transition-all ease-in-out duration-500 w-full'>
+
+                    <div className='h-full flex flex-none flex-col text-green-600 font-mono text-xs transition-all ease-in-out duration-500 w-full'>
+
                         { submissionText1 && (
                             <>
                                 <p>{`% Encrypting CALLSIGN...`}</p>
@@ -314,67 +346,108 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                             </>
                         )} */}
 
-                     </div>
+                    </div>
+
                  )}
 
                  {!submitted && validate && (
-                    <div className='h-full flex flex-none flex-col font-mono text-xs transition-all ease-in-out duration-500 w-full text-center'>
-                        <p className={`text-7xl validate ${correctGuess ? 'text-green-600' : 'text-red-600'}`}>{`${correctGuess ? 'VALID CALLSIGN' : 'INVALID CALLSIGN'}`}</p>
-                        <div className={`text-center mt-20 flex gap-4 mx-auto`}>
-                            <Button ref={scoreBtnRef} 
-                            variant="outline" 
-                            className={`transition-all ease-in-out duration-500`}>
-                                Scores
-                            </Button>
-                            <Button ref={nextRoundBtnRef} 
-                            variant="outline" 
-                            className={`transition-all ease-in-out duration-500`}
-                            onClick={handleNext}
-                            >
-                                Next Round
-                            </Button>
+
+                    <div className='h-[40vh] flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
+
+                        <p className={`text-6xl font-mono validate ${correctGuess ? 'text-green-600' : 'text-red-600'}`}>
                             
-                        </div>
-                        <div className='flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4'>
-                        {readyNextRound.map((playerObj, index) => {
-                                return (
-                                    <Button
-                                        key={index}
-                                        className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                        variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                        onClick={e => readyToggle(e, playerObj)}
-                                    >
-                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                            {playerObj.readyNext && (
+                            {`${correctGuess ? 'AGENT AUTHENTICATED' : 'FAILED TO AUTHENTICATE'}`}
+                            
+                        </p>
+
+                        <div 
+                            className={`flex flex-none flex-col gap-16 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
+                            style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
+                        >
+
+                            <div className='flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4'>
+
+                                {readyNextRound.map((playerObj, index) => {
+
+                                    return (
+
+                                        <Button
+                                            key={index}
+                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                            variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                            // onClick={e => readyToggle(e, playerObj)}
+                                        >
+                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                {playerObj.readyNext && (
+                                                    <Check className="text-slate-900" size={14} />
+                                                ) || (
+                                                    <Ellipsis className="text-slate-900" size={14} />
+                                                )}
+                                            </div>
+                                            <p className="text-xs">{playerObj.playerName}</p>
+                                        </Button>
+
+                                    )
+
+                                })}
+
+                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+
+                                    return (
+
+                                        <Button
+                                            key={index}
+                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                            variant="green"
+                                        >
+                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                 <Check className="text-slate-900" size={14} />
-                                            ) || (
-                                                <Ellipsis className="text-slate-900" size={14} />
-                                            )}
-                                        </div>
-                                        <p className="text-xs">{playerObj.playerName}</p>
+                                            </div>
+                                            <p className="text-xs">{`Bot ${index + 1}`}</p>
+                                        </Button>
+                                    )
+
+                                })} */}
+
+                            </div>
+
+                            <div className={`text-center flex gap-8 mx-auto`}>
+
+                                {roomDetails.keepScore && (
+
+                                    <Button 
+                                        ref={scoreBtnRef} 
+                                        variant="indigo" 
+                                        // className={`w-36 transition-all ease-in-out duration-200`}
+                                        className={`w-36`}
+                                    >
+                                        View Scores
                                     </Button>
-                                )
-                            })}
+
+                                )}
+
+                                <Button 
+                                    ref={nextRoundBtnRef} 
+                                    variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
+                                    // className={`w-36 transition-all ease-in-out duration-200`}
+                                    className={`w-36`}
+                                    // onClick={handleNext}
+                                    onClick={toggleReady}
+                                >
+                                    {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready" : "Ready Up" }`}
+                                </Button>
+                                
+                            </div>
+
                         </div>
-                        
+
                     </div>
+
                  )}
 
                 {!submitted && !validate && (
 
-
-
-
-
-
-
-
-
-
-
-
-
-                    <>
+                    <div className="flex flex-none flex-col w-full relative items-center py-16 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
                         {roomDetails.timeLimit !== 0 && currentIndex === 2 && (
 
@@ -382,7 +455,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                         )}
                         
-                        <Label className="mb-12 text-lg leading-none">Your hints have been revealed!</Label>
+                        <Label className="mb-12 text-lg leading-none text-center">Your hints have been revealed!</Label>
 
                         <div className="flex flex-row flex-wrap justify-center gap-4">
 
@@ -552,8 +625,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                             className="w-36 font-mono" 
                                             variant="default"
                                             type="submit"
-                                            // onClick={checkGuess} 
-                                            // ref={guessInputRef} 
                                         >    
                                             Authenticate
                                         </Button>
@@ -568,7 +639,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                         )}
 
-                    </>
+                    </div>
 
                 )}
 

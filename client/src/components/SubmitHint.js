@@ -233,7 +233,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
             </div>
 
-            <div className={`h-full transition-all ease-in-out duration-500 ${enterHint ? "w-full " : "invisible opacity-5"}`}>
+            <div className={`h-full transition-all ease-in-out duration-500 ${enterHint ? "w-full" : "invisible opacity-5"}`}>
 
                 {enterHint && (
 
@@ -271,7 +271,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                                     className="flex flex-col items-center w-full font-sans pt-2"
                                 >
 
-                                    <Label htmlFor="example" className="mb-3">Enter your one-word hint:</Label>
+                                    <Label htmlFor="example" className="mb-3 text-center">Enter your one-word hint:</Label>
 
                                     <div className="flex flex-row w-full justify-center items-end">
 

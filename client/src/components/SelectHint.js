@@ -161,7 +161,7 @@ const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVote
                     {playerName === roomDetails.guesser && (
 
                         <>
-                            <p className="mb-6">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
+                            <p className="mb-6 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
 
                             <Progress
                                 value={(isVoted.filter(player => player.voted && playerName === roomDetails.guesser)).length / (results.length-1) * 100}
@@ -231,7 +231,7 @@ const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVote
                     
                         <>
 
-                            <Label className="mb-12 text-lg leading-none">Select the hints that are too similar or illegal:</Label>
+                            <Label className="mb-12 text-lg leading-none text-center">Select the hints that are too similar or illegal:</Label>
 
                             <div className="flex flex-row flex-wrap justify-center gap-10">
 
