@@ -8,11 +8,11 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
-    const [readyNextRound, setReadyNextRound] = useState([])
+    const [readyNextRound, setReadyNextRound] = readyNextRoundState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
     const [correctGuess, setCorrectGuess] = correctGuessState;
@@ -41,68 +41,14 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         });
 
-        // update toggle for all users
-        socket.on("receiveToggle", (readyState) => {
-
-            setReadyNextRound(readyState);
-
-            if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
-
-                console.log("TRIGGER NEXT ROUND");
-
-            }
-
-        });
-
         // cleanup function
         return () => {
 
             socket.removeAllListeners("receiveGuess");
-            socket.removeAllListeners("receiveToggle");
 
         }
 
     }, [socket]);
-
-    // setup ready state for next round
-    useEffect(() => {
-
-        setReadyNextRound(
-
-            inGame.map((player) => {
-
-                return ({
-
-                    playerName: player,
-                    readyNext: false
-
-                });
-
-            })
-
-        );
-
-        // const readyForNextRound = [];
-        // inGame.forEach(player => readyForNextRound.push({
-        //     readyNext: false,
-        //     playerName: player
-        // }));
-        // setReadyNextRound(readyForNextRound);
-
-    }, [inGame]);
-
-    // // render normal page whenever you visit the RevealHint card each round
-    // useEffect(() => {
-    //     if(currentIndex == 2) {
-    //         setSubmitted(false);
-    //         setValidate(false);
-    //         setSubmissionText1(false);
-    //         setSubmissionText2(false);
-    //         setSubmissionText3(false);
-    //         setSubmissionText4(false);
-    //         setSubmissionText5(false);
-    //     }
-    // }, [currentIndex])
 
     useEffect(() => {
 
@@ -130,20 +76,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
         
     }, [submitted]);
-
-    // // guesser submission for all users
-    // useEffect(() => {
-    //     const handleReceiveSubmitGuess = (result) => {
-    //         setCorrectGuess(result);
-    //         setSubmitted(true);
-    //     }
-
-    //     socket.on("receiveSubmitGuess", handleReceiveSubmitGuess); 
-
-    //     return () => {
-    //         socket.off("receiveSubmitGuess", handleReceiveSubmitGuess);
-    //     }
-    // }, [socket, setCorrectGuess]);
 
     useEffect(() => {
 
@@ -274,25 +206,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         }
     }
-
-    // const readyToggle = (e, playerObj) => {
-    //     e.preventDefault();
-        
-    //     // checks if player is toggling their own ready button or not, returns out of readyToggle if not
-    //     if (playerObj.playerName !== playerName) return;
-
-    //     let tempReadyNextRound = readyNextRound;
-    //     let newTempReadyNextRound;
-
-    //     if (Array.isArray(tempReadyNextRound)) {
-    //         newTempReadyNextRound = tempReadyNextRound.map(player => 
-    //             player.playerName === playerObj.playerName ? {...player, readyNext: !player.readyNext, } : player
-    //         )
-    //     } 
-        
-    //     tempReadyNextRound = newTempReadyNextRound;
-    //     socket.emit("sendToggle", roomDetails.roomID, tempReadyNextRound);
-    // };
 
     const toggleReady = () => {
 

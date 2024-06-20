@@ -76,6 +76,8 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
+	const [readyNextRound, setReadyNextRound] = useState([]);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -172,6 +174,21 @@ function Game() {
 
 					})
 
+				);
+
+				setReadyNextRound(
+
+					playing.map((player) => {
+		
+						return ({
+		
+							playerName: player,
+							readyNext: false
+		
+						});
+		
+					})
+		
 				);
 
                 setRoomDetails(roomDetails);
@@ -335,6 +352,23 @@ function Game() {
 
         });
 
+		// update toggle for all users
+        socket.on("receiveToggle", (readyState) => {
+
+            setReadyNextRound(readyState);
+
+            if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
+
+                console.log("TRIGGER NEXT ROUND");
+
+				// guesser guesserID setGuesser
+
+
+
+            }
+
+        });
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -343,6 +377,7 @@ function Game() {
 			socket.removeAllListeners("receiveHint");
 			socket.removeAllListeners("receiveVote");
 			socket.removeAllListeners("receiveSubmitGuess");
+			socket.removeAllListeners("receiveToggle");
             
         }
 
@@ -572,6 +607,7 @@ function Game() {
 					setStartFade={setStartFade}
 					correctGuessState={[correctGuess, setCorrectGuess]}
 					numGuessesState={[remainingGuesses, setRemainingGuesses]}
+					readyNextRoundState={[readyNextRound, setReadyNextRound]}
 				/>
 
 		}
