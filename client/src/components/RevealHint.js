@@ -331,7 +331,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                         )}
                         { submissionText3 && (
                             <>
-                                <p>{`% Encrypting callsign: ${guess}`}</p>
+                                <p>{`% Encrypting callsign: ${guess ? guess : "[NULL]"}`}</p>
                                 <p>{`% Sending 1askjgak124aksgjhjk124asfsaj`}</p>
                             </>
                         )}

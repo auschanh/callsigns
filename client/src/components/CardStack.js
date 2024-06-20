@@ -74,7 +74,7 @@ function CardStack({ cards, currentIndex, handleNext, timeLimitReached, showErro
 							className={`h-full w-full`}
 						>
 
-							<div className={`w-full transition-all ease-in-out duration-500 ${timeLimitReached ? "invisible opacity-5" : "h-full"} ${startFade ? "invisible opacity-5" : ""}`}>
+							<div className={`w-full transition-all ease-in-out duration-1000 ${timeLimitReached ? "invisible opacity-5" : "h-full"} ${startFade ? "invisible opacity-5" : ""}`}>
 
 								{timeLimitReached === false && (
 

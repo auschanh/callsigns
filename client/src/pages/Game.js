@@ -307,7 +307,15 @@ function Game() {
 
                 setCorrectGuess(true);
 
-				setSubmitted(true);
+				setStartFade(true);
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+					setSubmitted(true);
+
+				}, 1000);
 
             } else {
 
@@ -453,7 +461,15 @@ function Game() {
 
         if (remainingGuesses === 0) {
 
-            setSubmitted(true);
+            setStartFade(true);
+
+			setTimeout(() => {
+
+				setStartFade(false);
+
+				setSubmitted(true);
+
+			}, 1000);
 
         }
 
@@ -681,8 +697,8 @@ function Game() {
 												? "border-stone-800 duration-300" 
 												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
 										) : correctGuess 
-											? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-1000" 
-											: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-1000"
+											? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
+											: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
 
