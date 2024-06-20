@@ -119,7 +119,12 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             setTimeout(() => {
 
                 setValidate(true);
-                setSubmitted(false);
+                
+                setTimeout(() => {
+
+                    setSubmitted(false);
+
+                }, 1000);
 
             }, 6000);
         }
@@ -153,6 +158,20 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
 
     }, [submitted, validate]);
+
+    useEffect(() => {
+
+        if (correctGuess === false) {
+
+            setTimeout(() => {
+
+                setCorrectGuess(undefined);
+
+            }, 500);
+
+        }
+
+    }, [correctGuess]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -211,10 +230,10 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         } else if (singularizeWord(stemmedGuess) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
-            guessInputRef.current.classList.add("border-green-500");
+            // guessInputRef.current.classList.add("border-green-500");
             // guessInputRef.current.classList.add("shadow-[0_0_20px_5px_#22c55e]");
-            guessValidationRef.current.classList.add("text-green-600");
-            guessValidationRef.current.innerText = "% You got the callsign!";
+            // guessValidationRef.current.classList.add("text-green-600");
+            // guessValidationRef.current.innerText = "% You got the callsign!";
 
             // setTimeout(() => {
 
@@ -226,12 +245,11 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         } else if (singularizeWord(stemmedGuess) !== singularizeWord(stemmerWord(cleanedCallSign))) {
 
-            guessInputRef.current.classList.add("border-red-500");
-            guessInputRef.current.classList.add("shadow-[0_0_20px_5px_red]");
-            guessValidationRef.current.classList.add("text-red-500");
-
             if (remainingGuesses > 1) {
 
+                guessInputRef.current.classList.add("border-red-500");
+                guessInputRef.current.classList.add("shadow-[0_0_20px_5px_red]");
+                guessValidationRef.current.classList.add("text-red-500");
                 guessValidationRef.current.innerText = "% ERROR: Incorrect credentials, please try again.";
 
                 setTimeout(() => {
@@ -242,15 +260,13 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
             } else {
 
-                guessValidationRef.current.innerText = "% ABORT: Unable to authenticate. Session terminated.";
+                // guessValidationRef.current.innerText = "% ABORT: Unable to authenticate. Session terminated.";
+
+                guessInputRef.current.classList.add("border-slate-400");
 
             }
 
-            if (remainingGuesses !== 11) {
-
-                socket.emit("submitGuess", roomDetails.roomID, false);
-
-            }
+            socket.emit("submitGuess", roomDetails.roomID, false);
 
         } else {
 
@@ -313,7 +329,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     
                 {submitted && (
 
-                    <div className='h-full flex flex-none flex-col text-green-600 font-mono text-xs transition-all ease-in-out duration-500 w-full'>
+                    <div className={`h-full flex flex-none flex-col text-green-600 font-mono text-xs transition-all ease-in-out duration-500 w-full ${validate ? "invisible opacity-5" : ""}`}>
 
                         { submissionText1 && (
                             <>
@@ -331,6 +347,9 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                         )}
                         { submissionText3 && (
                             <>
+                                <p>{`% ...`}</p>
+                                <p>{`% ...`}</p>
+                                <p>{`% ...`}</p>
                                 <p>{`% Encrypting callsign: ${guess ? guess : "[NULL]"}`}</p>
                                 <p>{`% Sending 1askjgak124aksgjhjk124asfsaj`}</p>
                             </>
@@ -352,13 +371,23 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                 {!submitted && validate && (
 
-                    <div className='h-[40vh] flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
+                    <div className='h-[40vh] px-24 flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
 
-                        <p className={`text-6xl font-mono validate ${correctGuess ? 'text-green-600' : 'text-red-600'}`}>
-                            
-                            {`${correctGuess ? 'AGENT AUTHENTICATED' : 'FAILED TO AUTHENTICATE'}`}
-                            
-                        </p>
+                        <div className={`validate font-mono`}>
+
+                            <h2 className={`text-lg mb-2 ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+
+                                {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+
+                            </h2>
+
+                            <h1 className={`text-6xl ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                
+                                {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                
+                            </h1>
+        
+                        </div>
 
                         <div 
                             className={`flex flex-none flex-col gap-16 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
@@ -537,7 +566,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                         <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances to figure out their callsign:</>
 
-                                    ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses === 1 && (
+                                    ) || roomDetails.numGuesses === 1 && (
 
                                         <><span className="font-bold">{guesser}</span> has just 1 chance to figure out their callsign:</>
 
@@ -545,19 +574,20 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                         <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances remaining to figure out their callsign:</>
 
-                                    ) || remainingGuesses === 1 && (
+                                    ) || remainingGuesses <= 1 && (
 
                                         <><span className="font-bold">{guesser}</span> has 1 last chance to figure out their callsign:</>
 
-                                    ) || remainingGuesses <= 0 && (
+                                    // ) || remainingGuesses <= 0 && (
 
-                                        <><span className="font-bold">{guesser}</span> was unable to authenticate with HQ.</>
+                                    //     <><span className="font-bold">{guesser}</span> was unable to authenticate with HQ.</>
 
                                     )}
                                     
                                 </h1>
 
-                                <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess ? "text-green-600" : "text-slate-800"}`}>
+                                {/* <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess ? "text-green-600" : "text-slate-800"}`}> */}
+                                <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess === false ? "text-red-500" : "text-slate-800"} transition-colors duration-200`}>
                                     {guess === "" ? '...' : guess}
                                 </p>
                             </>
@@ -582,7 +612,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                             <>You have {remainingGuesses} chances to figure out your callsign!</>
 
-                                        ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses === 1 && (
+                                        ) || roomDetails.numGuesses === 1 && (
 
                                             <>You have just 1 chance to figure out your callsign!</>
 
@@ -590,13 +620,13 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                             <>You have {remainingGuesses} chances remaining to figure out your callsign!</>
 
-                                        ) || remainingGuesses === 1 && (
+                                        ) || remainingGuesses <= 1 && (
 
                                             <>Last chance to figure out your callsign!</>
 
-                                        ) || remainingGuesses <= 0 && (
+                                        // ) || remainingGuesses <= 0 && (
 
-                                            <>You were unable to authenticate with HQ.</>
+                                        //     <>You were unable to authenticate with HQ.</>
             
                                         )}
                                         
