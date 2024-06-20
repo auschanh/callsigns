@@ -665,6 +665,10 @@ io.on("connection", (socket) => {
 		io.to(roomID).emit("receiveToggle", readyState);
 	});
 
+	socket.on("setNextSlide", (roomID) => {
+		io.to(roomID).emit("receiveNextSlide");
+	});
+
 	socket.on("disconnecting", () => {
 
 		const leavingRooms = [...socket.rooms];

@@ -55,7 +55,7 @@ function Game() {
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 
-	const [currentRound, setCurrentRound] = useState(0);
+	const [currentRound, setCurrentRound] = useState(1);
 
 	// state for words
 	const [guess, setGuess] = useState("");
@@ -94,6 +94,28 @@ function Game() {
 			throw error;
 
 		}
+
+	};
+
+	const handleNext = () => {
+
+		console.log(currentRound);
+
+		// setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
+		
+		(async () => {
+
+			try {
+
+				await socket.emit("setNextSlide", roomDetails.roomID);
+
+			} catch (error) {
+
+				throw error;
+
+			}
+
+		})();
 
 	};
 
@@ -361,13 +383,26 @@ function Game() {
 
                 console.log("TRIGGER NEXT ROUND");
 
+				handleNext();
+
 				// guesser guesserID setGuesser
-
-
 
             }
 
         });
+
+		socket.on("receiveNextSlide" , () => {
+
+			const newIndex = (currentIndex + 1) % cards.length;
+			setCurrentIndex(newIndex);
+
+			if (newIndex === 0) {
+
+				setCurrentRound(currentRound => currentRound + 1);
+	
+			}
+
+		});
 
         return () => {
 
@@ -378,10 +413,11 @@ function Game() {
 			socket.removeAllListeners("receiveVote");
 			socket.removeAllListeners("receiveSubmitGuess");
 			socket.removeAllListeners("receiveToggle");
+			socket.removeAllListeners("receiveNextSlide");
             
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, currentIndex]);
 
 	// consolidate into just inGame
 	useEffect(() => {
@@ -422,11 +458,13 @@ function Game() {
 
 		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
 
-		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
+		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
-			console.log("set current index: 1");
+			console.log("HOST set current index: 1");
 
-			setCurrentIndex(1);
+			// setCurrentIndex(1);
+
+			handleNext();
 
 		}
 
@@ -436,7 +474,7 @@ function Game() {
 
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
-		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
+		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((player) => { return player.voted === true })) {
 
 			setResults(
 
@@ -456,23 +494,15 @@ function Game() {
 
 			);
 
-			console.log("set current index: 2");
+			console.log("HOST set current index: 2");
 
-			setCurrentIndex(2);
+			// setCurrentIndex(2);
+
+			handleNext();
 
 		}
 
 	}, [isVoted]);
-
-	useEffect(() => {
-
-		if (currentIndex === 0) {
-
-			setCurrentRound(currentRound + 1);
-
-		}
-
-	}, [currentIndex]);
 
 	useEffect(() => {
 
@@ -482,7 +512,13 @@ function Game() {
 
 				setTimeLimitReached(undefined);
 
-				handleNext();
+				if (playerName === roomDetails.host) {
+
+					console.log("HOST will trigger new slide");
+
+					handleNext();
+
+				}
 
 			}, 7000);
 
@@ -531,10 +567,6 @@ function Game() {
 	const singularizeWord = (w) => {
 		return pluralize.singular(w);
 	}
-
-	const handleNext = () => {
-		setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
-	};
 
 	const cards = [
 
@@ -595,7 +627,6 @@ function Game() {
 				<RevealHint 
 					resultsState={[results, setResults]} 
 					roomDetails={roomDetails} 
-					handleNext={handleNext} 
 					guessState={[guess, setGuess]}
 					submittedState={[submitted, setSubmitted]}
 					validateState={[validate, setValidate]}
