@@ -658,9 +658,7 @@ io.on("connection", (socket) => {
 
 	// guesser submitted a valid guess
 	socket.on("submitGuess", (roomID, isCorrect) => {
-
 		io.to(roomID).emit("receiveSubmitGuess", isCorrect);
-
 	});
 
 	socket.on("sendToggle", (roomID, readyState) => {

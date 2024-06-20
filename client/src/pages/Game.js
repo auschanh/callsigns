@@ -319,7 +319,17 @@ function Game() {
 
             } else {
 
-                setRemainingGuesses(prev => prev - 1);
+				if (remainingGuesses > 1) {
+
+					setCorrectGuess(false);
+
+				}
+
+				if (remainingGuesses !== 11) {
+
+					setRemainingGuesses(prev => prev - 1);
+
+				}
 
             }
 
@@ -336,7 +346,7 @@ function Game() {
             
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses]);
 
 	// consolidate into just inGame
 	useEffect(() => {
@@ -687,7 +697,7 @@ function Game() {
 					<div>
 
 						<div className={`
-							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-all ease-in-out ${
+							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-[box-shadow,_border-color] ease-in-out ${
 								(!enterHint || submitted) 
 									? "shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 duration-1000" 
 									: !validate 

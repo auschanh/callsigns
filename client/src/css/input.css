@@ -128,5 +128,5 @@
 }
 
 #countdown {
-  animation: blink-out 1s ease-out forwards infinite;
+  animation: blink-out 1s ease-out forwards 3;
 }

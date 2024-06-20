@@ -2252,6 +2252,11 @@ video {
   color: rgb(22 163 74 / var(--tw-text-opacity));
 }
 
+.text-green-900 {
+  --tw-text-opacity: 1;
+  color: rgb(20 83 45 / var(--tw-text-opacity));
+}
+
 .text-red-500 {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -2260,6 +2265,16 @@ video {
 .text-red-600 {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity));
+}
+
+.text-red-700 {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity));
+}
+
+.text-red-900 {
+  --tw-text-opacity: 1;
+  color: rgb(127 29 29 / var(--tw-text-opacity));
 }
 
 .text-slate-300 {
@@ -2494,6 +2509,12 @@ video {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.transition-\[box-shadow\2c _border-color\] {
+  transition-property: box-shadow, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .transition-\[opacity\2c _visibility\] {
   transition-property: opacity, visibility;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -2550,6 +2571,10 @@ video {
 
 .duration-700 {
   transition-duration: 700ms;
+}
+
+.duration-100 {
+  transition-duration: 100ms;
 }
 
 .ease-in-out {
@@ -2622,6 +2647,10 @@ video {
 
 .duration-700 {
   animation-duration: 700ms;
+}
+
+.duration-100 {
+  animation-duration: 100ms;
 }
 
 .ease-in-out {
@@ -2762,7 +2791,7 @@ video {
 }
 
 #countdown {
-  animation: blink-out 1s ease-out forwards infinite;
+  animation: blink-out 1s ease-out forwards 3;
 }
 
 .file\:border-0::-webkit-file-upload-button {
