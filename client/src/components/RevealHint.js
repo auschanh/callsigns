@@ -49,6 +49,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
 
                 console.log("TRIGGER NEXT ROUND");
+                handleNext();
 
             }
 

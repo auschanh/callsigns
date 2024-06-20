@@ -55,7 +55,7 @@ function Game() {
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 
-	const [currentRound, setCurrentRound] = useState(0);
+	const [currentRound, setCurrentRound] = useState(1);
 
 	// state for words
 	const [guess, setGuess] = useState("");
@@ -429,15 +429,6 @@ function Game() {
 
 	}, [isVoted]);
 
-	useEffect(() => {
-
-		if (currentIndex === 0) {
-
-			setCurrentRound(currentRound + 1);
-
-		}
-
-	}, [currentIndex]);
 
 	useEffect(() => {
 
@@ -467,6 +458,7 @@ function Game() {
 
 	}, [timeLimitReached]);
 
+
 	useEffect(() => {
 
         if (remainingGuesses === 0) {
@@ -485,6 +477,25 @@ function Game() {
 
     }, [remainingGuesses]);
 
+
+	useEffect(() => {
+
+		socket.on("receiveUpdateRound" , () => {
+
+			const newIndex = (currentIndex + 1) % cards.length;
+			setCurrentIndex(newIndex);
+
+			if (newIndex === 0) {
+				setCurrentRound(currentRound => currentRound + 1);
+
+			}
+		})
+
+		return () => socket.removeAllListeners("receiveUpdateRound");
+
+	}, [currentIndex]);
+
+
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
 	}
@@ -498,7 +509,8 @@ function Game() {
 	}
 
 	const handleNext = () => {
-		setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
+		// setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
+		socket.emit("updateRound", roomDetails.roomID);
 	};
 
 	const cards = [
