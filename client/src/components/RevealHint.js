@@ -7,8 +7,9 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -25,6 +26,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
+    const [showScore, setShowScore] = useState(false);
+    const [scores, setScores] = scoresState;
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -302,18 +305,13 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             return (
             
                 player.playerName === playerName ? 
-            
                     ({
 
                         ...player,
                         readyNext: !player.readyNext
 
                     })
-
-                :
-
-                    player
-
+                : player
             );
 
         });
@@ -321,6 +319,12 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         socket.emit("sendToggle", roomDetails.roomID, readyState);
 
     }
+
+
+    const showScores = () => {
+        setShowScore(!showScore);
+    }
+
 
     return (
 
@@ -371,106 +375,156 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                 )}
 
                 {!submitted && validate && (
-
+                    
                     <div className='h-[40vh] px-24 flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
-
-                        <div className={`validate font-mono`}>
-
-                            <h2 className={`text-lg mb-2 ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
-
-                                {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
-
-                            </h2>
-
-                            <h1 className={`text-6xl ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
-                                
-                                {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
-                                
-                            </h1>
-        
-                        </div>
-
-                        <div 
-                            className={`flex flex-none flex-col gap-16 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
-                            style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
-                        >
-
-                            <div className='flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4'>
-
-                                {readyNextRound.map((playerObj, index) => {
-
-                                    return (
-
-                                        <Button
-                                            key={index}
-                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                            variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                            // onClick={e => readyToggle(e, playerObj)}
-                                        >
-                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                {playerObj.readyNext && (
-                                                    <Check className="text-slate-900" size={14} />
-                                                ) || (
-                                                    <Ellipsis className="text-slate-900" size={14} />
-                                                )}
-                                            </div>
-                                            <p className="text-xs">{playerObj.playerName}</p>
-                                        </Button>
-
-                                    )
-
-                                })}
-
-                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
-
-                                    return (
-
-                                        <Button
-                                            key={index}
-                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                            variant="green"
-                                        >
-                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                <Check className="text-slate-900" size={14} />
-                                            </div>
-                                            <p className="text-xs">{`Bot ${index + 1}`}</p>
-                                        </Button>
-                                    )
-
-                                })} */}
-
-                            </div>
-
-                            <div className={`text-center flex gap-8 mx-auto`}>
-
-                                {roomDetails.keepScore && (
-
+                        
+                        {showScore ? (
+                            
+                            <div>
+                                <div className='mb-10 left-0'>
                                     <Button 
                                         ref={scoreBtnRef} 
                                         variant="indigo" 
                                         // className={`w-36 transition-all ease-in-out duration-200`}
                                         className={`w-36`}
+                                        onClick={showScores}
                                     >
-                                        View Scores
+                                        Back
                                     </Button>
+                                </div>
+                               
+                                <Table className="text-white">
+                                    <TableHeader>
 
-                                )}
+                                        <TableRow className="!text-green-600">
+                                        <TableHead className="w-[100px]">Player</TableHead>
+                                        <TableHead>Score</TableHead>
+                                        <TableHead>Good Hints</TableHead>
+                                        <TableHead>Bad Hints</TableHead>
+                                        </TableRow>
 
-                                <Button 
-                                    ref={nextRoundBtnRef} 
-                                    variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
-                                    // className={`w-36 transition-all ease-in-out duration-200`}
-                                    className={`w-36`}
-                                    // onClick={handleNext}
-                                    onClick={toggleReady}
-                                >
-                                    {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready" : "Ready Up" }`}
-                                </Button>
-                                
+                                    </TableHeader>
+                                    <TableBody>
+
+                                        {
+                                            scores.map((player, index) => {
+                                               return (<TableRow key={index}>
+                                                <TableCell className="font-medium">{player.playerName}</TableCell>
+                                                <TableCell>{player.score}</TableCell>
+                                                <TableCell>{player.goodHints}</TableCell>
+                                                <TableCell className="text-right">{player.badHints}</TableCell>
+                                                </TableRow>)
+                                            })
+                                        }
+                                        
+                                    </TableBody>
+                                </Table>
                             </div>
+                        ) : 
+                        <></>}
 
-                        </div>
+                        {!showScore && (
+                            <>
+                              <div className={`validate font-mono`}>
 
+                                <h2 className={`text-lg mb-2 ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+
+                                    {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+
+                                </h2>
+
+                                <h1 className={`text-6xl ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                    
+                                    {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                    
+                                </h1>
+
+                                </div>
+
+                                <div 
+                                className={`flex flex-none flex-col gap-16 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
+                                style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
+                                >
+
+                                <div className='flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4'>
+
+                                    {readyNextRound.map((playerObj, index) => {
+
+                                        return (
+
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                // onClick={e => readyToggle(e, playerObj)}
+                                            >
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                    {playerObj.readyNext && (
+                                                        <Check className="text-slate-900" size={14} />
+                                                    ) || (
+                                                        <Ellipsis className="text-slate-900" size={14} />
+                                                    )}
+                                                </div>
+                                                <p className="text-xs">{playerObj.playerName}</p>
+                                            </Button>
+
+                                        )
+
+                                    })}
+
+                                    {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+
+                                        return (
+
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                variant="green"
+                                            >
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                    <Check className="text-slate-900" size={14} />
+                                                </div>
+                                                <p className="text-xs">{`Bot ${index + 1}`}</p>
+                                            </Button>
+                                        )
+
+                                    })} */}
+
+                                </div>
+
+                                <div className={`text-center flex gap-8 mx-auto`}>
+                                    
+                                    {roomDetails.keepScore && (
+
+                                        <Button 
+                                            ref={scoreBtnRef} 
+                                            variant="indigo" 
+                                            // className={`w-36 transition-all ease-in-out duration-200`}
+                                            className={`w-36`}
+                                            onClick={showScores}
+                                        >
+                                            View Scores
+                                        </Button>
+
+                                    )}
+
+                                    <Button 
+                                        ref={nextRoundBtnRef} 
+                                        variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
+                                        // className={`w-36 transition-all ease-in-out duration-200`}
+                                        className={`w-36`}
+                                        // onClick={handleNext}
+                                        onClick={toggleReady}
+                                    >
+                                        {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready" : "Ready Up" }`}
+                                    </Button>
+                                    
+                                </div>
+
+                                </div>
+                            </>
+                      
+                    )}
                     </div>
 
                 )}

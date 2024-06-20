@@ -76,6 +76,8 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
+	const [scores, setScores] = useState([]);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -172,6 +174,19 @@ function Game() {
 
 					})
 
+				);
+
+				setScores( 
+					playing.map((player) => {
+						return ({
+
+							playerName: player,
+							score: 0,
+							goodHints: 0,
+							badHints: 0
+
+						});
+					})
 				);
 
                 setRoomDetails(roomDetails);
@@ -584,6 +599,7 @@ function Game() {
 					setStartFade={setStartFade}
 					correctGuessState={[correctGuess, setCorrectGuess]}
 					numGuessesState={[remainingGuesses, setRemainingGuesses]}
+					scoresState={[scores, setScores]}
 				/>
 
 		}
