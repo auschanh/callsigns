@@ -319,6 +319,69 @@ function App() {
 
 		});
 
+		// host only
+		socket.on("receiveNewCallsign", (newCallsign) => {
+
+			(async () => {
+
+				if (generatedWords.includes(newCallsign)) {
+
+					const retrievedWord = await generateWord();
+
+					try {
+
+						await socket.emit("sendNextCallsign", retrievedWord, [...generatedWords, retrievedWord]);
+		
+					} catch (error) {
+		
+						throw error;
+		
+					}
+
+				} else {
+
+					try {
+
+						await socket.emit("sendNextCallsign", newCallsign, [...generatedWords, newCallsign]);
+		
+					} catch (error) {
+		
+						throw error;
+		
+					}
+
+				}
+
+			})();
+
+		});
+
+		socket.on("receiveNextCallsign", (callsign, generatedWords, isHost) => {
+
+			setCallsign(callsign);
+
+			setGeneratedWords(generatedWords);
+
+			if (isHost) {
+
+				(async () => {
+
+					try {
+		
+						await socket.emit("sendNextRound");
+						
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
+
+			}
+
+		});
+
 		return () => {
 
 			socket.removeAllListeners("redirectGame");
@@ -330,6 +393,8 @@ function App() {
 			socket.removeAllListeners("leftRoom");
 			socket.removeAllListeners("notifyReturnToLobby");
 			socket.removeAllListeners("navigateLobby");
+			socket.removeAllListeners("receiveNewCallsign");
+			socket.removeAllListeners("receiveNextCallsign");
 
 		}
 

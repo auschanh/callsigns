@@ -6,13 +6,13 @@ import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
 import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-react";
 
-const SelectHint = ({ resultsState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState }) => {
+const SelectHint = ({ resultsState, votedState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState }) => {
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
     const [socket, setSocket] = useSocketContext();
     
-    const [voted, setVoted] = useState(false);
+    const [voted, setVoted] = votedState;
 
     const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 

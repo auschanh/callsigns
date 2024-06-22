@@ -665,13 +665,42 @@ io.on("connection", (socket) => {
 		io.to(roomID).emit("receiveToggle", readyState);
 	});
 
-	socket.on("updateRound", (roomID) => {
-		io.to(roomID).emit("receiveUpdateRound");
-	});
-
 	socket.on("updateScore", (roomID, playerName, newScore) => {
 		io.to(roomID).emit("receiveUpdateScore", playerName, newScore);
-	})
+	});
+
+	socket.on("setNextSlide", (roomID) => {
+		io.to(roomID).emit("receiveNextSlide");
+	});
+
+	// host only
+	socket.on("generateNewCallsign", () => {
+
+		const callsign = getMysteryWord();
+
+		socket.emit("receiveNewCallsign", callsign);
+
+	});
+
+	// host only
+	socket.on("sendNextCallsign", (callsign, generatedWords) => {
+
+		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
+
+		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
+
+	});
+
+	// host only
+	socket.on("sendNextRound", () => {
+
+		const roomList = getPlayersInLobby(socket.roomID);
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
+
+		io.to(socket.roomID).emit("receiveNextRound", roomList, findRoom);
+
+	});
 
 	socket.on("disconnecting", () => {
 
