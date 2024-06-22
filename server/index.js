@@ -667,6 +667,10 @@ io.on("connection", (socket) => {
 
 	socket.on("updateRound", (roomID) => {
 		io.to(roomID).emit("receiveUpdateRound");
+	});
+
+	socket.on("updateScore", (roomID, playerName, newScore) => {
+		io.to(roomID).emit("receiveUpdateScore", playerName, newScore);
 	})
 
 	socket.on("disconnecting", () => {

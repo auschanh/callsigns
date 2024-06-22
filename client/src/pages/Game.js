@@ -412,31 +412,48 @@ function Game() {
 
 	}, [submissions]);
 
-	useEffect(() => {
 
+	useEffect(() => {
+		// removes guesser from pool, removes voted out hints, and subtracts score
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
-			setResults(
+			const votedOutResults = results.map((result) => {
 
-				results.map((result) => {
+				if (result.count >= (Math.floor(excludeGuesser.length / 2) + 1)) {
 
-					if (result.count >= (Math.floor(excludeGuesser.length / 2) + 1)) {
+					return {...result, visible: false};
 
-						return {...result, visible: false};
+				} else {
 
-					} else {
+					return result;
 
-						return result;
+				}
 
-					}
+			});
 
-				})
+			setResults(votedOutResults);
 
-			);
+			console.log(votedOutResults.map(result => {
+				return result.visible == false ? result.playerName : null;
+			}))
 
-			console.log("set current index: 2");
+			const newScores = scores.map((player => {
+
+				if(votedOutResults.map(result => {
+					return result.visible == false ? result.playerName : null;
+				}).includes(player.playerName)){
+					return {...player, score: player.score-1}
+				} else {
+					return player;
+				}
+
+			}))
+
+			console.log(newScores);
+
+			setScores(newScores);
 
 			setCurrentIndex(2);
 
@@ -570,6 +587,7 @@ function Game() {
 					currentIndex={currentIndex}
 					setTimeLimitReached={setTimeLimitReached}
 					setStartFade={setStartFade}
+					scoresState={[scores, setScores]}
 				/>
 
 		},
@@ -660,26 +678,37 @@ function Game() {
 						<Slider currentIndex={currentIndex} numCards={cards.length-1} cards={cards} />
 					</div>
 
-					<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
-					
-					<Popover open={chatExpanded} onOpenChange={setChatExpanded}>
+					<div className="flex justify-end ml-auto absolute right-0 top-6 mr-10 gap-4">
+						<div className="text-white mt-1 mr-2">
+						Score: {scores.map(player => player.playerName == playerName ? player.score : "")
+						}
+						</div>
+							
+						<div>
+							<Popover open={chatExpanded} onOpenChange={setChatExpanded}>
+								<PopoverTrigger asChild>
+									<div className="">
+										<div className="relative">
+											<Button className="p-0 aspect-square mb-1" variant="outline"><MessageSquare size={14} /></Button>
+											<div className={`absolute -top-1 -right-1 aspect-square w-2.5 rounded-full bg-cyan-500 transition-all duration-500 ${newMessage ? "" : "invisible opacity-5"}`} />
+										</div>
+									</div>
+								</PopoverTrigger>
 
-						<PopoverTrigger asChild>
-							<div className="absolute top-0 right-0 mt-6 mr-20">
-								<div className="relative">
-									<Button className="p-0 aspect-square mb-1" variant="outline"><MessageSquare size={14} /></Button>
-									<div className={`absolute -top-1 -right-1 aspect-square w-2.5 rounded-full bg-cyan-500 transition-all duration-500 ${newMessage ? "" : "invisible opacity-5"}`} />
-								</div>
-							</div>
-						</PopoverTrigger>
+								<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
 
-						<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
+									<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
 
-							<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+								</PopoverContent>
 
-						</PopoverContent>
+							</Popover>
+						</div>
 
-       				</Popover>
+						<div>
+							<GameMenu roomDetails={roomDetails} isClosedRoomState={[isClosedRoom, setIsClosedRoom]} sessionUrl={sessionUrl} />
+						</div>
+						
+					</div>
 
 					<div className="absolute top-[4%] flex flex-row gap-8">
 

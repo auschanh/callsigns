@@ -123,7 +123,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 
             <PopoverTrigger asChild>
-                <div className="absolute top-0 right-0 m-6">
+                <div className="">
                     <div className="relative">
                         <Button className="p-0 aspect-square mb-1" variant="outline"><Users size={14} /></Button>
                         <div className={`absolute -top-1 -right-1 aspect-square w-2.5 rounded-full bg-cyan-500 transition-all duration-500 ${isPlayerWaiting ? "" : "invisible opacity-5"}`} />
