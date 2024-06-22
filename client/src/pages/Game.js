@@ -904,10 +904,14 @@ function Game() {
 					</div>
 
 					<div className="flex justify-end ml-auto absolute right-0 top-6 mr-10 gap-4">
-						<div className="text-white mt-1 mr-2">
-						Score: {scores.map(player => player.playerName == playerName ? player.score : "")
-						}
-						</div>
+
+						{roomDetails.keepScore && (
+
+							<div className="text-white mt-1 mr-2">
+								Score: {scores.map(player => player.playerName == playerName ? player.score : "")}
+							</div>
+
+						)}
 							
 						<div>
 							<Popover open={chatExpanded} onOpenChange={setChatExpanded}>
