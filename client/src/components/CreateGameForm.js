@@ -92,7 +92,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 			numGuesses: values.numGuesses? values.numGuesses[0] + 1 : 1,
 			numRounds: values.numRounds? values.numRounds[0] + 1 : 11,
 			timeLimit: values.timeLimit? values.timeLimit[0] : 0,
-			keepScore: values.keepScore? values.keepScore : true,
+			keepScore: values.keepScore !== undefined ? values.keepScore : true,
 
 		}
 
