@@ -677,7 +677,7 @@ function Game() {
 
 				if(votedOutResults.map(result => {
 					return result.visible == false ? result.playerName : null;}).includes(player.playerName)){
-					
+						console.log("voted out here")
 						return {...player, score: player.score-1}
 
 				} else {
@@ -772,7 +772,7 @@ function Game() {
 
 		return () => socket.removeAllListeners("receiveUpdateRound");
 
-	}, [currentIndex]);
+	}, [currentIndex, socket]);
 
 
 	useEffect(() => {
@@ -784,7 +784,7 @@ function Game() {
 			console.log("Results obj: ", results);
 			let removedHints = [];
 			results.map(result => {
-				if(result.beenRemoved == true) {
+				if(result.visible == false) {
 					removedHints.push(result.hint);
 				}
 			});
@@ -792,9 +792,11 @@ function Game() {
 			console.log("RemovedHints variable: ", removedHints)
 			numRemovedHints = removedHints.length;
 
+			console.log("This is the guesser: ", guesser);
 			setScores(
 				(prev) => prev.map(player => {
-					if(player.playerName == playerName) {
+					console.log("checking this player: ", player.playerName);
+					if(player.playerName == guesser) {
 						return {...player, score: player.score + numRemovedHints + 1}
 					} else {
 						return player;
@@ -806,7 +808,7 @@ function Game() {
 
 		return () => socket.removeAllListeners("receiveUpdateScore");
 
-	}, [submitted]);
+	}, [guesser, submitted, results, socket]);
 
 
 	const validateWord = (w) => {
