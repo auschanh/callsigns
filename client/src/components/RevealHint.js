@@ -74,6 +74,15 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             }, 6000);
         }
+
+        return () => {
+
+            setSubmissionText1(false);
+            setSubmissionText2(false);
+            setSubmissionText3(false);
+            setSubmissionText4(false);
+
+        }
         
     }, [submitted]);
 
@@ -86,6 +95,12 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                 setShowReadyState(true);
 
             }, 2000);
+
+        }
+
+        return () => {
+
+            setShowReadyState(false);
 
         }
 
@@ -230,7 +245,19 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         });
 
-        socket.emit("sendToggle", roomDetails.roomID, readyState);
+        (async () => {
+
+            try {
+
+                await socket.emit("sendToggle", roomDetails.roomID, readyState);
+
+            } catch (error) {
+
+                throw error;
+
+            }
+
+        })();
 
     }
 
@@ -288,13 +315,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                         <div className={`validate font-mono`}>
 
-                            <h2 className={`text-lg mb-2 ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+                            <h2 className={`text-lg mb-2 text-center ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
                                 {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
                             </h2>
 
-                            <h1 className={`text-6xl ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                            <h1 className={`text-6xl text-center ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
                                 
                                 {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
                                 

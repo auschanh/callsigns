@@ -50,12 +50,16 @@ function Game() {
 	const [results, setResults] = useState([]);
 
 	const [isVoted, setIsVoted] = useState();
+	
+	const [readyNextRound, setReadyNextRound] = useState([]);
 
 	const [voteList, setVoteList] = useState(isVoted?.filter(player => player.voted === true));
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 
 	const [currentRound, setCurrentRound] = useState(1);
+
+	const [voted, setVoted] = useState(false);
 
 	// state for words
 	const [guess, setGuess] = useState("");
@@ -76,7 +80,7 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
-	const [readyNextRound, setReadyNextRound] = useState([]);
+	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -97,27 +101,140 @@ function Game() {
 
 	};
 
-	const handleNext = () => {
-
-		console.log(currentRound);
-
-		// setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
+	const handleNext = async () => {
 		
-		(async () => {
+		try {
 
-			try {
+			await socket.emit("setNextSlide", roomDetails.roomID);
 
-				await socket.emit("setNextSlide", roomDetails.roomID);
+		} catch (error) {
 
-			} catch (error) {
+			throw error;
 
-				throw error;
-
-			}
-
-		})();
+		}
 
 	};
+
+	const resetRound = (othersInLobby, roomDetails) => {
+
+		if (othersInLobby && playerName !== undefined) {
+
+			setHint(["", false]);
+
+			setVoted(false);
+
+			setGuess("");
+
+			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+
+			setInGame(playing);
+
+			setSubmissions(
+
+				playing.map((player) => {
+	
+					return ({
+		
+						playerName: player,
+						hint: ""
+		
+					});
+		
+				})
+
+			);
+
+			setResults(
+
+				playing.map((player) => {
+
+					return ({
+
+						playerName: player,
+						hint: "",
+						count: 0,
+						toRemove: false,
+						beenRemoved: false,
+						visible: true
+					
+					});
+		
+				})
+
+			);
+
+			setIsVoted(
+
+				playing.map((player) => {
+
+					return ({
+
+						playerName: player,
+						voted: false
+
+					});
+
+				})
+
+			);
+
+			setTimeout(() => {
+
+				setCorrectGuess(false);
+
+				setReadyNextRound(
+
+					playing.map((player) => {
+		
+						return ({
+		
+							playerName: player,
+							readyNext: false
+		
+						});
+		
+					})
+		
+				);
+
+			}, 1000);
+
+			setRoomDetails(roomDetails);
+
+			setRemainingGuesses(roomDetails.numGuesses);
+
+			setGuesser(roomDetails.guesser);
+
+			setIsClosedRoom(roomDetails.isClosedRoom);
+
+			setInLobby(othersInLobby);
+
+		} else {
+
+			setRoomDetails(false);
+
+			console.log(isClosedRoom);
+
+			setIsClosedRoom(isClosedRoom);
+
+			setIsAlertOpen(true);
+
+		}
+
+
+
+
+
+		
+		
+
+		// guesser guesserID setGuesser
+
+
+
+		
+
+	}
 
 	useEffect(() => {
 
@@ -374,6 +491,17 @@ function Game() {
 
         });
 
+		socket.on("receiveNextSlide" , () => {
+
+			const newIndex = (currentIndex + 1) % cards.length;
+			setCurrentIndex(newIndex);
+
+			if (newIndex === 0) {
+				setCurrentRound(currentRound => currentRound + 1);
+			}
+
+		});
+
 		// update toggle for all users
         socket.on("receiveToggle", (readyState) => {
 
@@ -383,24 +511,51 @@ function Game() {
 
                 console.log("TRIGGER NEXT ROUND");
 
-				handleNext();
+				(async () => {
 
-				// guesser guesserID setGuesser
+					try {
+		
+						await socket.emit("generateNewCallsign");
+		
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
 
             }
 
         });
 
-		socket.on("receiveNextSlide" , () => {
+		socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
 
-			const newIndex = (currentIndex + 1) % cards.length;
-			setCurrentIndex(newIndex);
+			resetRound(othersInLobby, roomDetails);
 
-			if (newIndex === 0) {
+			setStartFade(true);
 
-				setCurrentRound(currentRound => currentRound + 1);
-	
-			}
+			setFadeBorder(true);
+
+			setTimeout(() => {
+
+				setValidate(false);
+
+				if (playerName === roomDetails.host) {
+
+					handleNext();
+
+				}
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+					setFadeBorder(false);
+
+				}, 1000);
+
+			}, 1000);
 
 		});
 
@@ -412,12 +567,13 @@ function Game() {
 			socket.removeAllListeners("receiveHint");
 			socket.removeAllListeners("receiveVote");
 			socket.removeAllListeners("receiveSubmitGuess");
-			socket.removeAllListeners("receiveToggle");
 			socket.removeAllListeners("receiveNextSlide");
+			socket.removeAllListeners("receiveToggle");
+			socket.removeAllListeners("receiveNextRound");
             
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, currentIndex]);
+    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
 
 	// consolidate into just inGame
 	useEffect(() => {
@@ -474,7 +630,7 @@ function Game() {
 
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
-		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((player) => { return player.voted === true })) {
+		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
 			setResults(
 
@@ -494,11 +650,15 @@ function Game() {
 
 			);
 
-			console.log("HOST set current index: 2");
+			if (playerName === roomDetails.host) {
 
-			// setCurrentIndex(2);
+				console.log("HOST set current index: 2");
 
-			handleNext();
+				// setCurrentIndex(2);
+
+				handleNext();
+
+			}
 
 		}
 
@@ -603,6 +763,7 @@ function Game() {
 
 				<SelectHint 
 					resultsState={[results, setResults]} 
+					votedState={[voted, setVoted]}
 					submissions={submissions}
 					roomDetails={roomDetails} 
 					playerName={playerName} 
@@ -763,7 +924,7 @@ function Game() {
 
 					<div>
 
-						<div className={`
+						{/* <div className={`
 							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-[box-shadow,_border-color] ease-in-out ${
 								(!enterHint || submitted) 
 									? "shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 duration-1000" 
@@ -776,6 +937,24 @@ function Game() {
 										) : correctGuess 
 											? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
 											: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+							}
+						`} /> */}
+
+						<div className={`
+							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-[box-shadow,_border-color] ease-in-out ${
+								(!enterHint || submitted) 
+									? "shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 duration-1000" 
+									: fadeBorder 
+										? "border-stone-800 duration-1000"
+										: !validate 
+											? (showError 
+												? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] duration-300" 
+												: (startFade || timeLimitReached) 
+													? "border-stone-800 duration-300" 
+													: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
+											) : correctGuess 
+												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
+												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
 
