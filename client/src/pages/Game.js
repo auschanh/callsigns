@@ -676,16 +676,15 @@ function Game() {
 			const newScores = scores.map((player => {
 
 				if(votedOutResults.map(result => {
-					return result.visible == false ? result.playerName : null;
-				}).includes(player.playerName)){
-					return {...player, score: player.score-1}
+					return result.visible == false ? result.playerName : null;}).includes(player.playerName)){
+					
+						return {...player, score: player.score-1}
+
 				} else {
 					return player;
 				}
 
 			}))
-
-			console.log(newScores);
 
 			setScores(newScores);
 
@@ -756,6 +755,59 @@ function Game() {
         }
 
     }, [remainingGuesses]);
+
+
+	useEffect(() => {
+
+		socket.on("receiveUpdateRound" , () => {
+
+			const newIndex = (currentIndex + 1) % cards.length;
+			setCurrentIndex(newIndex);
+
+			if (newIndex === 0) {
+				setCurrentRound(currentRound => currentRound + 1);
+
+			}
+		})
+
+		return () => socket.removeAllListeners("receiveUpdateRound");
+
+	}, [currentIndex]);
+
+
+	useEffect(() => {
+		// runs when guesser guesses
+		socket.on("receiveUpdateScore" , () => {
+			// calculate number of hints eliminated
+			let numRemovedHints = 0;
+
+			console.log("Results obj: ", results);
+			let removedHints = [];
+			results.map(result => {
+				if(result.beenRemoved == true) {
+					removedHints.push(result.hint);
+				}
+			});
+
+			console.log("RemovedHints variable: ", removedHints)
+			numRemovedHints = removedHints.length;
+
+			setScores(
+				(prev) => prev.map(player => {
+					if(player.playerName == playerName) {
+						return {...player, score: player.score + numRemovedHints + 1}
+					} else {
+						return player;
+					}
+				})
+			);
+			
+		})
+
+		return () => socket.removeAllListeners("receiveUpdateScore");
+
+	}, [submitted]);
+
 
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars

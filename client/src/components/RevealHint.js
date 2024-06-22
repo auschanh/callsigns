@@ -192,6 +192,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             // }, 500);
 
             socket.emit("submitGuess", roomDetails.roomID, true);
+            socket.emit("updateScore", roomDetails.roomID, playerName);
 
         } else if (singularizeWord(stemmedGuess) !== singularizeWord(stemmerWord(cleanedCallSign))) {
 
@@ -217,6 +218,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             }
 
             socket.emit("submitGuess", roomDetails.roomID, false);
+            socket.emit("updateScore", roomDetails.roomID, playerName);
 
         } else {
 
