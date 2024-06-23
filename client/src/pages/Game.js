@@ -223,19 +223,6 @@ function Game() {
 
 		}
 
-
-
-
-
-		
-		
-
-		// guesser guesserID setGuesser
-
-
-
-		
-
 	}
 
 	useEffect(() => {
@@ -689,7 +676,6 @@ function Game() {
 
 			setScores(newScores);
 
-
 			if (playerName === roomDetails.host) {
 
 				console.log("HOST set current index: 2");
@@ -982,22 +968,6 @@ function Game() {
 
 					<div>
 
-						{/* <div className={`
-							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-[box-shadow,_border-color] ease-in-out ${
-								(!enterHint || submitted) 
-									? "shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 duration-1000" 
-									: !validate 
-										? (showError 
-											? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] duration-300" 
-											: (startFade || timeLimitReached) 
-												? "border-stone-800 duration-300" 
-												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
-										) : correctGuess 
-											? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
-											: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
-							}
-						`} /> */}
-
 						<div className={`
 							pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid transition-[box-shadow,_border-color] ease-in-out ${
 								(!enterHint || submitted) 
@@ -1015,59 +985,6 @@ function Game() {
 												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
-
-						{/* 
-						
-						// intro green border
-						<div 
-							className={`
-								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
-								shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 
-								${enterHint ? "invisible opacity-5" : ""}
-							`} 
-						/>
-
-						// default border
-						<div 
-							className={`
-								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
-								shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 transition-[opacity,_visibility] ease-in-out duration-1000 
-								${enterHint ? "" : "invisible opacity-5"}
-								${startFade ? "invisible opacity-5" : timeLimitReached ? "invisible opacity-5" : ""}
-								${submitted ? "invisible opacity-5" : validate ? "invisible opacity-5" : ""}
-							`} 
-						/>
-
-						// time expired border
-						<div 
-							className={`
-								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
-								transition-all ease-in-out duration-300 
-								${enterHint ? "" : "invisible opacity-5"} 
-								${startFade ? "border-stone-800" : timeLimitReached ? "border-stone-800" : "invisible opacity-5"} 
-								${showError ? "border-red-500 shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b]" : "border-stone-800"}
-							`} 
-						/>
-
-						// end round animation border
-						<div 
-							className={`
-								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
-								shadow-[inset_0rem_0rem_2rem_0.1rem_#12873b] border-green-800 transition-[opacity,_visibility] ease-in-out duration-1000 
-								${submitted ? "" : "invisible opacity-5"}
-							`} 
-						/>
-
-						// end round screen border
-						<div 
-							className={`
-								pointer-events-none absolute z-40 mt-[5vh] h-[75vh] w-[65vw] rounded-3xl border border-solid 
-								transition-[opacity,_visibility] ease-in-out duration-1000 
-								${!validate ? "invisible opacity-5" : correctGuess ? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500" : "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500"}
-							`} 
-						/> 
-						
-						*/}
 						
 						<CardStack 
 							cards={cards} 

@@ -692,11 +692,124 @@ io.on("connection", (socket) => {
 	});
 
 	// host only
-	socket.on("sendNextRound", () => {
+	socket.on("sendNextRound", (selectedPlayers, joinOrder) => {
 
 		const roomList = getPlayersInLobby(socket.roomID);
 
 		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
+
+		// select next guesser
+
+		// get all socketIDs in lobby as strings
+		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
+
+		const usernames = socketsInLobby.map((socketID) => {
+
+			// use those strings to get the actual socket objects
+			const foundSocket = io.sockets.sockets.get(socketID);
+
+			return {
+
+				// extract out the usernames for each socket
+				username: foundSocket.username,
+				socketID: socketID
+
+			}
+
+		});
+
+		// choose a guesser
+		if (findRoom.guesser === "" && findRoom.guesserID === "") {
+
+			console.log("next round: none selected");
+
+			console.log(findRoom);
+
+			const index = Math.floor(Math.random() * selectedPlayers.length);
+
+			const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+			findRoom.guesser = guesser.username;
+			findRoom.guesserID = guesser.socketID;
+
+		// } else if (findRoom.setGuesser) {
+
+		// 	console.log(findRoom.guesser + " selected");
+			
+		// 	console.log(findRoom);
+
+		// 	findRoom.setGuesser = false;
+
+		// 	if (!selectedPlayers.includes(findRoom.guesser)) {
+
+		// 		const index = Math.floor(Math.random() * selectedPlayers.length);
+
+		// 		const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+		// 		findRoom.guesser = guesser.username;
+		// 		findRoom.guesserID = guesser.socketID;
+
+		// 	}
+
+		} else {
+
+			const selectedInOrder = joinOrder.filter((playerName) => { return selectedPlayers.includes(playerName) });
+
+			const prevGuesserIndex = selectedInOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
+
+			console.log(prevGuesserIndex);
+
+			if (prevGuesserIndex !== -1) {
+
+				const currentGuesser = usernames.find(({ username }) => { return username === selectedInOrder[(prevGuesserIndex + 1) % selectedInOrder.length] });
+
+				if (currentGuesser) {
+
+					// next to be guesser
+					findRoom.guesser = currentGuesser.username;
+					findRoom.guesserID = currentGuesser.socketID;
+
+					console.log("next round: previous guesser: " + selectedInOrder[prevGuesserIndex]);
+
+					console.log("next round: current guesser: " + currentGuesser.username);
+
+					console.log(findRoom);
+
+				} else {
+
+					console.log("next round: currentGuesser fail");
+
+					const index = Math.floor(Math.random() * selectedPlayers.length);
+
+					const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
+
+					findRoom.guesser = guesser.username;
+					findRoom.guesserID = guesser.socketID;
+
+				}
+
+			} else {
+
+				console.log("next round: prevGuesser fail");
+
+				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
+
+				let offset = 1;
+
+				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
+
+					offset += 1;
+
+				}
+
+				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
+
+				findRoom.guesser = guesser.username;
+				findRoom.guesserID = guesser.socketID;
+
+			}
+
+		}
 
 		io.to(socket.roomID).emit("receiveNextRound", roomList, findRoom);
 

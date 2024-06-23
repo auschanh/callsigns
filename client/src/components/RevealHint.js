@@ -381,6 +381,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                     <div className='flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4'>
 
+                                        {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
+
                                         {readyNextRound.map((playerObj, index) => {
 
                                             return (
