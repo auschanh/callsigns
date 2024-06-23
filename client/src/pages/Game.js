@@ -82,6 +82,8 @@ function Game() {
 
 	const [scores, setScores] = useState([]);
 
+	const [sortedScores, setSortedScores] = useState([]);
+
 	const [menuScore, setMenuScore] = useState(false);
 
 	const [fadeBorder, setFadeBorder] = useState(false);
@@ -787,7 +789,6 @@ function Game() {
 			// calculate number of hints eliminated
 			let numRemovedHints = 0;
 
-			console.log("Results obj: ", results);
 			let removedHints = [];
 			results.map(result => {
 				if(result.visible == false) {
@@ -795,14 +796,11 @@ function Game() {
 				}
 			});
 
-			console.log("RemovedHints variable: ", removedHints)
 			numRemovedHints = removedHints.length;
 			
 			setScores(
 				(prev) => prev.map(player => {
-					console.log("checking this player: ", player.playerName);
 					if(player.playerName == guesser) {
-						console.log("player score before update: ", player.score);
 						return {...player, score: player.score + numRemovedHints + 1}
 					} else {
 						return player;
@@ -811,6 +809,9 @@ function Game() {
 			);
 			
 		})
+
+		const sortedScores = [...scores].sort((a,b) => b.score - a.score);
+		setSortedScores(sortedScores);
 
 		return () => socket.removeAllListeners("receiveUpdateScore");
 
@@ -904,6 +905,7 @@ function Game() {
 					scoresState={[scores, setScores]}
 					readyNextRoundState={[readyNextRound, setReadyNextRound]}
 					menuScoreState={[menuScore, setMenuScore]}
+					sortedScoresState={[sortedScores, setSortedScores]}
 				/>
 
 		}

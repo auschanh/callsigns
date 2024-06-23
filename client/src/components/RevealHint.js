@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -28,6 +28,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [showReadyState, setShowReadyState] = useState(false);
     const [showScore, setShowScore] = useState(false);
     const [scores, setScores] = scoresState;
+    const [sortedScores, setSortedScores] = sortedScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
 
     const guessInputRef = useRef(null);
@@ -340,9 +341,9 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                     </TableHeader>
                                     <TableBody className="text-center">
-
+                                        
                                         {
-                                            scores.map((player, index) => {
+                                            sortedScores.map((player, index) => {
                                                return (<TableRow key={index}>
                                                 <TableCell className="font-medium">{player.playerName}</TableCell>
                                                 <TableCell>{player.score}</TableCell>
