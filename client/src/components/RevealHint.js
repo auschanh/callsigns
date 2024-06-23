@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -28,6 +28,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [showReadyState, setShowReadyState] = useState(false);
     const [showScore, setShowScore] = useState(false);
     const [scores, setScores] = scoresState;
+    const [menuScore, setMenuScore] = menuScoreState;
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -218,8 +219,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             }
 
             socket.emit("submitGuess", roomDetails.roomID, false);
-            socket.emit("updateScore", roomDetails.roomID, playerName);
-
+            
         } else {
 
             guessInputRef.current.classList.add("border-slate-400");
@@ -329,17 +329,17 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 </div>
                                
                                 <Table className="text-white">
-                                    <TableHeader>
+                                    <TableHeader className="text-center">
 
                                         <TableRow className="!text-green-600">
-                                        <TableHead className="w-[100px]">Player</TableHead>
-                                        <TableHead>Score</TableHead>
-                                        <TableHead>Good Hints</TableHead>
-                                        <TableHead>Bad Hints</TableHead>
+                                        <TableHead className="w-[100px] text-center">Player</TableHead>
+                                        <TableHead className="text-center">Score</TableHead>
+                                        <TableHead className="text-center">Good Hints</TableHead>
+                                        <TableHead className="text-center">Bad Hints</TableHead>
                                         </TableRow>
 
                                     </TableHeader>
-                                    <TableBody>
+                                    <TableBody className="text-center">
 
                                         {
                                             scores.map((player, index) => {
@@ -347,7 +347,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                                 <TableCell className="font-medium">{player.playerName}</TableCell>
                                                 <TableCell>{player.score}</TableCell>
                                                 <TableCell>{player.goodHints}</TableCell>
-                                                <TableCell className="text-right">{player.badHints}</TableCell>
+                                                <TableCell>{player.badHints}</TableCell>
                                                 </TableRow>)
                                             })
                                         }
@@ -373,7 +373,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                         {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
                                         
                                     </h1>
-
+                                    {/* Change Menu State to reflect scores */}
+                                    {setMenuScore(true)}
                                 </div>
 
                                 <div 

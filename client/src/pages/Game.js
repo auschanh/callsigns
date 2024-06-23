@@ -82,6 +82,8 @@ function Game() {
 
 	const [scores, setScores] = useState([]);
 
+	const [menuScore, setMenuScore] = useState(false);
+
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const navigate = useNavigate();
@@ -126,6 +128,8 @@ function Game() {
 			setVoted(false);
 
 			setGuess("");
+
+			setMenuScore(false);
 
 			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
 
@@ -648,7 +652,7 @@ function Game() {
 
 	useEffect(() => {
 
-		// removes guesser from pool, removes voted out hints, and subtracts score
+		// removes guesser from pool, removes voted out hints, and calculates score
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
@@ -676,9 +680,11 @@ function Game() {
 			const newScores = scores.map((player => {
 
 				if(votedOutResults.map(result => {
-					return result.visible == false ? result.playerName : null;}).includes(player.playerName)){
+					return result.visible == true ? result.playerName : null;}).includes(player.playerName)
+					&& player.playerName != guesser
+				){
 						console.log("voted out here")
-						return {...player, score: player.score-1}
+						return {...player, score: player.score+1}
 
 				} else {
 					return player;
@@ -791,12 +797,12 @@ function Game() {
 
 			console.log("RemovedHints variable: ", removedHints)
 			numRemovedHints = removedHints.length;
-
-			console.log("This is the guesser: ", guesser);
+			
 			setScores(
 				(prev) => prev.map(player => {
 					console.log("checking this player: ", player.playerName);
 					if(player.playerName == guesser) {
+						console.log("player score before update: ", player.score);
 						return {...player, score: player.score + numRemovedHints + 1}
 					} else {
 						return player;
@@ -897,6 +903,7 @@ function Game() {
 					numGuessesState={[remainingGuesses, setRemainingGuesses]}
 					scoresState={[scores, setScores]}
 					readyNextRoundState={[readyNextRound, setReadyNextRound]}
+					menuScoreState={[menuScore, setMenuScore]}
 				/>
 
 		}
@@ -959,7 +966,8 @@ function Game() {
 
 					<div className="flex justify-end ml-auto absolute right-0 top-6 mr-10 gap-4">
 						<div className="text-white mt-1 mr-2">
-						Score: {scores.map(player => player.playerName == playerName ? player.score : "")
+						Score: {
+						menuScore && (scores.map(player => player.playerName == playerName ? player.score : ""))
 						}
 						</div>
 							
