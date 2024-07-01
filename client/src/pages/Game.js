@@ -673,7 +673,11 @@ function Game() {
 					&& player.playerName != guesser
 				){
 						console.log("voted out here")
-						return {...player, score: player.score+1}
+						return {...player, score: player.score+1, goodHints: player.goodHints + 1}
+
+				} else if(player.playerName != guesser) {
+
+					return {...player, badHints: player.badHints + 1};
 
 				} else {
 					return player;

@@ -332,11 +332,11 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 <Table className="text-white">
                                     <TableHeader className="text-center">
 
-                                        <TableRow className="!text-green-600">
-                                        <TableHead className="w-[100px] text-center">Player</TableHead>
-                                        <TableHead className="text-center">Score</TableHead>
-                                        <TableHead className="text-center">Good Hints</TableHead>
-                                        <TableHead className="text-center">Bad Hints</TableHead>
+                                        <TableRow className="">
+                                        <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
+                                        <TableHead className="text-center text-green-600">Score</TableHead>
+                                        <TableHead className="text-center  text-green-600">Good Hints</TableHead>
+                                        <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
                                         </TableRow>
 
                                     </TableHeader>
@@ -346,7 +346,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                             sortedScores.map((player, index) => {
                                                return (<TableRow key={index}>
                                                 <TableCell className="font-medium">{player.playerName}</TableCell>
-                                                <TableCell>{player.score}</TableCell>
+                                                <TableCell classList="font-extrabold">{player.score}</TableCell>
                                                 <TableCell>{player.goodHints}</TableCell>
                                                 <TableCell>{player.badHints}</TableCell>
                                                 </TableRow>)
