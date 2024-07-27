@@ -31,7 +31,7 @@ function App() {
 
 	const [callsign, setCallsign] = useState();
 
-	const [generatedWords, setGeneratedWords] = useState(["Board", "Boil", "Bolt"]);
+	const [generatedWords, setGeneratedWords] = useState([]);
 
 	const [messageList, setMessageList] = useState([]);
 

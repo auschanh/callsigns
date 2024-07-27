@@ -41,17 +41,16 @@ app.post("/newJsonFile", (req, res) => {
 });
 
 // "Board" --remove this line later
-let count = 72;
+// let count = 72;
 
 const getMysteryWord = () => {
 
 	// --remove these lines later
-	const randomWord = wordFile[count].Word;
-	count++;
+	// const randomWord = wordFile[count].Word;
+	// count++;
 
 	// reactivate this line
-	// const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
-	console.log(randomWord);
+	const randomWord = wordFile[Math.floor(Math.random() * wordFile.length)].Word;
 	return randomWord;
 };
 
