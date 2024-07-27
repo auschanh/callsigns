@@ -88,6 +88,8 @@ function Game() {
 
 	const [fadeBorder, setFadeBorder] = useState(false);
 
+	const [isNewRound, setIsNewRound] = useState(false);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -122,7 +124,6 @@ function Game() {
 	};
 
 	const resetRound = (othersInLobby, roomDetails) => {
-
 		if (othersInLobby && playerName !== undefined) {
 
 			setHint(["", false]);
@@ -134,6 +135,8 @@ function Game() {
 			setMenuScore(false);
 
 			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+
+			setIsNewRound(true);
 
 			setInGame(playing);
 
@@ -258,8 +261,10 @@ function Game() {
 			if (othersInLobby && playerName !== undefined) {
 
 				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+				
+				setIsNewRound(true);
 
-                setInGame(playing);
+				setInGame(playing);
 
 				setSubmissions(
 
@@ -590,37 +595,42 @@ function Game() {
 	// consolidate into just inGame
 	useEffect(() => {
 
-		setSubmissions(
+		if(isNewRound){
+			setSubmissions(
 
-			submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
+				submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
+	
+			);
+	
+			setResults(
+	
+				results?.filter((player) => {
+	
+					if (player.hint !== "") {
+	
+						return player;
+	
+					} else {
+	
+						return inGame.includes(player.playerName);
+	
+					}
+	
+				})
+	
+			);
+			setIsVoted(
+	
+				isVoted?.filter((player) => { return inGame.includes(player.playerName) })
+	
+			);
+			// always false unless from roomExists or resetRound
+			setIsNewRound(false);
+		}
 
-		);
-
-		setResults(
-
-			results?.filter((player) => {
-
-				if (player.hint !== "") {
-
-					return player;
-
-				} else {
-
-					return inGame.includes(player.playerName);
-
-				}
-
-			})
-
-		);
-
-		setIsVoted(
-
-			isVoted?.filter((player) => { return inGame.includes(player.playerName) })
-
-		);
 
 	}, [inGame]);
+
 
 	useEffect(() => {
 
