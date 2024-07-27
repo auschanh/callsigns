@@ -124,6 +124,7 @@ function Game() {
 	};
 
 	const resetRound = (othersInLobby, roomDetails) => {
+
 		if (othersInLobby && playerName !== undefined) {
 
 			setHint(["", false]);
@@ -596,6 +597,7 @@ function Game() {
 	useEffect(() => {
 
 		if(isNewRound){
+
 			setSubmissions(
 
 				submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
@@ -619,11 +621,13 @@ function Game() {
 				})
 	
 			);
+
 			setIsVoted(
 	
 				isVoted?.filter((player) => { return inGame.includes(player.playerName) })
 	
 			);
+			
 			// always false unless from roomExists or resetRound
 			setIsNewRound(false);
 		}

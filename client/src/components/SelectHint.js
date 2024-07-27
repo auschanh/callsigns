@@ -201,7 +201,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
 
                                 })}
 
-                                {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
                                     return (
 
@@ -221,7 +221,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
 
                                     );
 
-                                })}
+                                })} */}
 
                             </div>
 

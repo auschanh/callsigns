@@ -380,7 +380,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                                 })}
 
-                                {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
+                                {/* {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
 
                                     return (
 
@@ -397,7 +397,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                                     );
 
-                                })}
+                                })} */}
 
                             </div>
 

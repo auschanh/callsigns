@@ -605,7 +605,7 @@ function JoinRoom() {
 
                                             })} */}
 
-                                            {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                            {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
                                                 return (
 
@@ -618,7 +618,7 @@ function JoinRoom() {
 
                                                 );
 
-                                            })}
+                                            })} */}
 
                                         </div>
                                     
@@ -663,7 +663,7 @@ function JoinRoom() {
 
                                                 })}
 
-                                                {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
+                                                {/* {Array.from({ length: roomDetails.prevAiPlayers }, (_, index) => {
 
                                                     return (
 
@@ -676,7 +676,7 @@ function JoinRoom() {
 
                                                     );
 
-                                                })}
+                                                })} */}
 
                                             </div>
                                         

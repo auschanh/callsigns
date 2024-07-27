@@ -297,7 +297,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 												defaultValue={field.value}
 												className="flex flex-row gap-4"
 											>
-												{Array.from({ length: 7 }, (_, index) => {
+												{/* {Array.from({ length: 7 }, (_, index) => {
 													return (
 														<FormItem
 															key={index + 1}
@@ -325,7 +325,38 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 															</FormLabel>
 														</FormItem>
 													);
+												})} */}
+
+												{Array.from({ length: 5 }, (_, index) => {
+													return (
+														<FormItem
+															key={index + 3}
+															className="flex items-center"
+														>
+															<FormLabel
+																className={`
+																	cursor-pointer h-10 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300
+																	border border-slate-200 bg-white text-slate-500 hover:bg-slate-900/80 hover:text-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50
+																	duration-300
+																	${field.value === index + 3
+																		? "border bg-slate-900 text-slate-50 outline ring-offset-white ring-2 ring-slate-950 ring-offset-2"
+																		: ""
+																	}
+																`}
+															>
+																<FormControl>
+																	<RadioGroupItem
+																		value={index + 3}
+																		className="invisble h-0 w-0 border-none"
+																		onClick={() => {handlePlayerCount(index + 3)}}
+																	/>
+																</FormControl>
+																{index + 3}
+															</FormLabel>
+														</FormItem>
+													);
 												})}
+
 											</RadioGroup>
 										</FormControl>
 										<FormMessage />
@@ -333,7 +364,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 								)}
 							/>
 
-							<FormField
+							{/* <FormField
 								defaultValue={0}
 								control={form.control}
 								name="aiPlayers"
@@ -483,7 +514,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 										<FormMessage />
 									</FormItem>
 								)}
-							/>
+							/> */}
 
 						</TabsContent>
 

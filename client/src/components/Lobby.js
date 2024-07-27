@@ -720,7 +720,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 							})}
 
-							{Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
+							{/* {Array.from({ length: gameInfo.aiPlayers }, (_, index) => {
 
 								return (
 
@@ -757,7 +757,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 								);
 
-							})}
+							})} */}
 
 						</div>
 
@@ -802,7 +802,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 								})}
 
-								{Array.from({ length: prevAiPlayers }, (_, index) => {
+								{/* {Array.from({ length: prevAiPlayers }, (_, index) => {
 
 									return (
 
@@ -815,7 +815,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 									);
 
-								})}
+								})} */}
 
 							</div>
 						
