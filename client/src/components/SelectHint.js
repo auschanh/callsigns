@@ -280,7 +280,13 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
 
                             </div>
 
-                            <div className="flex flex-row justify-center gap-4 mt-16">
+                            <div className="mt-12">
+
+                                <h3 className="text-sm">Hints with <span className="font-bold">{Math.ceil((isVoted.length - 1) / 2)}</span> or more votes will be eliminated</h3>
+
+                            </div>
+
+                            <div className="flex flex-row justify-center gap-4 mt-6">
 
                                 {results.some((result) => { return result.hint !== "" }) && (
 

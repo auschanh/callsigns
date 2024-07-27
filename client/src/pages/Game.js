@@ -596,7 +596,7 @@ function Game() {
 	// consolidate into just inGame
 	useEffect(() => {
 
-		if(isNewRound){
+		if (isNewRound) {
 
 			setSubmissions(
 
@@ -662,7 +662,7 @@ function Game() {
 
 			const votedOutResults = results.map((result) => {
 
-				if (result.count >= (Math.floor(excludeGuesser.length / 2) + 1)) {
+				if (result.count >= (Math.ceil(excludeGuesser.length / 2))) {
 
 					return {...result, visible: false};
 
@@ -842,8 +842,8 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Come up with a one-word hint to help `}</span>
-					<span className="font-semibold">{roomDetails?.guesser}</span>
-					<span>{` guess their callsign`}</span>
+					<span className="font-bold">{roomDetails?.guesser}</span>
+					<span>{` guess their callsign.`}</span>
 				</p>,
 
 			content:  
@@ -864,7 +864,14 @@ function Game() {
 		},
 		{
 			title: "Hint Elimination",
-			phase: "Decide which hints are too similar or illegal",
+
+			phase: 
+				<p>
+					<span>{`Decide which hints are too similar or illegal. Hints with `}</span>
+					<span className="font-bold">{Math.ceil((inGame?.length - 1) / 2)}</span>
+					<span>{` or more votes will be eliminated.`}</span>
+				</p>,
+
 			content: 
 
 				<SelectHint 
@@ -887,7 +894,8 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Reveal all approved hints to `}</span>
-					<span className="font-semibold">{roomDetails?.guesser}</span>
+					<span className="font-bold">{roomDetails?.guesser}</span>
+					.
 				</p>,		
 
 			content: 
@@ -979,7 +987,7 @@ function Game() {
 
 						{roomDetails.keepScore && (
 
-							<div className="text-white mt-1 mr-2">
+							<div className="text-slate-100 font-mono mt-2 mr-6">
 								Score: {scores.map(player => player.playerName == playerName ? player.score : "")}
 							</div>
 

@@ -401,7 +401,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                                         {playerObj.readyNext && (
                                                             <Check className="text-slate-900" size={14} />
                                                         ) || (
-                                                            <Ellipsis className="text-slate-900" size={14} />
+                                                            // <Ellipsis className="text-slate-900" size={14} />
+                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
                                                         )}
                                                     </div>
                                                     <p className="text-xs">{playerObj.playerName}</p>
@@ -455,7 +456,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                             // onClick={handleNext}
                                             onClick={toggleReady}
                                         >
-                                            {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready" : "Ready Up" }`}
+                                            {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
                                         </Button>
                                     
                                     </div>
