@@ -341,6 +341,7 @@ function Game() {
 
 							playerName: player,
 							score: 0,
+							correctGuesses: 0,
 							goodHints: 0,
 							badHints: 0
 
@@ -807,7 +808,10 @@ function Game() {
 			setScores(
 				(prev) => prev.map(player => {
 					if(player.playerName == guesser) {
-						return {...player, score: player.score + numRemovedHints + 1}
+						return {...player, 
+							score: player.score + numRemovedHints + 1, 
+							correctGuesses: player.correctGuesses + 1
+							}
 					} else {
 						return player;
 					}
@@ -843,6 +847,7 @@ function Game() {
 				<TableRow className="">
 				<TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
 				<TableHead className="text-center text-green-600">Score</TableHead>
+				<TableHead className="text-center  text-green-600">Correct Guesses</TableHead>
 				<TableHead className="text-center  text-green-600">Good Hints</TableHead>
 				<TableHead className="text-center  text-green-600">Bad Hints</TableHead>
 				</TableRow>
@@ -855,6 +860,7 @@ function Game() {
 						return (<TableRow key={index}>
 						<TableCell className="font-medium">{player.playerName}</TableCell>
 						<TableCell classList="font-extrabold">{player.score}</TableCell>
+						<TableCell>{player.correctGuesses}</TableCell>
 						<TableCell>{player.goodHints}</TableCell>
 						<TableCell>{player.badHints}</TableCell>
 						</TableRow>)
@@ -1018,11 +1024,11 @@ function Game() {
 									<PopoverTrigger asChild>
 									<div className="">
 										<div className="relative">
-											<Button className="p-2 aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+											<Button className="justify-right p-2 aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
 										</div>
 									</div>
 									</PopoverTrigger>
-									<PopoverContent className="w-96 mr-40">
+									<PopoverContent className="w-[36rem] mr-40">
 										<div className="text-black mt-1 mr-2">
 											{generateScoreTable('black')}
 										</div>
