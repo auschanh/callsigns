@@ -130,3 +130,7 @@
 #countdown {
   animation: blink-out 1s ease-out forwards 3;
 }
+/* 
+.blur {
+  filter: blur(3px);
+} */

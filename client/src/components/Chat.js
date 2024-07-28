@@ -7,10 +7,13 @@ import { ChevronUp, User, Users } from "lucide-react";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 
 function Chat({ username, roomName, roomID }) {
 
     const [socket, setSocket] = useSocketContext();
+
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
@@ -228,8 +231,7 @@ function Chat({ username, roomName, roomID }) {
                                 )}
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
-
-                                    <p className="leading-none text-sm break-words">{messageContent.message}</p>
+                                    <p className={`leading-none text-sm break-words ${playerName === guesser && (username !== messageContent.author)  ? 'blur' : ''} } `}>{messageContent.message}</p>
 
                                 </div>
 
