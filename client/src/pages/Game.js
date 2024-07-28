@@ -1044,12 +1044,12 @@ function Game() {
 
 						{roomDetails.keepScore && (
 
-							<div className="mr-6">
+							<div className="mr-10">
 								<Popover>
 									<PopoverTrigger asChild>
 									<div className="">
 										<div className="relative">
-											<Button className="justify-right p-2 text-slate-100 font-mono aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+											<Button className="justify-right p-2 font-mono aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
 										</div>
 									</div>
 									</PopoverTrigger>
