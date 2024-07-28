@@ -22,6 +22,8 @@ import { MessageSquare, TriangleAlert } from "lucide-react";
 import { ReactComponent as HiddenIcon } from "../assets/noun-hidden-5642408.svg";
 import { stemmer } from "stemmer";
 import pluralize from "pluralize";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
+
 
 function Game() {
 	
@@ -333,6 +335,7 @@ function Game() {
 
 							playerName: player,
 							score: 0,
+							correctGuesses: 0,
 							goodHints: 0,
 							badHints: 0
 
@@ -821,7 +824,10 @@ function Game() {
 			setScores(
 				(prev) => prev.map(player => {
 					if(player.playerName == guesser) {
-						return {...player, score: player.score + numRemovedHints + 1}
+						return {...player, 
+							score: player.score + numRemovedHints + 1, 
+							correctGuesses: player.correctGuesses + 1
+							}
 					} else {
 						return player;
 					}
@@ -849,6 +855,40 @@ function Game() {
 	const singularizeWord = (w) => {
 		return pluralize.singular(w);
 	}
+
+	const generateScoreTable = (cellColour) => {
+		let table = <Table className={`text-${cellColour}`}>
+			<TableHeader className="text-center">
+
+				<TableRow className="">
+				<TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
+				<TableHead className="text-center text-green-600">Score</TableHead>
+				<TableHead className="text-center  text-green-600">Correct Guesses</TableHead>
+				<TableHead className="text-center  text-green-600">Good Hints</TableHead>
+				<TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+				</TableRow>
+
+			</TableHeader>
+			<TableBody className="text-center">
+				
+				{
+					sortedScores.map((player, index) => {
+						return (<TableRow key={index}>
+						<TableCell className="font-medium">{player.playerName}</TableCell>
+						<TableCell classList="font-extrabold">{player.score}</TableCell>
+						<TableCell>{player.correctGuesses}</TableCell>
+						<TableCell>{player.goodHints}</TableCell>
+						<TableCell>{player.badHints}</TableCell>
+						</TableRow>)
+					})
+				}
+				
+			</TableBody>
+		</Table>;
+		
+		return table;
+	}
+
 
 	const cards = [
 
@@ -934,6 +974,7 @@ function Game() {
 					readyNextRoundState={[readyNextRound, setReadyNextRound]}
 					menuScoreState={[menuScore, setMenuScore]}
 					sortedScoresState={[sortedScores, setSortedScores]}
+					generateScoreTable={generateScoreTable}
 				/>
 
 		}
@@ -1003,10 +1044,23 @@ function Game() {
 
 						{roomDetails.keepScore && (
 
-							<div className="text-slate-100 font-mono mt-2 mr-6">
-								Score: {scores.map(player => player.playerName == playerName ? player.score : "")}
+							<div className="mr-6">
+								<Popover>
+									<PopoverTrigger asChild>
+									<div className="">
+										<div className="relative">
+											<Button className="justify-right p-2 text-slate-100 font-mono aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+										</div>
+									</div>
+									</PopoverTrigger>
+									<PopoverContent className="w-[36rem] mr-40">
+										<div className="text-black mt-1 mr-2">
+											{generateScoreTable('black')}
+										</div>
+									</PopoverContent>
+								</Popover>
 							</div>
-
+							
 						)}
 							
 						<div>

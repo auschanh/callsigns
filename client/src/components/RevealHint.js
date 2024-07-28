@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -330,8 +330,11 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                         Back
                                     </Button>
                                 </div>
-                               
-                                <Table className="text-white">
+                                <div>
+                                {generateScoreTable('white')}
+
+                                </div>
+                                {/* <Table className="text-white">
                                     <TableHeader className="text-center">
 
                                         <TableRow className="">
@@ -356,7 +359,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                         }
                                         
                                     </TableBody>
-                                </Table>
+                                </Table> */}
                             </div>
 
                         ) || (
