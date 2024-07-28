@@ -846,31 +846,35 @@ io.on("connection", (socket) => {
 
 				const findRoom = roomLookup.find(({ roomID }) => { return roomID === room });
 
-				if (socket.username === findRoom.guesser) {
+				if (findRoom) {
 
-					findRoom.guesser = "";
-					findRoom.guesserID = "";
-					findRoom.setGuesser = false;
+					if (socket.username === findRoom.guesser) {
 
-				}
-
-				// if you're the host
-				if (findRoom && findRoom.hostID === socket.id) {
-
-					const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
-
-					const newHostSocketID = socketsInLobby.find((playerSocket) => { return playerSocket !== socket.id });
-
-					const foundSocket = io.sockets.sockets.get(newHostSocketID);
-
-					findRoom.host = foundSocket.username;
-					findRoom.hostID = foundSocket.id;
-
-					if (!findRoom.isGameStarted) {
-
-						socket.to(foundSocket.id).emit("newHost");
-
+						findRoom.guesser = "";
+						findRoom.guesserID = "";
+						findRoom.setGuesser = false;
+	
 					}
+	
+					// if you're the host
+					if (findRoom.hostID === socket.id) {
+	
+						const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
+	
+						const newHostSocketID = socketsInLobby.find((playerSocket) => { return playerSocket !== socket.id });
+	
+						const foundSocket = io.sockets.sockets.get(newHostSocketID);
+	
+						findRoom.host = foundSocket.username;
+						findRoom.hostID = foundSocket.id;
+	
+						if (!findRoom.isGameStarted) {
+	
+							socket.to(foundSocket.id).emit("newHost");
+	
+						}
+					}
+					
 				}
 
 			}

@@ -235,12 +235,14 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
             return (
             
                 player.playerName === playerName ? 
+
                     ({
 
                         ...player,
                         readyNext: !player.readyNext
 
                     })
+                    
                 : player
             );
 

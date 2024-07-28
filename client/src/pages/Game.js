@@ -88,8 +88,6 @@ function Game() {
 
 	const [fadeBorder, setFadeBorder] = useState(false);
 
-	const [isNewRound, setIsNewRound] = useState(false);
-
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -136,8 +134,6 @@ function Game() {
 			setMenuScore(false);
 
 			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
-
-			setIsNewRound(true);
 
 			setInGame(playing);
 
@@ -262,8 +258,6 @@ function Game() {
 			if (othersInLobby && playerName !== undefined) {
 
 				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
-				
-				setIsNewRound(true);
 
 				setInGame(playing);
 
@@ -594,47 +588,65 @@ function Game() {
     }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
 
 	// consolidate into just inGame
+	// disconnect protection
+	// remove disconnected players so we don't have to wait for their input
 	useEffect(() => {
 
-		if (isNewRound) {
+		// we don't want to wait for disconnected players to submit a hint
+		// filter out submissions of disconnected players
+		setSubmissions(
 
-			setSubmissions(
+			submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
 
-				submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
-	
-			);
-	
-			setResults(
-	
-				results?.filter((player) => {
-	
-					if (player.hint !== "") {
-	
-						return player;
-	
-					} else {
-	
-						return inGame.includes(player.playerName);
-	
-					}
-	
-				})
-	
-			);
+		);
 
-			setIsVoted(
+		// if a disconnected player has already submitted a hint, leave the hint
+		setResults(
 	
-				isVoted?.filter((player) => { return inGame.includes(player.playerName) })
-	
-			);
-			
-			// always false unless from roomExists or resetRound
-			setIsNewRound(false);
+			results?.filter((player) => {
+
+				if (player.hint !== "") {
+
+					return player;
+
+				} else {
+
+					return inGame.includes(player.playerName);
+
+				}
+
+			})
+
+		);
+
+		// we don't want to wait for disconnected players to vote
+		// filter out has-voted-status of disconnected players
+		setIsVoted(
+		
+			isVoted?.filter((player) => { return inGame.includes(player.playerName) })
+
+		);
+
+		// we don't want to wait for disconnected players to ready up for the next round
+		setReadyNextRound(
+
+			readyNextRound?.filter((player) => { return inGame.includes(player.playerName) })
+
+		);
+
+		// we don't want to wait for a disconnected guesser to guess on the last slide
+
+
+
+		// if there are less than 3 players left in the game, players will need to return to lobby
+		if (inGame?.length < 3) {
+
+
+
 		}
 
-
+	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);
-
 
 	useEffect(() => {
 
@@ -642,11 +654,13 @@ function Game() {
 
 		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
-			console.log("HOST set current index: 1");
+			if (currentIndex === 0) {
 
-			// setCurrentIndex(1);
+				console.log("HOST set current index: 1");
 
-			handleNext();
+				handleNext();
+
+			}
 
 		}
 
@@ -703,11 +717,13 @@ function Game() {
 
 			if (playerName === roomDetails.host) {
 
-				console.log("HOST set current index: 2");
+				if (currentIndex === 1) {
 
-				// setCurrentIndex(2);
-
-				handleNext();
+					console.log("HOST set current index: 2");
+	
+					handleNext();
+	
+				}
 
 			}
 
