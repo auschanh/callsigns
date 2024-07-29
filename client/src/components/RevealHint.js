@@ -3,13 +3,14 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Input } from "../components/ui/input";
 import Timer from './Timer';
+import AgentIndicator from './AgentIndicator';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -276,7 +277,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                         { submissionText1 && (
                             <>
-                                <p>{`% Encrypting CALLSIGN...`}</p>
+                                <p>{`% Begin encryption...`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -294,7 +295,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 <p>{`% ...`}</p>
                                 <p>{`% ...`}</p>
                                 <p>{`% Encrypting callsign: ${guess ? guess : "[NULL]"}`}</p>
-                                <p>{`% Sending 1askjgak124aksgjhjk124asfsaj`}</p>
+                                <p>{`% Transmitting: ${encryptedCallsign}`}</p>
                             </>
                         )}
                         { submissionText4 && (
@@ -479,6 +480,12 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                 {!submitted && !validate && (
 
                     <div className="flex flex-none flex-col w-full relative items-center py-16 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+
+                        {playerName === guesser && (
+
+                            <AgentIndicator />
+
+                        )}
 
                         {roomDetails.timeLimit !== 0 && currentIndex === 2 && (
 

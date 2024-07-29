@@ -3,10 +3,14 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Progress } from "./ui/progress";
 import Timer from './Timer';
+import AgentIndicator from './AgentIndicator';
 import { useSocketContext } from "../contexts/SocketContext";
+import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-react";
 
-const SelectHint = ({ resultsState, votedState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState }) => {
+const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState }) => {
+
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
@@ -150,6 +154,12 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
 
             <div className="w-full relative py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
+                {playerName === guesser && (
+
+                    <AgentIndicator />
+
+                )}
+                
                 {roomDetails.timeLimit !== 0 && currentIndex === 1 && (
 
                     <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} slideIndex={1} />
@@ -160,13 +170,13 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
 
                     {/* if player is the guesser load progress component  */}
 
-                    {playerName === roomDetails.guesser && (
+                    {playerName === guesser && (
 
                         <>
                             <p className="mb-6 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
 
                             <Progress
-                                value={(isVoted.filter(player => player.voted && playerName === roomDetails.guesser)).length / (results.length-1) * 100}
+                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (results.length-1) * 100}
                                 max={100}
                             /> 
 
@@ -241,7 +251,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
                                 
                                     results.map((result, index) => {
 
-                                        if (result.playerName !== roomDetails.guesser && result.hint !== "") {
+                                        if (result.playerName !== guesser && result.hint !== "") {
 
                                             return (
 
