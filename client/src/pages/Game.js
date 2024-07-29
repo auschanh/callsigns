@@ -20,6 +20,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { MessageSquare, TriangleAlert } from "lucide-react";
 import { ReactComponent as HiddenIcon } from "../assets/noun-hidden-5642408.svg";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 import { stemmer } from "stemmer";
 import pluralize from "pluralize";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
@@ -874,8 +875,8 @@ function Game() {
 				{
 					sortedScores.map((player, index) => {
 						return (<TableRow key={index}>
-						<TableCell className="font-medium">{player.playerName}</TableCell>
-						<TableCell classList="font-extrabold">{player.score}</TableCell>
+						<TableCell className="font-medium">{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5 fill-${cellColour}`}/> : ''}{player.playerName}</TableCell>
+						<TableCell className="font-extrabold">{player.score}</TableCell>
 						<TableCell>{player.correctGuesses}</TableCell>
 						<TableCell>{player.goodHints}</TableCell>
 						<TableCell>{player.badHints}</TableCell>

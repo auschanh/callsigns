@@ -1925,6 +1925,18 @@ video {
   fill: currentColor;
 }
 
+.fill-amber-500 {
+  fill: #f59e0b;
+}
+
+.fill-amber-400 {
+  fill: #fbbf24;
+}
+
+.fill-white {
+  fill: #fff;
+}
+
 .stroke-slate-900 {
   stroke: #0f172a;
 }
