@@ -857,11 +857,12 @@ function Game() {
 		return pluralize.singular(w);
 	}
 
-	const generateScoreTable = (cellColour) => {
+	const generateScoreTable = (cellColour, agentColour) => {
 		let table = <Table className={`text-${cellColour}`}>
 			<TableHeader className="text-center">
 
 				<TableRow className="">
+				<TableHead className="w-0"></TableHead>
 				<TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
 				<TableHead className="text-center text-green-600">Score</TableHead>
 				<TableHead className="text-center  text-green-600">Correct Guesses</TableHead>
@@ -875,7 +876,8 @@ function Game() {
 				{
 					sortedScores.map((player, index) => {
 						return (<TableRow key={index}>
-						<TableCell className="font-medium">{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5 fill-${cellColour}`}/> : ''}{player.playerName}</TableCell>
+						<TableCell className={`font-medium fill-${agentColour}`}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`} style={{fill: "#fbbf24"}}/> : ''}</TableCell>
+						<TableCell className="font-medium">{player.playerName}</TableCell>
 						<TableCell className="font-extrabold">{player.score}</TableCell>
 						<TableCell>{player.correctGuesses}</TableCell>
 						<TableCell>{player.goodHints}</TableCell>
@@ -1056,7 +1058,7 @@ function Game() {
 									</PopoverTrigger>
 									<PopoverContent className="w-[36rem] mr-40">
 										<div className="text-black mt-1 mr-2">
-											{generateScoreTable('black')}
+											{generateScoreTable('black', 'black')}
 										</div>
 									</PopoverContent>
 								</Popover>

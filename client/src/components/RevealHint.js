@@ -331,7 +331,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                     </Button>
                                 </div>
                                 <div>
-                                {generateScoreTable('white')}
+                                {generateScoreTable('white', 'amber-400')}
 
                                 </div>
                                 {/* <Table className="text-white">
