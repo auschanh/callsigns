@@ -91,6 +91,8 @@ function Game() {
 
 	const [fadeBorder, setFadeBorder] = useState(false);
 
+	const [hintArray, setHintArray] = useState([]);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -443,6 +445,8 @@ function Game() {
 
 			);
 
+			
+
 		});
 
 		socket.on("receiveVote", (playerName, externalResults, voted) => {
@@ -575,8 +579,13 @@ function Game() {
 
 		});
 
-        return () => {
+		socket.on("receiveHintArray", (duplicates) => {
 
+			setHintArray(duplicates);
+		});
+
+        return () => {
+			
             socket.removeAllListeners("roomExists");
 			socket.removeAllListeners("sendSelectedPlayers");
 			socket.removeAllListeners("isRoomClosed");
@@ -586,7 +595,8 @@ function Game() {
 			socket.removeAllListeners("receiveNextSlide");
 			socket.removeAllListeners("receiveToggle");
 			socket.removeAllListeners("receiveNextRound");
-            
+			socket.removeAllListeners("receiveHintArray");
+
         }
 
     }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
@@ -657,6 +667,22 @@ function Game() {
 		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
 
 		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
+
+			// every submitted a hint, create hint Array
+			const tempHintArray = excludeGuesser.map((player, index) => {
+				return player.hint
+			});
+
+
+			const duplicates = tempHintArray.filter((currHint, index) => {
+				return tempHintArray.some((hint, i) => {
+					return currHint === hint && index !== i 
+				})
+			});
+
+			console.log(duplicates);
+
+			socket.emit("sendHintArray", roomDetails.roomID, duplicates);
 
 			if (currentIndex === 0) {
 
@@ -944,6 +970,7 @@ function Game() {
 					setTimeLimitReached={setTimeLimitReached}
 					setStartFade={setStartFade}
 					scoresState={[scores, setScores]}
+					hintArrayState={[hintArray, setHintArray]}
 				/>
 
 		},

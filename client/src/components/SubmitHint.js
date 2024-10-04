@@ -98,6 +98,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
 	const handleSubmit = async (event) => {
 
+        // possibly make state for users literal input, before cleaning their hint
         const checkHint = hint[0].toLowerCase().trim(); // clean up user's input
         const cleanedCallSign = callsign.toLowerCase().trim()
         const stemmedHint = stemmerWord(checkHint);

@@ -668,6 +668,10 @@ io.on("connection", (socket) => {
 		io.to(roomID).emit("receiveUpdateScore", playerName, newScore);
 	});
 
+	socket.on("sendHintArray", (roomID, hintArray) => {
+		io.to(roomID).emit("receiveHintArray", hintArray);
+	})
+
 	socket.on("setNextSlide", (roomID) => {
 		io.to(roomID).emit("receiveNextSlide");
 	});

@@ -6,7 +6,7 @@ import Timer from './Timer';
 import { useSocketContext } from "../contexts/SocketContext";
 import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-react";
 
-const SelectHint = ({ resultsState, votedState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState }) => {
+const SelectHint = ({ resultsState, votedState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState, hintArrayState }) => {
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
@@ -19,6 +19,8 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
     const [isNoneSelected, setIsNoneSelected] = useState(true);
 
     const [scores, setScores] = scoresState;
+
+    const [hintArray, setHintArray] = hintArrayState;
 
     useEffect(() => {
 
@@ -236,10 +238,12 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, player
                             <Label className="mb-12 text-lg leading-none text-center">Select the hints that are too similar or illegal:</Label>
 
                             <div className="flex flex-row flex-wrap justify-center gap-10">
-
                                 {results.some((result) => { return result.hint !== "" }) && (
-                                
+                                    
+                                    
                                     results.map((result, index) => {
+                                        
+                                        // 2 arrays of hints to check if any are the same TODO
 
                                         if (result.playerName !== roomDetails.guesser && result.hint !== "") {
 
