@@ -92,6 +92,7 @@ function Game() {
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const [hintArray, setHintArray] = useState([]);
+	const [encryptedCallsign, setEncryptedCallsign] = useState();
 
 	const navigate = useNavigate();
 
@@ -235,6 +236,22 @@ function Game() {
 		}
 
 	}
+
+	const getId = (length) => {
+
+        let result = '';
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        while (result.length < length) {
+
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+
+        }
+
+        return result;
+
+    }
 
 	useEffect(() => {
 
@@ -478,6 +495,8 @@ function Game() {
 		});
 
 		socket.on("receiveSubmitGuess", (isCorrect) => {
+
+			setEncryptedCallsign(getId(32));
 
             if (isCorrect) {
 
@@ -964,7 +983,6 @@ function Game() {
 					votedState={[voted, setVoted]}
 					submissions={submissions}
 					roomDetails={roomDetails} 
-					playerName={playerName} 
 					isVoted={isVoted}
 					currentIndex={currentIndex}
 					setTimeLimitReached={setTimeLimitReached}
@@ -1005,6 +1023,8 @@ function Game() {
 					menuScoreState={[menuScore, setMenuScore]}
 					sortedScoresState={[sortedScores, setSortedScores]}
 					generateScoreTable={generateScoreTable}
+					encryptedCallsign={encryptedCallsign}
+					currentRound={currentRound}
 				/>
 
 		}
@@ -1066,6 +1086,7 @@ function Game() {
 					</div>
 
 					<div className="flex justify-end ml-auto absolute right-0 top-6 mr-10 gap-4">
+
 						{/* <div className="text-white mt-1 mr-2">
 						Score: {
 						menuScore && (scores.map(player => player.playerName == playerName ? player.score : ""))
@@ -1079,7 +1100,7 @@ function Game() {
 									<PopoverTrigger asChild>
 									<div className="">
 										<div className="relative">
-											<Button className="justify-right p-2 font-mono aspect-square mb-1 mr-2" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+											<Button className="justify-right px-3 py-2 font-mono aspect-square mb-1 mr-4" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
 										</div>
 									</div>
 									</PopoverTrigger>

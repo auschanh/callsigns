@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Progress } from "./ui/progress";
 import Timer from './Timer';
+import AgentIndicator from './AgentIndicator';
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
@@ -242,6 +243,12 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                         <div className="w-full relative bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 py-12 px-24 rounded-lg text-black">
 
+                            {playerName === guesser && (
+
+                                <AgentIndicator />
+
+                            )}
+
                             {roomDetails.timeLimit !== 0 && currentIndex === 0 && (
 
                                 <Timer timeLimit={roomDetails.timeLimit} setTimeLimitReached={setTimeLimitReached} setStartFade={setStartFade} slideIndex={0} />
@@ -251,6 +258,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                             {playerName === guesser && (
 
                                 <div className="mb-8">
+
                                     <p className="mb-6 text-center">{submissions.filter(vote => vote.hint).length} {submissions.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
 
                                     <Progress 

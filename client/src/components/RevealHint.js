@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Input } from "../components/ui/input";
 import Timer from './Timer';
+import AgentIndicator from './AgentIndicator';
+import { toast } from "sonner";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable }) => {
+const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -30,11 +33,14 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
+    const [showEndGame, setShowEndGame] = useState(false);
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
     const scoreBtnRef = useRef(null);
     const nextRoundBtnRef = useRef(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -124,6 +130,22 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
 
     }, [correctGuess]);
+
+    useEffect(() => {
+
+        if (currentRound === roomDetails.numRounds && showReadyState) {
+
+            setShowEndGame(true);
+
+        }
+
+        return () => {
+
+            setShowEndGame(false);
+
+        }
+
+    }, [currentRound, showReadyState]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -264,6 +286,33 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
     }
 
+    const handleReturnLobby = async () => {
+
+        try {
+
+            await socket.emit("returnToLobby", roomDetails.roomID, playerName);
+
+            toast.dismiss();
+
+            if (playerName === roomDetails.host) {
+
+                navigate(`/newhost/${roomDetails.roomID}`);
+    
+            } else {
+    
+                navigate(`/lobby/${roomDetails.roomID}`);
+    
+            }
+
+
+        } catch (error) {
+
+            throw error;
+
+        }
+
+    }
+
     return (
 
         <div className="flex flex-none w-full h-full justify-center items-center">
@@ -276,7 +325,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                         { submissionText1 && (
                             <>
-                                <p>{`% Encrypting CALLSIGN...`}</p>
+                                <p>{`% Begin encryption...`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -294,7 +343,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 <p>{`% ...`}</p>
                                 <p>{`% ...`}</p>
                                 <p>{`% Encrypting callsign: ${guess ? guess : "[NULL]"}`}</p>
-                                <p>{`% Sending 1askjgak124aksgjhjk124asfsaj`}</p>
+                                <p>{`% Transmitting: ${encryptedCallsign}`}</p>
                             </>
                         )}
                         { submissionText4 && (
@@ -379,61 +428,75 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                         {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
                                         
                                     </h1>
+
                                     {/* Change Menu State to reflect scores */}
-                                    {setMenuScore(true)}
+                                    {/* {setMenuScore(true)} */}
+
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
+                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
-                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full px-24 gap-4'>
+                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4'>
 
-                                        {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
+                                        {!showEndGame && (
 
-                                        {readyNextRound.map((playerObj, index) => {
+                                            <>
 
-                                            return (
+                                                {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
 
-                                                <Button
-                                                    key={index}
-                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                    variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                                    // onClick={e => readyToggle(e, playerObj)}
-                                                >
-                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        {playerObj.readyNext && (
-                                                            <Check className="text-slate-900" size={14} />
-                                                        ) || (
-                                                            // <Ellipsis className="text-slate-900" size={14} />
-                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-xs">{playerObj.playerName}</p>
-                                                </Button>
+                                                {readyNextRound.map((playerObj, index) => {
 
-                                            )
+                                                    return (
 
-                                        })}
+                                                        <Button
+                                                            key={index}
+                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                            variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                            // onClick={e => readyToggle(e, playerObj)}
+                                                        >
+                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                {playerObj.readyNext && (
+                                                                    <Check className="text-slate-900" size={14} />
+                                                                ) || (
+                                                                    // <Ellipsis className="text-slate-900" size={14} />
+                                                                    <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-xs">{playerObj.playerName}</p>
+                                                        </Button>
 
-                                        {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                                    )
 
-                                            return (
+                                                })}
 
-                                                <Button
-                                                    key={index}
-                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                    variant="green"
-                                                >
-                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        <Check className="text-slate-900" size={14} />
-                                                    </div>
-                                                    <p className="text-xs">{`Bot ${index + 1}`}</p>
-                                                </Button>
-                                            )
+                                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
-                                        })} */}
+                                                    return (
+
+                                                        <Button
+                                                            key={index}
+                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                            variant="green"
+                                                        >
+                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                <Check className="text-slate-900" size={14} />
+                                                            </div>
+                                                            <p className="text-xs">{`Bot ${index + 1}`}</p>
+                                                        </Button>
+                                                    )
+
+                                                })} */}
+
+                                            </>
+
+                                        ) || (
+
+                                            <h1 className={`text-amber-400 font-mono text-2xl`}>{`<<< END OF MISSION >>>`}</h1>
+
+                                        )}
 
                                     </div>
 
@@ -455,13 +518,13 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                         <Button 
                                             ref={nextRoundBtnRef} 
-                                            variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
+                                            variant={`${ showEndGame ? "red" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
                                             // className={`w-36 transition-all ease-in-out duration-200`}
                                             className={`w-36`}
                                             // onClick={handleNext}
-                                            onClick={toggleReady}
+                                            onClick={showEndGame ? handleReturnLobby : toggleReady}
                                         >
-                                            {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
+                                            {`${ showEndGame ? "Return to Lobby" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
                                         </Button>
                                     
                                     </div>
@@ -479,6 +542,12 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                 {!submitted && !validate && (
 
                     <div className="flex flex-none flex-col w-full relative items-center py-16 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+
+                        {playerName === guesser && (
+
+                            <AgentIndicator />
+
+                        )}
 
                         {roomDetails.timeLimit !== 0 && currentIndex === 2 && (
 
