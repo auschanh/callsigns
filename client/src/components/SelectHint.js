@@ -9,7 +9,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-react";
 
 
-const SelectHint = ({ resultsState, votedState, submissions, roomDetails, playerName, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState, hintArrayState }) => {
+const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState, hintArrayState }) => {
 
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
