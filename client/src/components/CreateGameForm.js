@@ -15,44 +15,7 @@ import { Switch } from "./ui/switch";
 
 import { useSocketContext } from "../contexts/SocketContext";
 
-// Form Validation
-const formSchema = z.object({
-
-	username: z.string().min(1, {
-
-		message: "Please enter a username.", 
-
-	}),
-
-	roomName: z.string().min(1, {
-
-		message: "Please select a room name."
-
-	}),
-
-	numPlayers: z.number().gt(0, {
-
-		message: "Enter number of players."
-
-	}),
-
-	aiPlayers: z.number().gte(0, {
-
-		message: "Enter number of AI players."
-
-	}),
-
-	numGuesses: z.number().array().optional(),
-
-	numRounds: z.number().array().optional(),
-
-	timeLimit: z.number().array().optional(),
-
-	keepScore: z.boolean().optional(),
-
-});
-
-function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
+function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 	const [socket, setSocket] = useSocketContext();
 
@@ -65,6 +28,44 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated }) {
 	const [isAiPlayers, setIsAiPlayers] = useState(false);
 
 	const [isRoomCreated, setIsRoomCreated] = roomCreated;
+
+	// Form Validation
+	const formSchema = z.object({
+
+		username: z.string()
+			.min(1, { message: "Please enter a username." })
+			.min(3, { message: "Username must be at least 3 characters long." })
+			.refine((value) => !/\s/.test(value), { message: "Username cannot contain spaces." })
+			.refine((value) => /(.*[a-z]){1}/i.test(value), { message: "Username must contain at least one letter." })
+			.refine((value) => (!gameInfo || gameInfo.username === value) || !inLobby?.some((player) => { return player.playerName === value }), { message: "This username has already been taken." })
+			,
+
+		roomName: z.string()
+			.min(1, { message: "Please select a room name." })
+			.refine((value) => /^[^\s]/.test(value), { message: "Room name cannot start with a space." })
+			,
+
+		numPlayers: z.number().gt(0, {
+
+			message: "Enter number of players."
+
+		}),
+
+		aiPlayers: z.number().gte(0, {
+
+			message: "Enter number of AI players."
+
+		}),
+
+		numGuesses: z.number().array().optional(),
+
+		numRounds: z.number().array().optional(),
+
+		timeLimit: z.number().array().optional(),
+
+		keepScore: z.boolean().optional(),
+
+	});
 
 	// 1. Define your form.
 	const form = useForm({

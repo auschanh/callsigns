@@ -139,7 +139,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
         content:
 
-            <CreateGameForm gameInfoState={[gameInfo, setGameInfo]} nextSlide={nextSlide} roomCreated={[isRoomCreated, setIsRoomCreated]} />
+            <CreateGameForm gameInfoState={[gameInfo, setGameInfo]} nextSlide={nextSlide} roomCreated={[isRoomCreated, setIsRoomCreated]} inLobby={inLobby} />
 
     }, {
 

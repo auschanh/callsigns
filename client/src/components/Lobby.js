@@ -477,7 +477,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																	) || (
 
 																		<p className="text-slate-900 text-xs font-semibold">
-																			{player.playerName.charAt(0).toUpperCase()}
+																			{player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 																		</p>
 
 																	)}
@@ -563,7 +563,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																		) || (
 
 																			<p className="text-slate-900 text-xs font-semibold">
-																				{player.playerName.charAt(0).toUpperCase()}
+																				{player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 																			</p>
 
 																		)}
@@ -789,7 +789,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												) || (
 
 													<p className="text-slate-900 text-xs font-semibold">
-														{player.charAt(0).toUpperCase()}
+														{player.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 													</p>
 
 												)}

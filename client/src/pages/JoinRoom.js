@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Chat from "../components/Chat";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
@@ -52,6 +52,8 @@ function JoinRoom() {
     const { roomID } = useParams();
 
     const navigate = useNavigate();
+
+    const invalidUsernameRef = useRef(null);
 
     useEffect(() => {
 
@@ -315,8 +317,34 @@ function JoinRoom() {
 
     function onSubmit(values) {
 
+        // username cannot be blank
+        if (values.username === "") {
+
+            invalidUsernameRef.current.innerText = "Please enter a username.";
+
+        // username cannot contain any spaces
+        } else if (/\s/.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username cannot contain spaces."
+
+        // username must be at least 3 characters
+        } else if (!/.{3,}/.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username must be at least 3 characters long.";
+
+        // username must contain at least one letter
+        } else if (!/(.*[a-z]){1}/i.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username must contain at least one letter.";
+
         // cannot enter an existing username
-        if (values.username !== "") {
+        } else if (values.username !== username && inLobby.some((player) => { return player.playerName === values.username })) {
+
+            invalidUsernameRef.current.innerText = "This username has already been taken.";
+
+        } else {
+
+            invalidUsernameRef.current.innerText = "";
 
             console.log(values.username);
 
@@ -496,7 +524,7 @@ function JoinRoom() {
                                                                                 ) || (
 
                                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                        {player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                                     </p>
 
                                                                                 )}
@@ -544,7 +572,7 @@ function JoinRoom() {
                                                                                 ) || (
 
                                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                        {player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                                     </p>
 
                                                                                 )}
@@ -650,7 +678,7 @@ function JoinRoom() {
                                                                 ) || (
 
                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                        {player.charAt(0).toUpperCase()}
+                                                                        {player.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                     </p>
 
                                                                 )}
@@ -717,7 +745,7 @@ function JoinRoom() {
                             </AlertDialogHeader>
 
                             <Form {...form}>
-                                <form className="flex flex-col gap-12" onSubmit={form.handleSubmit(onSubmit)}>
+                                <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
                                     <FormField
                                         defaultValue={''}
                                         control={form.control}
@@ -738,7 +766,13 @@ function JoinRoom() {
                                             </FormItem>
                                         )}
                                     />
+
+                                    <div className="my-2 h-8">
+                                        <p className="text-xs text-red-500" ref={invalidUsernameRef}></p>
+                                    </div>
+                                    
                                     <Button className="flex flex-row self-end" type="submit">Submit</Button>
+
                                 </form>
                             </Form>
 
