@@ -332,6 +332,7 @@ io.on("connection", (socket) => {
 
 			const roomList = getPlayersInLobby(roomName);
 
+			// if successful
 			if (roomList.some(({ playerName }) => { return playerName === username })) {
 
 				socket.emit("getLobby", roomList, findRoom);

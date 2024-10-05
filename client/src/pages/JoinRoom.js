@@ -30,7 +30,7 @@ function JoinRoom() {
 
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
-    const [username, setUsername] = useState();
+    const [username, setUsername] = useState(`[NULL]`);
 
     const [success, setSuccess] = useState(0);
 
@@ -39,6 +39,8 @@ function JoinRoom() {
     const [copied, setCopied] = useState(false);
 
     const [roomDetails, setRoomDetails] = useState();
+
+    const [isFoundRoom, setIsFoundRoom] = useState(false);
 
     const [isReady, setIsReady] = useState(false);
 
@@ -76,7 +78,8 @@ function JoinRoom() {
             })();
         }
 
-        if (username && !inLobby.find(({playerName}) => { return playerName === username })) {
+        // if not already in lobby
+        if (!isFoundRoom || (username !== `[NULL]` && !inLobby.find(({playerName}) => { return playerName === username }))) {
 
             console.log("username triggered");
 
@@ -101,6 +104,8 @@ function JoinRoom() {
         }
 
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
+
+            setIsFoundRoom(true);
 
             if (othersInLobby) {
 
@@ -293,7 +298,7 @@ function JoinRoom() {
 
         }
 
-    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved, playerName]);
+    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved, playerName, isFoundRoom]);
 
     useEffect(() => {
 
