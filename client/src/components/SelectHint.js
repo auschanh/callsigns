@@ -136,20 +136,34 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
     }
 
     const handleClearSelection = () => {
-
         setResults(
-
             results.map((result) => {
-
                 return {...result, toRemove: false, beenRemoved: false};
-
             })
-
         );
-
         setIsNoneSelected(true);
-
     }
+
+    // keep track of which hints appear exacly ONCE
+    // use hintCount as a conditional to render the appropriate hints
+    // any hintCount > 1 does not get rendered
+    const hintCount = {}
+    results.forEach(player => {
+        if(player.hint){
+            hintCount[player.hint] = (hintCount[player.hint] || 0) + 1;
+            // if(hintCount[player.hint] > 1) {
+            //     player.beenRemoved = true;
+            // }   
+            // player.toRemove = true;
+        }
+    });
+
+    results.forEach(player => {
+        if(hintCount[player.hint] > 1) {
+            player.beenRemoved = true;
+        }
+    })
+        
 
     return (
 
@@ -249,15 +263,14 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                             <Label className="mb-12 text-lg leading-none text-center">Select the hints that are too similar or illegal:</Label>
 
                             <div className="flex flex-row flex-wrap justify-center gap-10">
+                            
                                 {results.some((result) => { return result.hint !== "" }) && (
-                                    
-                                    
+
                                     results.map((result, index) => {
                                         
-                                        // 2 arrays of hints to check if any are the same TODO
+                                        // renders good hints
 
-                                        if (result.playerName !== guesser && result.hint !== "") {
-
+                                        if (result.playerName !== guesser && result.hint !== "" && hintCount[result.hint] == 1) { // exclude guesser and blank hints
                                             return (
 
                                                 <div key={index} className="flex flex-col min-w-36 items-center gap-2">

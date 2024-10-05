@@ -565,7 +565,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 
                                     results.map((result, index) => {
 
-                                        if (result.playerName !== guesser && result.hint !== "") {
+                                        if (result.playerName !== guesser && result.hint !== "" && (result.beenRemoved !== true) && (result.toRemove !== true)) {
 
                                             return (
 

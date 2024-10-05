@@ -742,14 +742,14 @@ function Game() {
 			console.log(votedOutResults.map(result => {
 				return result.visible == false ? result.playerName : null;
 			}))
-
+			
+			// updates player scores based on if they were voted out or not
 			const newScores = scores.map((player => {
-
+				console.log("Voted out Results:", votedOutResults);
 				if(votedOutResults.map(result => {
 					return result.visible == true ? result.playerName : null;}).includes(player.playerName)
-					&& player.playerName != guesser
+					&& player.playerName != guesser && results.beenRemoved != true
 				){
-						console.log("voted out here")
 						return {...player, score: player.score+1, goodHints: player.goodHints + 1}
 
 				} else if(player.playerName != guesser) {
