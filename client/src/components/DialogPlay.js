@@ -16,7 +16,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 

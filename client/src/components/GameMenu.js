@@ -17,7 +17,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [isClosedRoom, setIsClosedRoom] = isClosedRoomState;
 

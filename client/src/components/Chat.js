@@ -17,7 +17,7 @@ function Chat({ username, roomName, roomID }) {
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [message, setMessage] = useState('');
 

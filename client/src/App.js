@@ -51,6 +51,8 @@ function App() {
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
+	const [regPlayerCount, setRegPlayerCount] = useState();
+
 	const navigate = useNavigate();
 
 	const generateWord = async () => {
@@ -412,6 +414,30 @@ function App() {
 
     }, [chatExpanded]);
 
+	useEffect(() => {
+
+		// count players that have entered a username
+		setRegPlayerCount(
+
+			inLobby.reduce((accumulator, currentValue) => {
+				
+				// if playerName is not null
+				if (currentValue.playerName) { 
+					
+					return accumulator + 1; 
+				
+				} else {
+					
+					return accumulator;
+
+				} 
+			
+			}, 0)
+
+		)
+
+	}, [inLobby]);
+
 	const handleReturnLobby = async () => {
 
 		try {
@@ -434,7 +460,7 @@ function App() {
 
 				<MessageContext.Provider value={[[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]]}>
 
-					<LobbyContext.Provider value={[inLobby, setInLobby]}>
+					<LobbyContext.Provider value={[[inLobby, setInLobby], regPlayerCount]}>
 
 						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]]}>
 

@@ -36,7 +36,7 @@ function Game() {
 
 	const [sessionUrl, setSessionUrl] = useState();
 
-	const [inLobby, setInLobby] = useLobbyContext();
+	const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
