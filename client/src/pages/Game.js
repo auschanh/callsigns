@@ -83,6 +83,10 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
+	const [toggleEndGameScreen, setToggleEndGameScreen] = useState(false);
+
+    const [showEndGame, setShowEndGame] = useState(false);
+
 	const [scores, setScores] = useState([]);
 
 	const [sortedScores, setSortedScores] = useState([]);
@@ -92,6 +96,7 @@ function Game() {
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const [hintArray, setHintArray] = useState([]);
+
 	const [encryptedCallsign, setEncryptedCallsign] = useState();
 
 	const navigate = useNavigate();
@@ -1025,6 +1030,8 @@ function Game() {
 					generateScoreTable={generateScoreTable}
 					encryptedCallsign={encryptedCallsign}
 					currentRound={currentRound}
+					toggleEndGameScreenState={[toggleEndGameScreen, setToggleEndGameScreen]}
+					showEndGameState={[showEndGame, setShowEndGame]}
 				/>
 
 		}
@@ -1195,9 +1202,13 @@ function Game() {
 												: (startFade || timeLimitReached) 
 													? "border-stone-800 duration-300" 
 													: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
-											) : correctGuess 
-												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
-												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+											) : showEndGame 
+												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
+												: toggleEndGameScreen
+													? "border-stone-800 duration-1000"
+													: correctGuess
+														? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
+														: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
 						

@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, toggleEndGameScreenState, showEndGameState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -33,7 +33,8 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
-    const [showEndGame, setShowEndGame] = useState(false);
+    const [toggleEndGameScreen, setToggleEndGameScreen] = toggleEndGameScreenState;
+    const [showEndGame, setShowEndGame] = showEndGameState;
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -101,9 +102,42 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         if (submitted === false && validate === true) {
 
+            if (currentRound === roomDetails.numRounds) {
+
+                setTimeout(() => {
+
+                    setToggleEndGameScreen(true);
+    
+                }, 5000);
+
+            } else {
+
+                setTimeout(() => {
+
+                    setShowReadyState(true);
+    
+                }, 2000);
+
+            }
+
+        }
+
+        return () => {
+
+            setToggleEndGameScreen(false);
+            setShowReadyState(false);
+
+        }
+
+    }, [submitted, validate, currentRound]);
+
+    useEffect(() => {
+
+        if (toggleEndGameScreen) {
+
             setTimeout(() => {
 
-                setShowReadyState(true);
+                setShowEndGame(true);
 
             }, 2000);
 
@@ -111,11 +145,11 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         return () => {
 
-            setShowReadyState(false);
+            setShowEndGame(false);
 
         }
 
-    }, [submitted, validate]);
+    }, [toggleEndGameScreen]);
 
     useEffect(() => {
 
@@ -130,22 +164,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
 
     }, [correctGuess]);
-
-    useEffect(() => {
-
-        if (currentRound === roomDetails.numRounds && showReadyState) {
-
-            setShowEndGame(true);
-
-        }
-
-        return () => {
-
-            setShowEndGame(false);
-
-        }
-
-    }, [currentRound, showReadyState]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -417,86 +435,81 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                 <div className={`validate font-mono`}>
 
-                                    <h2 className={`text-lg mb-2 text-center ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+                                    <div 
+                                        className={`transition-all ease-in-out ${toggleEndGameScreen ? "opacity-0" : ""} ${showEndGame ? "opacity-100" : ""}`}
+                                        style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
+                                    >
 
-                                        {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+                                        <h2 className={`text-lg mb-2 text-center ${showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
-                                    </h2>
+                                            {`${showEndGame ? '% RETURN TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
-                                    <h1 className={`text-6xl text-center ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
-                                        
-                                        {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
-                                        
-                                    </h1>
+                                        </h2>
 
-                                    {/* Change Menu State to reflect scores */}
-                                    {/* {setMenuScore(true)} */}
+                                        <h1 className={`text-6xl text-center ${showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                            
+                                            {`${showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                            
+                                        </h1>
+
+                                        {/* Change Menu State to reflect scores */}
+                                        {/* {setMenuScore(true)} */}
+
+                                    </div>
 
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
+                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${toggleEndGameScreen ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
                                     <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4'>
 
-                                        {!showEndGame && (
+                                        {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
 
-                                            <>
+                                        {readyNextRound.map((playerObj, index) => {
 
-                                                {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
+                                            return (
 
-                                                {readyNextRound.map((playerObj, index) => {
+                                                <Button
+                                                    key={index}
+                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                    variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                    // onClick={e => readyToggle(e, playerObj)}
+                                                >
+                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                        {playerObj.readyNext && (
+                                                            <Check className="text-slate-900" size={14} />
+                                                        ) || (
+                                                            // <Ellipsis className="text-slate-900" size={14} />
+                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs">{playerObj.playerName}</p>
+                                                </Button>
 
-                                                    return (
+                                            )
 
-                                                        <Button
-                                                            key={index}
-                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                            variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                                            // onClick={e => readyToggle(e, playerObj)}
-                                                        >
-                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                {playerObj.readyNext && (
-                                                                    <Check className="text-slate-900" size={14} />
-                                                                ) || (
-                                                                    // <Ellipsis className="text-slate-900" size={14} />
-                                                                    <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
-                                                                )}
-                                                            </div>
-                                                            <p className="text-xs">{playerObj.playerName}</p>
-                                                        </Button>
+                                        })}
 
-                                                    )
+                                        {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
-                                                })}
+                                            return (
 
-                                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
+                                                <Button
+                                                    key={index}
+                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                    variant="green"
+                                                >
+                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                        <Check className="text-slate-900" size={14} />
+                                                    </div>
+                                                    <p className="text-xs">{`Bot ${index + 1}`}</p>
+                                                </Button>
+                                            )
 
-                                                    return (
-
-                                                        <Button
-                                                            key={index}
-                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                            variant="green"
-                                                        >
-                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                <Check className="text-slate-900" size={14} />
-                                                            </div>
-                                                            <p className="text-xs">{`Bot ${index + 1}`}</p>
-                                                        </Button>
-                                                    )
-
-                                                })} */}
-
-                                            </>
-
-                                        ) || (
-
-                                            <h1 className={`text-amber-400 font-mono text-2xl`}>{`<<< END OF MISSION >>>`}</h1>
-
-                                        )}
+                                        })} */}
 
                                     </div>
 
@@ -518,13 +531,14 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                                         <Button 
                                             ref={nextRoundBtnRef} 
-                                            variant={`${ showEndGame ? "red" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
+                                            variant={`${ showEndGame ? "green" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
                                             // className={`w-36 transition-all ease-in-out duration-200`}
                                             className={`w-36`}
                                             // onClick={handleNext}
-                                            onClick={showEndGame ? handleReturnLobby : toggleReady}
+                                            // onClick={showEndGame ? handleReturnLobby : toggleReady}
+                                            onClick={toggleReady}
                                         >
-                                            {`${ showEndGame ? "Return to Lobby" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
+                                            {`${ showEndGame ? "Play Again" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
                                         </Button>
                                     
                                     </div>
