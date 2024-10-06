@@ -901,6 +901,10 @@ video {
   margin-top: auto;
 }
 
+.mr-0 {
+  margin-right: 0px;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -1365,6 +1369,10 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }
 
 .touch-none {

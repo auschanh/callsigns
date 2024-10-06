@@ -249,8 +249,8 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                             <Label className="mb-12 text-lg leading-none text-center">Select the hints that are too similar or illegal:</Label>
 
                             <div className="flex flex-row flex-wrap justify-center gap-10">
+
                                 {results.some((result) => { return result.hint !== "" }) && (
-                                    
                                     
                                     results.map((result, index) => {
                                         
@@ -307,7 +307,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
 
                                     <>
 
-                                        <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                        <Button onClick={handleRemove} variant={voted ? "green" : isNoneSelected ? "disabledRed" : "red"} className={`flex flex-row w-44 transition-all ease-in-out duration-150 ${ isNoneSelected ? "cursor-not-allowed" : ""}`}>
 
                                             {voted && (
 
