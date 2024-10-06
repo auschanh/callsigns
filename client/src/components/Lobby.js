@@ -18,7 +18,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 	
 	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-	const [inLobby, setInLobby] = useLobbyContext();
+	const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
 	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
@@ -532,7 +532,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 								} else {
 
-									if (!inGame?.includes(player.playerName)) {
+									if (player.playerName && !inGame?.includes(player.playerName)) {
 
 										return (
 
@@ -634,11 +634,11 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 							})}
 
-							{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
+							{inLobby && Array.from({ length: gameInfo.numPlayers - regPlayerCount }, (_, index) => {
 
 								if (!inGame) {
 
-									if (inLobby.length < gameInfo.numPlayers) {
+									if (regPlayerCount < gameInfo.numPlayers) {
 
 										return (
 
@@ -650,7 +650,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														key={index}
 													>
 														<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-														<p>Player {inLobby.length + index + 1}</p>
+														<p>Player {regPlayerCount + index + 1}</p>
 													</Badge>
 												</ContextMenuTrigger>
 												<ContextMenuContent className="p-0 border-0">
@@ -681,7 +681,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 							})}
 
-							{inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < gameInfo.numPlayers) && Array.from({ length: gameInfo.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+							{inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < gameInfo.numPlayers) && Array.from({ length: gameInfo.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
 
 								return (
 
@@ -693,7 +693,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												key={index}
 											>
 												<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-												<p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+												<p>Player {(regPlayerCount - inGame.length) + index + 1}</p>
 											</Badge>
 										</ContextMenuTrigger>
 										<ContextMenuContent className="p-0 border-0">

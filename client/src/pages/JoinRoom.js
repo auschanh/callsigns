@@ -26,11 +26,11 @@ function JoinRoom() {
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
 
-    const [username, setUsername] = useState(`[NULL]`);
+    const [username, setUsername] = useState();
 
     const [success, setSuccess] = useState(0);
 
@@ -79,7 +79,7 @@ function JoinRoom() {
         }
 
         // if not already in lobby
-        if (!isFoundRoom || (username !== `[NULL]` && !inLobby.find(({playerName}) => { return playerName === username }))) {
+        if (!isFoundRoom || (username && !inLobby.find(({playerName}) => { return playerName === username }))) {
 
             console.log("username triggered");
 
@@ -550,7 +550,7 @@ function JoinRoom() {
 
                                                 } else {
 
-                                                    if (!inGame?.includes(player.playerName)) {
+                                                    if (player.playerName && !inGame?.includes(player.playerName)) {
 
                                                         return (
 
@@ -605,17 +605,17 @@ function JoinRoom() {
                                                 }
                                             })}
 
-                                            {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
+                                            {inLobby && Array.from({ length: roomDetails.numPlayers - regPlayerCount }, (_, index) => {
 
                                                 if (!inGame) {
 
-                                                    if (inLobby.length < roomDetails.numPlayers) {
+                                                    if (regPlayerCount < roomDetails.numPlayers) {
 
                                                         return (
 
                                                             <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                                 <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                                <p>Player {inLobby.length + index + 1}</p>
+                                                                <p>Player {regPlayerCount + index + 1}</p>
                                                             </Badge>
                                 
                                                         );
@@ -625,18 +625,18 @@ function JoinRoom() {
 
                                             })}
 
-                                            {/* {inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+                                            {inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
 
                                                 return (
 
                                                     <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                         <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                        <p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+                                                        <p>Player {(regPlayerCount - inGame.length) + index + 1}</p>
                                                     </Badge>
 
                                                 );
 
-                                            })} */}
+                                            })}
 
                                             {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
