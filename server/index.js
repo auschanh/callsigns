@@ -703,7 +703,6 @@ io.on("connection", (socket) => {
 		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
 
 		// select next guesser
-
 		// get all socketIDs in lobby as strings
 		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
 

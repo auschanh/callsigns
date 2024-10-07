@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, toggleEndGameScreenState, showEndGameState }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -33,7 +33,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
-    const [toggleEndGameScreen, setToggleEndGameScreen] = toggleEndGameScreenState;
+    const [isLastRound, setIsLastRound] = isLastRoundState;
     const [showEndGame, setShowEndGame] = showEndGameState;
 
     const guessInputRef = useRef(null);
@@ -106,7 +106,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                 setTimeout(() => {
 
-                    setToggleEndGameScreen(true);
+                    setIsLastRound(true);
     
                 }, 5000);
 
@@ -124,7 +124,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         return () => {
 
-            setToggleEndGameScreen(false);
+            setIsLastRound(false);
             setShowReadyState(false);
 
         }
@@ -133,7 +133,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
     useEffect(() => {
 
-        if (toggleEndGameScreen) {
+        if (isLastRound) {
 
             setTimeout(() => {
 
@@ -145,11 +145,15 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         return () => {
 
-            setShowEndGame(false);
+            setTimeout(() => {
+
+                setShowEndGame(false);
+
+            }, 2000);
 
         }
 
-    }, [toggleEndGameScreen]);
+    }, [isLastRound]);
 
     useEffect(() => {
 
@@ -436,13 +440,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 <div className={`validate font-mono`}>
 
                                     <div 
-                                        className={`transition-all ease-in-out ${toggleEndGameScreen ? "opacity-0" : ""} ${showEndGame ? "opacity-100" : ""}`}
+                                        className={`transition-all ease-in-out ${isLastRound ? "opacity-0" : ""} ${showEndGame ? "opacity-100" : ""}`}
                                         style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                     >
 
                                         <h2 className={`text-lg mb-2 text-center ${showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
-                                            {`${showEndGame ? '% RETURN TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+                                            {`${showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
                                         </h2>
 
@@ -460,7 +464,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${toggleEndGameScreen ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
+                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
@@ -531,14 +535,14 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                         <Button 
                                             ref={nextRoundBtnRef} 
-                                            variant={`${ showEndGame ? "green" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
+                                            variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
                                             // className={`w-36 transition-all ease-in-out duration-200`}
                                             className={`w-36`}
                                             // onClick={handleNext}
                                             // onClick={showEndGame ? handleReturnLobby : toggleReady}
                                             onClick={toggleReady}
                                         >
-                                            {`${ showEndGame ? "Play Again" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
+                                            {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : showEndGame ? "Play Again" : "Ready Up" }`}
                                         </Button>
                                     
                                     </div>

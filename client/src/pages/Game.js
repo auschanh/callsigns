@@ -83,7 +83,7 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
-	const [toggleEndGameScreen, setToggleEndGameScreen] = useState(false);
+	const [isLastRound, setIsLastRound] = useState(false);
 
     const [showEndGame, setShowEndGame] = useState(false);
 
@@ -227,6 +227,32 @@ function Game() {
 			setIsClosedRoom(roomDetails.isClosedRoom);
 
 			setInLobby(othersInLobby);
+
+			if (currentRound === roomDetails.numRounds) {
+
+				setScores( 
+
+					playing.map((player) => {
+
+						return ({
+
+							playerName: player,
+							score: 0,
+							correctGuesses: 0,
+							goodHints: 0,
+							badHints: 0
+
+						});
+
+					})
+
+				);
+
+				setSortedScores([]);
+
+				setCurrentRound(0);
+
+			}
 
 		} else {
 
@@ -553,7 +579,7 @@ function Game() {
 
             if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
 
-                console.log("TRIGGER NEXT ROUND");
+				console.log("TRIGGER NEXT ROUND");
 
 				(async () => {
 
@@ -606,6 +632,7 @@ function Game() {
 		socket.on("receiveHintArray", (duplicates) => {
 
 			setHintArray(duplicates);
+
 		});
 
         return () => {
@@ -1030,7 +1057,7 @@ function Game() {
 					generateScoreTable={generateScoreTable}
 					encryptedCallsign={encryptedCallsign}
 					currentRound={currentRound}
-					toggleEndGameScreenState={[toggleEndGameScreen, setToggleEndGameScreen]}
+					isLastRoundState={[isLastRound, setIsLastRound]}
 					showEndGameState={[showEndGame, setShowEndGame]}
 				/>
 
@@ -1107,7 +1134,7 @@ function Game() {
 									<PopoverTrigger asChild>
 									<div className="">
 										<div className="relative">
-											<Button className="justify-right px-3 py-2 font-mono aspect-square mb-1" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+											<Button className="justify-right px-3 py-2 font-mono aspect-square mb-1" variant="outline">Score: {scores.map(player => player.playerName === playerName ? player.score : "")}</Button>
 										</div>
 									</div>
 									</PopoverTrigger>
@@ -1204,7 +1231,7 @@ function Game() {
 													: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
 											) : showEndGame 
 												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
-												: toggleEndGameScreen
+												: isLastRound
 													? "border-stone-800 duration-1000"
 													: correctGuess
 														? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
