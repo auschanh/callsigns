@@ -136,7 +136,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
                 <div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 [&:hover:not(:has(button:hover))]:bg-slate-200">
 
                     <div className="flex items-center justify-center h-10 aspect-square rounded-full bg-slate-900">
-                        <p className="text-slate-50 text-xl">{playerName.charAt(0).toUpperCase()}</p>
+                        <p className="text-slate-50 text-xl">{playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
                     </div>
 
                     <h3 className="text-lg text-slate-900 px-6 break-all">{playerName}</h3>

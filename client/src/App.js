@@ -369,10 +369,8 @@ function App() {
 				(async () => {
 
 					try {
-
-						const joinOrder = inLobby.map((player) => { return player.playerName });
 		
-						await socket.emit("sendNextRound", selectedPlayers, joinOrder);
+						await socket.emit("sendNextRound");
 						
 					} catch (error) {
 		

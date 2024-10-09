@@ -678,33 +678,13 @@ io.on("connection", (socket) => {
 	});
 
 	// host only
-	socket.on("generateNewCallsign", () => {
+	socket.on("selectNextGuesser", (roomID, selectedPlayers, joinOrder) => {
 
-		const callsign = getMysteryWord();
-
-		socket.emit("receiveNewCallsign", callsign);
-
-	});
-
-	// host only
-	socket.on("sendNextCallsign", (callsign, generatedWords) => {
-
-		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
-
-		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
-
-	});
-
-	// host only
-	socket.on("sendNextRound", (selectedPlayers, joinOrder) => {
-
-		const roomList = getPlayersInLobby(socket.roomID);
-
-		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
 
 		// select next guesser
 		// get all socketIDs in lobby as strings
-		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
+		const socketsInLobby = [...io.sockets.adapter.rooms.get(roomID)];
 
 		const usernames = socketsInLobby.map((socketID) => {
 
@@ -813,6 +793,35 @@ io.on("connection", (socket) => {
 			}
 
 		}
+
+		io.to(roomID).emit("receiveNextGuesser", findRoom);
+
+	});
+
+	// host only
+	socket.on("generateNewCallsign", () => {
+
+		const callsign = getMysteryWord();
+
+		socket.emit("receiveNewCallsign", callsign);
+
+	});
+
+	// host only
+	socket.on("sendNextCallsign", (callsign, generatedWords) => {
+
+		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
+
+		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
+
+	});
+
+	// host only
+	socket.on("sendNextRound", () => {
+
+		const roomList = getPlayersInLobby(socket.roomID);
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
 
 		io.to(socket.roomID).emit("receiveNextRound", roomList, findRoom);
 

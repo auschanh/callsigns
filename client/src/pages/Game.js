@@ -222,8 +222,6 @@ function Game() {
 
 			setRemainingGuesses(roomDetails.numGuesses);
 
-			setGuesser(roomDetails.guesser);
-
 			setIsClosedRoom(roomDetails.isClosedRoom);
 
 			setInLobby(othersInLobby);
@@ -283,6 +281,41 @@ function Game() {
         return result;
 
     }
+
+	const triggerEndRound = () => {
+
+		setStartFade(true);
+
+		setTimeout(() => {
+
+			setStartFade(false);
+
+			setSubmitted(true);
+
+		}, 1000);
+
+		// host only, pick the next guesser
+		if (playerName === roomDetails.host) {
+
+			(async () => {
+
+				try {
+
+					const joinOrder = inLobby.map((player) => { return player.playerName });
+	
+					await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
+	
+				} catch (error) {
+	
+					throw error;
+	
+				}
+	
+			})();
+
+		}
+
+	}
 
 	useEffect(() => {
 
@@ -533,15 +566,7 @@ function Game() {
 
                 setCorrectGuess(true);
 
-				setStartFade(true);
-
-				setTimeout(() => {
-
-					setStartFade(false);
-
-					setSubmitted(true);
-
-				}, 1000);
+				triggerEndRound();
 
             } else {
 
@@ -572,30 +597,42 @@ function Game() {
 
 		});
 
+		socket.on("receiveNextGuesser", (roomDetails) => {
+
+			setRoomDetails(roomDetails);
+
+		});
+
 		// update toggle for all users
         socket.on("receiveToggle", (readyState) => {
 
             setReadyNextRound(readyState);
 
-            if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
+			if (readyState.every((player) => { return player.readyNext })) {
 
-				console.log("TRIGGER NEXT ROUND");
+				setGuesser(roomDetails.guesser);
 
-				(async () => {
+				if (playerName === roomDetails.host) {
 
-					try {
-		
-						await socket.emit("generateNewCallsign");
-		
-					} catch (error) {
-		
-						throw error;
-		
-					}
-		
-				})();
+					console.log("TRIGGER NEXT ROUND");
+	
+					(async () => {
+	
+						try {
+			
+							await socket.emit("generateNewCallsign");
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+			
+					})();
+	
+				}
 
-            }
+			}
 
         });
 
@@ -644,6 +681,7 @@ function Game() {
 			socket.removeAllListeners("receiveVote");
 			socket.removeAllListeners("receiveSubmitGuess");
 			socket.removeAllListeners("receiveNextSlide");
+			socket.removeAllListeners("receiveNextGuesser");
 			socket.removeAllListeners("receiveToggle");
 			socket.removeAllListeners("receiveNextRound");
 			socket.removeAllListeners("receiveHintArray");
@@ -851,15 +889,7 @@ function Game() {
 
         if (remainingGuesses === 0) {
 
-            setStartFade(true);
-
-			setTimeout(() => {
-
-				setStartFade(false);
-
-				setSubmitted(true);
-
-			}, 1000);
+			triggerEndRound();
 
         }
 
@@ -901,7 +931,7 @@ function Game() {
 			
 			setScores(
 				(prev) => prev.map(player => {
-					if(player.playerName == guesser) {
+					if(player.playerName === guesser) {
 						return {...player, 
 							score: player.score + numRemovedHints + 1, 
 							correctGuesses: player.correctGuesses + 1
@@ -1199,13 +1229,13 @@ function Game() {
 							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
 								<p className="text-sm text-center">
 
-									{roomDetails.guesser.length > 20 && (
+									{guesser.length > 20 && (
 
-										`${roomDetails.guesser.substring(0, 20)}...`
+										`${guesser.substring(0, 20)}...`
 
 									) || (
 
-										roomDetails.guesser
+										guesser
 
 									)}
 

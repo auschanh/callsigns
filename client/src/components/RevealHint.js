@@ -11,6 +11,7 @@ import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState }) => {
 
@@ -129,7 +130,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         }
 
-    }, [submitted, validate, currentRound]);
+    }, [roomDetails, submitted, validate, currentRound]);
 
     useEffect(() => {
 
@@ -483,11 +484,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                     // onClick={e => readyToggle(e, playerObj)}
                                                 >
                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        {playerObj.readyNext && (
+                                                        {roomDetails.guesser === playerObj.playerName && (
+                                                            <AgentIcon className="aspect-square h-5" />
+                                                        ) || playerObj.readyNext && (
                                                             <Check className="text-slate-900" size={14} />
                                                         ) || (
                                                             // <Ellipsis className="text-slate-900" size={14} />
-                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
+                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
                                                         )}
                                                     </div>
                                                     <p className="text-xs">{playerObj.playerName}</p>
