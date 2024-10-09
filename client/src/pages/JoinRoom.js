@@ -79,9 +79,11 @@ function JoinRoom() {
         }
 
         // if not already in lobby
-        if (!isFoundRoom || (username && !inLobby.find(({playerName}) => { return playerName === username }))) {
+        if (isFoundRoom || (username && !inLobby.find(({playerName}) => { return playerName === username }))) {
 
             console.log("username triggered");
+
+            setIsFoundRoom(false);
 
             (async () => {
 
@@ -105,9 +107,9 @@ function JoinRoom() {
 
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
-            setIsFoundRoom(true);
-
             if (othersInLobby) {
+
+                setIsFoundRoom(true);
 
                 setSuccess(1);
 
