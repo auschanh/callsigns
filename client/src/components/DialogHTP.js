@@ -8,7 +8,9 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
-import { Check, X, Trash2 } from "lucide-react";
+import { Check, X, Trash2, RotateCcw } from "lucide-react";
+import { stemmer } from "stemmer";
+import pluralize from "pluralize";
 
 function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
@@ -16,7 +18,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
     const username = undefined;
 
-    const mysteryWord = "coffee";
+    const mysteryWord = "Coffee";
 
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -24,6 +26,8 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
     const spaceBetweenSlides = 5;
 
     const [example, setExample] = useState(["macchiato", false]);
+
+    const [isUndo, setIsUndo] = useState(false);
 
     const hintInputRef = useRef(null);
 
@@ -38,18 +42,18 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         }, {
 
-            playerName: "Amanda",
-            hint: "warm"
-
-        }, {
-
             playerName: "Stephanie",
             hint: "warm"
 
         }, {
 
             playerName: "Frank",
-            hint: "coffee"
+            hint: "warm"
+
+        }, {
+
+            playerName: "Lisa",
+            hint: "kaffee"
 
         }
 
@@ -59,7 +63,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         submissions.map((submission, index) => {
 
-            return index === 0 ? {...submission, toRemove: false, beenRemoved: false, visible: true} : {...submission, toRemove: true, beenRemoved: false, visible: false};
+            return index === 0 ? {...submission, toRemove: false, beenRemoved: false, visible: true} : {...submission, toRemove: false, beenRemoved: false, visible: false};
 
         })
 
@@ -73,9 +77,29 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
     }
 
+    const [isNoneSelected, setIsNoneSelected] = useState(true);
+
+    useEffect(() => {
+
+        if (results.every(({ toRemove }) => { return toRemove === false })) {
+
+            setIsNoneSelected(true);
+
+        } else {
+
+            setIsNoneSelected(false);
+
+        }
+
+    }, [results]);
+
     const handleSubmit = (event) => {
 
         event.preventDefault();
+
+        const checkHint = example[0].toLowerCase().trim(); // clean up user's input
+        const cleanedCallSign = mysteryWord.toLowerCase().trim();
+        const stemmedHint = stemmerWord(checkHint);
 
         if (example[1]) {
 
@@ -83,18 +107,39 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         }
 
-        if (example[0] === mysteryWord) {
+        if (example[0] === "") {
+
+			hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Please enter a hint"
+
+        } else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
             hintInputRef.current.classList.add("border-2");
-            hintInputRef.current.classList.remove("border-slate-200");
+            hintInputRef.current.classList.remove("border-slate-400");
             hintInputRef.current.classList.add("border-red-500");
-            hintValidationRef.current.innerText = "Your hint cannot be the mystery word!"
+            hintValidationRef.current.innerText = "Your hint cannot be the callsign"
+
+		} else if (checkHint.includes(cleanedCallSign)) {
+
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot contain the callsign"
+            
+        } else if (validateWord(stemmedHint)) {
+
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot contain spaces, numbers or special characters"
             
         } else {
 
             hintInputRef.current.classList.remove("border-2");
+            hintInputRef.current.classList.add("border-slate-400");
             hintInputRef.current.classList.remove("border-red-500");
-            hintInputRef.current.classList.add("border-slate-200");
             hintValidationRef.current.innerText = "";
             
             setExample([example[0], true]);
@@ -114,7 +159,13 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
         }
     }
 
-    const changeToRed = (playerName) => {
+    const handleUndoSubmit = () => {
+
+        setExample(["", false]);
+
+    }
+
+    const selectToRemove = (playerName) => {
 
         setResults(
 
@@ -129,7 +180,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
     const handleRemove = () => {
 
-        if (voted) {
+        if (voted || isNoneSelected) {
 
             return;
 
@@ -173,14 +224,44 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         setVoted(false);
 
+        setIsNoneSelected(true);
+
     }
+
+    const handleClearSelection = () => {
+
+        setResults(
+
+            results.map((result) => {
+
+                return {...result, toRemove: false, beenRemoved: false};
+
+            })
+
+        );
+
+        setIsNoneSelected(true);
+
+    }
+
+    const validateWord = (w) => {
+		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
+	}
+
+	const stemmerWord = (w) => {
+		return stemmer(w);
+	}
+
+	const singularizeWord = (w) => {
+		return pluralize.singular(w);
+	}
 
     const rules = [{
 
         content: 
-            <div className="flex flex-col w-full items-center self-center">
-                <Label>Callsign</Label>
-                <div className="flex mt-2 p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+            <div className="flex flex-col w-full items-center self-center text-slate-300">
+                <Label className="text-base">Callsign</Label>
+                <div className="flex mt-1 py-2 px-4 w-72 max-w-sm justify-center rounded-md bg-amber-400 hover:bg-amber-400/80 text-slate-900 text-lg dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950">
                     <p>{mysteryWord}</p>
                 </div>
             </div>,
@@ -193,9 +274,10 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center self-center">
-                <div className="flex p-2 w-full max-w-sm justify-center rounded-md border border-slate-600 bg-white ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
-                    <p>Alex is the stranded agent!</p>
+            <div className="flex flex-col w-full items-center self-center text-slate-300">
+                <Label className="text-base">Stranded Agent</Label>
+                <div className="flex mt-1 py-2 px-4 w-72 max-w-sm justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 text-lg dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950">
+                    <p>Alex</p>
                 </div>
             </div>,
 
@@ -207,10 +289,10 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
     }, {
 
         content:
-            <div className="flex flex-col w-full items-center mt-[8%]">
-                <div className="flex flex-col items-center mb-10">
-                    <Label className="text-[0.7rem]">Callsign</Label>
-                    <div className="flex mt-1 p-1 w-48 justify-center rounded-md border border-slate-600 bg-slate-200 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300">
+            <div className="flex flex-col w-full items-center mt-6">
+                <div className="flex flex-col items-center mb-[10%]">
+                    <Label className="text-xs text-slate-300">Callsign</Label>
+                    <div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-amber-400 hover:bg-amber-400/80 text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950">
                         <p className="text-sm text-center">{mysteryWord}</p>
                     </div>
                 </div>
@@ -219,12 +301,13 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
                     <form name="exampleForm" onSubmit={handleSubmit} className="flex flex-col items-center w-full">
 
-                        <Label htmlFor="example" className="mb-2">Enter a one-word hint:</Label>
+                        <Label htmlFor="example" className="mb-2 text-slate-200">Enter a one-word hint:</Label>
 
                         <div className="flex flex-row w-full justify-center items-end">
 
                             <Input
-                                className="flex h-10 w-64"
+                                autoComplete="off"
+                                className="flex h-10 w-64 ring-offset-slate-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-50 focus-visible:ring-offset-2"
                                 type="text" 
                                 id="example"
                                 name="hint" 
@@ -234,27 +317,22 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                 ref={hintInputRef}
                             />
 
-                            <Button className="ml-2 w-24" variant={example[1] ? "green" : "default"} type="submit">
+                            <Button 
+                                className={`ml-2 w-24 ${example[1] ? "hover:bg-red-600" : ""}`}
+                                variant={example[1] ? "green" : "dark"} 
+                                type="button"
+                                onClick={example[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}
+                                onMouseEnter={() => {setIsUndo(true)}}
+                                onMouseLeave={() => {setIsUndo(false)}}
+                            >
 
-                                {example[1] && (
-
-                                    <>
-                                        Submitted
-                                    </>
-
-                                ) || (
-
-                                    <>
-                                        Submit
-                                    </>
-
-                                )}
+                                {example[1] ? (isUndo ? "Undo" : "Submitted") : "Submit"}
 
                             </Button>
 
                         </div>
 
-                        <p className="mt-2 text-xs text-red-500" ref={hintValidationRef}/>
+                        <p className="mt-4 text-xs h-2 text-red-500" ref={hintValidationRef}/>
 
                     </form>
 
@@ -278,9 +356,9 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                     </div>
                 </div> */}
 
-                <div className="flex flex-col w-full items-center mb-6">
+                <div className="flex flex-col w-full items-center mb-10">
 
-                    <Label className="mb-4 text-lg">Select the hints that are too similar or illegal:</Label>
+                    <Label className="mb-8 text-slate-200 text-lg">Select the hints that are too similar or illegal:</Label>
 
                     <div className="flex flex-row w-[95%] justify-center gap-4">
 
@@ -289,12 +367,12 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                             return (
 
                                 <div key={index} className="flex flex-col w-36 items-center">
-                                    <Label className="text-sm">{result.playerName}</Label>
+                                    <Label className="text-xs text-slate-300">{result.playerName}</Label>
                                     <Button 
-                                        onClick={voted ? () => {} : () => changeToRed(result.playerName)} 
+                                        onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
                                         variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
-                                        className={`flex mt-2 p-2 w-full max-w-sm justify-center ${result.beenRemoved ? "line-through" : ""}`} 
-                                        disabled={voted ? true : false}
+                                        className={`flex mt-1 p-2 w-full max-w-sm justify-center ${result.beenRemoved ? "line-through" : ""}`} 
+                                        disabled={voted}
                                     >
                                         {result.hint}
                                     </Button>
@@ -309,7 +387,12 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                 </div>
 
                 <div className="flex flex-row justify-center gap-2">
-                    <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44">
+
+                    <Button 
+                        onClick={handleRemove} 
+                        variant={voted ? "green" : isNoneSelected ? "disabledRed" : "red"} 
+                        className={`flex flex-row w-44 transition-all ease-in-out duration-150 ${ isNoneSelected ? "cursor-not-allowed" : ""}`}
+                    >
 
                         {voted && (
 
@@ -328,10 +411,38 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                         )}
 
                     </Button>
-                    <Button onClick={handleCancel} variant="default" className="flex flex-row w-44">
-                        <X size={16} className="mr-2" />
-                        Cancel Selection
+
+                    <Button 
+                        onClick={(isNoneSelected && !voted) ? () => {setVoted(true);} : voted ? handleCancel : handleClearSelection} 
+                        variant={(isNoneSelected && !voted) ? "green" : voted ? "dark" : "blue"} 
+                        className="flex flex-row w-44 transition-all ease-in-out duration-150"
+                    >
+
+                        {(isNoneSelected && !voted) && (
+
+                            <>
+                                <Check size={16} className="mr-2" />
+                                Looks Good!
+                            </>
+
+                        ) || voted && (
+
+                            <>
+                                <X size={16} className="mr-2" />
+                                Cancel Selection
+                            </>
+
+                        ) || (
+
+                            <>
+                                <RotateCcw size={16} className="mr-2" />
+                                Clear Selection
+                            </>
+
+                        )}
+
                     </Button>
+
                 </div>
 
             </div>,
@@ -346,7 +457,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         content:
             // defaultValue={["item-1", "item-2"]}
-            <Accordion className="flex flex-none flex-col mx-12" type="single" collapsible>
+            <Accordion className="flex flex-none flex-col mx-12 text-slate-200" type="single" collapsible>
                 <AccordionItem className="w-full border-slate-400" value="item-1">
                     <AccordionTrigger>Good hints are usually:</AccordionTrigger>
                     <AccordionContent>
@@ -389,9 +500,9 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                     </div>
                 </div> */}
 
-                <div className="flex flex-col w-full items-center mb-6">
+                <div className="flex flex-col w-full items-center mb-10">
 
-                    <Label className="mb-4 text-lg">Your hints have been revealed!</Label>
+                    <Label className="mb-8 text-lg text-slate-200">Your hints have been revealed!</Label>
 
                     <div className="flex flex-row w-[95%] justify-center gap-4">
 
@@ -402,7 +513,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                 return (
 
                                     <div key={index} className="flex flex-col w-36 items-center">
-                                        <Label className="text-sm">{result.playerName}</Label>
+                                        <Label className="text-xs text-slate-300">{result.playerName}</Label>
 
                                         {result.visible && (
                                         
@@ -442,7 +553,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
                 </div>
 
-                <h1 className="text-lg text-center font-medium">Now it's up to the stranded agent to figure out their callsign...</h1>
+                <h1 className="text-base text-center font-medium text-slate-200">Now it's up to the stranded agent to figure out their callsign...</h1>
 
             </div>,
 
@@ -493,7 +604,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
                             return (
 
-                                <Card key={index} className="flex-none flex-col w-full h-full bg-slate-200 border-slate-400 overflow-auto" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
+                                <Card key={index} className="flex-none flex-col w-full h-full border-slate-400 overflow-auto bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
                                     <div className="grid grid-flow-row  grid-rows-12 h-full">
                                         <CardContent className="grid row-span-8 mt-6 py-0">
                                             {card.content}

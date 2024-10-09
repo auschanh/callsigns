@@ -120,10 +120,10 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
         } else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
-         hintInputRef.current.classList.add("border-2");
-         hintInputRef.current.classList.remove("border-slate-400");
-         hintInputRef.current.classList.add("border-red-500");
-         hintValidationRef.current.innerText = "Your hint cannot be the callsign"
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot be the callsign"
 
 		} else if (checkHint.includes(cleanedCallSign)) {
 
@@ -297,7 +297,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                                         />
 
                                         <Button 
-                                            className={`ml-2 w-24 ${hint[1] ? "hover:bg-slate-500" : ""}`}
+                                            className={`ml-2 w-24 ${hint[1] ? "hover:bg-red-600" : ""}`}
                                             variant={hint[1] ? "green" : "default"} 
                                             type="button"
                                             onClick={hint[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}

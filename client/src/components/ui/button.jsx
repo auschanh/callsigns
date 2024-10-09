@@ -29,6 +29,7 @@ const buttonVariants = cva(
         disabled: "bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 opacity-50",
         disabledRed: "bg-red-600 text-slate-50 dark:bg-red-900 dark:text-slate-50 opacity-50",
         blue: "bg-blue-600 text-slate-50 hover:bg-blue-600/90 dark:bg-blue-50 dark:text-slate-900 dark:hover:bg-blue-50/90",
+        dark: "bg-slate-700 text-slate-50 border border-slate-100/50 hover:bg-slate-700/80 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"
       },
       size: {
         default: "h-10 px-4 py-2",

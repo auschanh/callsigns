@@ -89,7 +89,7 @@ const Carousel = forwardRef(function({ children: slides, slideState, spaceBetwee
                         {slides.map((_, index) => (
 
                             <div key={index} onClick={() => {scrollToMarker(index)}} className={`
-                                transition-all w-1.5 h-1.5 bg-black rounded-full cursor-pointer
+                                transition-all w-1.5 h-1.5 bg-white rounded-full cursor-pointer
                                 ${currentSlide === index ? "p-1" : "bg-opacity-50"}
                             `} />
 
