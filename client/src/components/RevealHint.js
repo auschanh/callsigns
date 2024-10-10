@@ -13,7 +13,8 @@ import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState }) => {
+
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -36,6 +37,8 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [menuScore, setMenuScore] = menuScoreState;
     const [isLastRound, setIsLastRound] = isLastRoundState;
     const [showEndGame, setShowEndGame] = showEndGameState;
+    const [revealCallsign, setRevealCallsign] = revealCallsignState;
+    const [prepRevCallsign, setPrepRevCallsign] = prepRevCallsignState;
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -101,21 +104,63 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
     useEffect(() => {
 
-        if (submitted === false && validate === true) {
+        if (prepRevCallsign === true && (submitted === false && validate === true)) {
+
+            setPrepRevCallsign(false);
 
             if (currentRound === roomDetails.numRounds) {
 
                 setTimeout(() => {
 
                     setIsLastRound(true);
+
+                    if (playerName === guesser) {
+
+                        console.log("fadecallsign1");
+
+                        setRevealCallsign([true, false, false]);
+
+                        setTimeout(() => {
+
+                            setRevealCallsign([true, true, false]);
+
+                            setTimeout(() => {
+
+                                setRevealCallsign([true, true, true]);
+                    
+                            }, 500);
+                
+                        }, 500);
+
+                    }
     
-                }, 5000);
+                }, 3000);
 
             } else {
 
                 setTimeout(() => {
 
                     setShowReadyState(true);
+
+                    if (playerName === guesser) {
+
+                        console.log("fadecallsign2");
+
+                        setRevealCallsign([true, false, false]);
+
+                        setTimeout(() => {
+
+                            setRevealCallsign([true, true, false]);
+
+                            setTimeout(() => {
+
+                                setRevealCallsign([true, true, true]);
+                    
+                            }, 500);
+                
+                        }, 500);
+
+                    }
     
                 }, 2000);
 
@@ -127,10 +172,11 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             setIsLastRound(false);
             setShowReadyState(false);
+            setRevealCallsign([false, false, false]);
 
         }
 
-    }, [roomDetails, submitted, validate, currentRound]);
+    }, [roomDetails, submitted, validate, currentRound, playerName, guesser, prepRevCallsign]);
 
     useEffect(() => {
 

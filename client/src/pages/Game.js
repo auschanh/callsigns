@@ -87,6 +87,10 @@ function Game() {
 
     const [showEndGame, setShowEndGame] = useState(false);
 
+	const [revealCallsign, setRevealCallsign] = useState([false, false, false]);
+
+	const [prepRevCallsign, setPrepRevCallsign] = useState(false);
+
 	const [scores, setScores] = useState([]);
 
 	const [sortedScores, setSortedScores] = useState([]);
@@ -612,6 +616,8 @@ function Game() {
 
 				setGuesser(roomDetails.guesser);
 
+				setRevealCallsign([false, false, false]);
+
 				if (playerName === roomDetails.host) {
 
 					console.log("TRIGGER NEXT ROUND");
@@ -898,20 +904,31 @@ function Game() {
 
 	useEffect(() => {
 
-		socket.on("receiveUpdateRound" , () => {
+        if (currentIndex === 1) {
 
-			const newIndex = (currentIndex + 1) % cards.length;
-			setCurrentIndex(newIndex);
+            setPrepRevCallsign(true);
 
-			if (newIndex === 0) {
-				setCurrentRound(currentRound => currentRound + 1);
+        }
 
-			}
-		})
+    }, [currentIndex]);
 
-		return () => socket.removeAllListeners("receiveUpdateRound");
 
-	}, [currentIndex, socket]);
+	// useEffect(() => {
+
+	// 	socket.on("receiveUpdateRound" , () => {
+
+	// 		const newIndex = (currentIndex + 1) % cards.length;
+	// 		setCurrentIndex(newIndex);
+
+	// 		if (newIndex === 0) {
+	// 			setCurrentRound(currentRound => currentRound + 1);
+
+	// 		}
+	// 	})
+
+	// 	return () => socket.removeAllListeners("receiveUpdateRound");
+
+	// }, [currentIndex, socket]);
 
 
 	useEffect(() => {
@@ -1089,6 +1106,8 @@ function Game() {
 					currentRound={currentRound}
 					isLastRoundState={[isLastRound, setIsLastRound]}
 					showEndGameState={[showEndGame, setShowEndGame]}
+					revealCallsignState={[revealCallsign, setRevealCallsign]}
+					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
 				/>
 
 		}
@@ -1212,11 +1231,15 @@ function Game() {
 								
 								{playerName !== guesser && (
 
-									<p className="text-sm text-center">{callsign}</p>
+									<p className={`text-sm text-center`}>{callsign}</p>
+
+								) || revealCallsign[1] && (
+
+									<p className={`text-sm text-center transition-opacity ease-in-out duration-500 ${revealCallsign[2] ? "" : "opacity-0"}`}>{callsign}</p>
 
 								) || (
 
-									<HiddenIcon className="aspect-square w-5" />
+									<HiddenIcon className={`aspect-square w-5 transition-opacity ease-in-out duration-500 ${revealCallsign[0] ? "opacity-0" : ""}`} />
 									// <p className="text-sm text-center">?</p>
 
 								)}
