@@ -54,8 +54,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         const sorted = [...tempScores].sort((a,b) => b.score - a.score);
 
-        console.log(tempScores);
-
 		setSortedScores(sorted);
 
     }
@@ -99,6 +97,16 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                     setSubmitted(false);
 
+                    if (correctGuess) {
+
+                        setTimeout(() => {
+
+                            updateGuesserScore();
+
+                        }, 1500);
+
+                    }
+
                 }, 1000);
 
             }, 6000);
@@ -120,12 +128,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
         if (prepRevCallsign === true && (submitted === false && validate === true)) {
 
             setPrepRevCallsign(false);
-
-            if (correctGuess) {
-
-                updateGuesserScore();
-
-            }
 
             if (currentRound === roomDetails.numRounds) {
 
