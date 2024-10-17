@@ -1257,6 +1257,14 @@ video {
   width: 100vw;
 }
 
+.w-16 {
+  width: 4rem;
+}
+
+.w-20 {
+  width: 5rem;
+}
+
 .min-w-36 {
   min-width: 9rem;
 }
@@ -1873,6 +1881,16 @@ video {
   background-color: rgb(250 204 21 / var(--tw-bg-opacity));
 }
 
+.bg-indigo-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(49 46 129 / var(--tw-bg-opacity));
+}
+
+.bg-indigo-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -2216,6 +2234,14 @@ video {
   padding-top: 6%;
 }
 
+.pr-0 {
+  padding-right: 0px;
+}
+
+.pr-1 {
+  padding-right: 0.25rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -2449,6 +2475,11 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.text-indigo-600 {
+  --tw-text-opacity: 1;
+  color: rgb(79 70 229 / var(--tw-text-opacity));
 }
 
 .underline {
@@ -3081,6 +3112,11 @@ video {
   background-color: rgb(234 179 8 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-indigo-800:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+}
+
 .hover\:text-slate-50:hover {
   --tw-text-opacity: 1;
   color: rgb(248 250 252 / var(--tw-text-opacity));
@@ -3089,6 +3125,11 @@ video {
 .hover\:text-slate-900:hover {
   --tw-text-opacity: 1;
   color: rgb(15 23 42 / var(--tw-text-opacity));
+}
+
+.hover\:text-slate-400:hover {
+  --tw-text-opacity: 1;
+  color: rgb(148 163 184 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {
@@ -3558,6 +3599,11 @@ video {
   background-color: rgb(234 179 8 / var(--tw-bg-opacity));
 }
 
+:is(.dark .dark\:bg-indigo-950) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 27 75 / var(--tw-bg-opacity));
+}
+
 :is(.dark .dark\:text-red-900) {
   --tw-text-opacity: 1;
   color: rgb(127 29 29 / var(--tw-text-opacity));
@@ -3653,6 +3699,10 @@ video {
 :is(.dark .dark\:hover\:bg-yellow-700:hover) {
   --tw-bg-opacity: 1;
   background-color: rgb(161 98 7 / var(--tw-bg-opacity));
+}
+
+:is(.dark .dark\:hover\:bg-indigo-950\/80:hover) {
+  background-color: rgb(30 27 75 / 0.8);
 }
 
 :is(.dark .dark\:hover\:text-slate-50:hover) {

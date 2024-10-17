@@ -97,6 +97,8 @@ function Game() {
 
 	const [menuScore, setMenuScore] = useState(false);
 
+	const [showScore, setShowScore] = useState(false);
+
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const [hintArray, setHintArray] = useState([]);
@@ -652,6 +654,8 @@ function Game() {
 
 			setTimeout(() => {
 
+				setShowScore(false);
+
 				setValidate(false);
 
 				if (playerName === roomDetails.host) {
@@ -1106,6 +1110,7 @@ function Game() {
 					showEndGameState={[showEndGame, setShowEndGame]}
 					revealCallsignState={[revealCallsign, setRevealCallsign]}
 					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
+					showScoreState={[showScore, setShowScore]}
 				/>
 
 		}

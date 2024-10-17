@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -31,7 +31,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
-    const [showScore, setShowScore] = useState(false);
+    const [showScore, setShowScore] = showScoreState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
@@ -438,7 +438,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                             
                             <div className="flex flex-col items-center w-full">
 
-                                <h1 className="text-indigo-900 text-3xl mb-8 font-mono">SCORES</h1>
+                                <h1 className="text-indigo-600 text-3xl mb-8">Scores</h1>
 
                                 <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
 
