@@ -421,23 +421,23 @@ function Game() {
 		
 				);
 
-				setScores( 
+				const resetScores = playing.map((player) => {
 
-					playing.map((player) => {
+					return ({
 
-						return ({
+						playerName: player,
+						score: 0,
+						correctGuesses: 0,
+						goodHints: 0,
+						badHints: 0
 
-							playerName: player,
-							score: 0,
-							correctGuesses: 0,
-							goodHints: 0,
-							badHints: 0
+					});
 
-						});
+				});
 
-					})
+				setScores(resetScores);
 
-				);
+				setSortedScores(resetScores);
 
                 setRoomDetails(roomDetails);
 
@@ -1026,8 +1026,8 @@ function Game() {
 				
 				{
 					sortedScores.map((player, index) => {
-						return (<TableRow key={index}>
-						<TableCell className={`absolute -left-2 w-0 font-medium`}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5 fill-${agentColour}`}/> : ''}</TableCell>
+						return (<TableRow key={index} className={`${cellColour === "white" ? "hover:bg-gradient-to-r from-black from-10% via-slate-900 via-50% to-black to-90%" : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"}`}>
+						<TableCell className={`absolute -left-2 w-0 font-medium`} style={{ fill: agentColour }}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`}/> : ''}</TableCell>
 						<TableCell className="w-24 font-medium">{player.playerName}</TableCell>
 						<TableCell className="w-24 font-extrabold">{player.score}</TableCell>
 						<TableCell className="w-24">{player.correctGuesses}</TableCell>

@@ -459,7 +459,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                     <div className="max-w-[80%]">
                                         
-                                        {generateScoreTable('white', 'slate-200')}
+                                        {generateScoreTable('white', '#94a3b8')}
 
                                     </div>
 
