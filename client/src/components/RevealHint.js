@@ -386,7 +386,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className={`h-full flex flex-none flex-col justify-center items-center w-full transition-all ease-in-out duration-500`}>
+            <div className={`h-full flex flex-none flex-col justify-center items-center w-full`}>
     
                 {submitted && (
 
@@ -432,12 +432,52 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                 {!submitted && validate && (
                     
-                    <div className='h-[40vh] px-24 flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
+                    <div className={`h-[40vh] px-24 flex flex-none flex-col justify-center text-xs w-full text-center gap-16 validate`}>
                         
                         {showScore && (
                             
-                            <div>
-                                <div className='mb-10 left-0'>
+                            <div className="flex flex-col items-center w-full">
+
+                                <h1 className="text-indigo-900 text-3xl mb-8 font-mono">SCORES</h1>
+
+                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
+
+                                    <div className="max-w-[80%]">
+                                        
+                                        {generateScoreTable('white', 'slate-200')}
+
+                                    </div>
+
+                                    {/* <Table className="text-white">
+                                        <TableHeader className="text-center">
+
+                                            <TableRow className="">
+                                            <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
+                                            <TableHead className="text-center text-green-600">Score</TableHead>
+                                            <TableHead className="text-center  text-green-600">Good Hints</TableHead>
+                                            <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+                                            </TableRow>
+
+                                        </TableHeader>
+                                        <TableBody className="text-center">
+                                            
+                                            {
+                                                sortedScores.map((player, index) => {
+                                                return (<TableRow key={index}>
+                                                    <TableCell className="font-medium">{player.playerName}</TableCell>
+                                                    <TableCell classList="font-extrabold">{player.score}</TableCell>
+                                                    <TableCell>{player.goodHints}</TableCell>
+                                                    <TableCell>{player.badHints}</TableCell>
+                                                    </TableRow>)
+                                                })
+                                            }
+                                            
+                                        </TableBody>
+                                    </Table> */}
+
+                                </div>
+
+                                <div className='mt-8 left-0'>
                                     <Button 
                                         ref={scoreBtnRef} 
                                         variant="indigo" 
@@ -447,71 +487,38 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                     >
                                         Back
                                     </Button>
-                                </div>
-                                <div>
-                                {generateScoreTable('white', 'amber-400')}
-
-                                </div>
-                                {/* <Table className="text-white">
-                                    <TableHeader className="text-center">
-
-                                        <TableRow className="">
-                                        <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
-                                        <TableHead className="text-center text-green-600">Score</TableHead>
-                                        <TableHead className="text-center  text-green-600">Good Hints</TableHead>
-                                        <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
-                                        </TableRow>
-
-                                    </TableHeader>
-                                    <TableBody className="text-center">
-                                        
-                                        {
-                                            sortedScores.map((player, index) => {
-                                               return (<TableRow key={index}>
-                                                <TableCell className="font-medium">{player.playerName}</TableCell>
-                                                <TableCell classList="font-extrabold">{player.score}</TableCell>
-                                                <TableCell>{player.goodHints}</TableCell>
-                                                <TableCell>{player.badHints}</TableCell>
-                                                </TableRow>)
-                                            })
-                                        }
-                                        
-                                    </TableBody>
-                                </Table> */}
+                                </div>  
+                                    
                             </div>
 
                         ) || (
 
-                            <>
+                            <div className="space-y-16">
 
-                                <div className={`validate font-mono`}>
+                                <div
+                                    className={`font-mono ${showEndGame ? "" : isLastRound ? "opacity-0" : ""}`}
+                                    style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
+                                >
 
-                                    <div 
-                                        className={`transition-all ease-in-out ${isLastRound ? "opacity-0" : ""} ${showEndGame ? "opacity-100" : ""}`}
-                                        style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
-                                    >
+                                    <h2 className={`text-lg mb-2 text-center ${showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
-                                        <h2 className={`text-lg mb-2 text-center ${showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+                                        {`${showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
-                                            {`${showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+                                    </h2>
 
-                                        </h2>
+                                    <h1 className={`text-6xl text-center ${showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                        
+                                        {`${showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                        
+                                    </h1>
 
-                                        <h1 className={`text-6xl text-center ${showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
-                                            
-                                            {`${showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
-                                            
-                                        </h1>
-
-                                        {/* Change Menu State to reflect scores */}
-                                        {/* {setMenuScore(true)} */}
-
-                                    </div>
+                                    {/* Change Menu State to reflect scores */}
+                                    {/* {setMenuScore(true)} */}
 
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
+                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-opacity ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
@@ -598,7 +605,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                 </div>
                                 
-                            </>
+                            </div>
 
                         )}
 
