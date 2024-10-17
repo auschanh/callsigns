@@ -982,30 +982,28 @@ function Game() {
 	}
 
 	const generateScoreTable = (cellColour, agentColour) => {
-		let table = <Table className={`text-${cellColour}`}>
-			<TableHeader className="text-center">
-
-				<TableRow className="">
-				<TableHead className="w-0"></TableHead>
-				<TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
-				<TableHead className="text-center text-green-600">Score</TableHead>
-				<TableHead className="text-center  text-green-600">Correct Guesses</TableHead>
-				<TableHead className="text-center  text-green-600">Good Hints</TableHead>
-				<TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+		let table = <Table className={`text-${cellColour} w-full h-full`}>
+			<TableHeader className="w-full h-full">
+				<TableRow className="w-full h-full text-xs">
+					<TableHead className="h-0 pb-4 text-center"></TableHead>
+					<TableHead className="h-0 pb-4 text-center">Player</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Score</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Correct Guesses</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Good Hints</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Bad Hints</TableHead>
 				</TableRow>
-
 			</TableHeader>
 			<TableBody className="text-center">
 				
 				{
 					sortedScores.map((player, index) => {
 						return (<TableRow key={index}>
-						<TableCell className={`font-medium fill-${agentColour}`}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`} style={{fill: "#fbbf24"}}/> : ''}</TableCell>
-						<TableCell className="font-medium">{player.playerName}</TableCell>
-						<TableCell className="font-extrabold">{player.score}</TableCell>
-						<TableCell>{player.correctGuesses}</TableCell>
-						<TableCell>{player.goodHints}</TableCell>
-						<TableCell>{player.badHints}</TableCell>
+						<TableCell className={`absolute -left-2 w-0 font-medium`}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5 fill-${agentColour}`}/> : ''}</TableCell>
+						<TableCell className="w-24 font-medium">{player.playerName}</TableCell>
+						<TableCell className="w-24 font-extrabold">{player.score}</TableCell>
+						<TableCell className="w-24">{player.correctGuesses}</TableCell>
+						<TableCell className="w-24">{player.goodHints}</TableCell>
+						<TableCell className="w-24">{player.badHints}</TableCell>
 						</TableRow>)
 					})
 				}
@@ -1187,7 +1185,7 @@ function Game() {
 										</div>
 									</div>
 									</PopoverTrigger>
-									<PopoverContent className="w-[36rem] mr-40">
+									<PopoverContent className="w-fit h-fit mr-40">
 										<div className="text-black mt-1 mr-2">
 											{generateScoreTable('black', 'black')}
 										</div>
