@@ -95,6 +95,8 @@ function Game() {
 
 	const [sortedScores, setSortedScores] = useState([]);
 
+	const [tempScores, setTempScores] = useState([]);
+
 	const [menuScore, setMenuScore] = useState(false);
 
 	const [showScore, setShowScore] = useState(false);
@@ -149,6 +151,8 @@ function Game() {
 			setGuess("");
 
 			setMenuScore(false);
+
+			setTempScores([]);
 
 			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
 
@@ -820,19 +824,19 @@ function Game() {
 			setResults(votedOutResults);
 
 			console.log(votedOutResults.map(result => {
-				return result.visible == false ? result.playerName : null;
+				return result.visible === false ? result.playerName : null;
 			}))
 
 			const newScores = scores.map((player => {
 
 				if(votedOutResults.map(result => {
-					return result.visible == true ? result.playerName : null;}).includes(player.playerName)
-					&& player.playerName != guesser
+					return result.visible === true ? result.playerName : null;}).includes(player.playerName)
+					&& player.playerName !== guesser
 				){
 						console.log("voted out here")
-						return {...player, score: player.score+1, goodHints: player.goodHints + 1}
+						return {...player, score: player.score + 1, goodHints: player.goodHints + 1}
 
-				} else if(player.playerName != guesser) {
+				} else if(player.playerName !== guesser) {
 
 					return {...player, badHints: player.badHints + 1};
 
@@ -843,6 +847,9 @@ function Game() {
 			}))
 
 			setScores(newScores);
+
+			const sorted = [...newScores].sort((a,b) => b.score - a.score);
+			setSortedScores(sorted);
 
 			if (playerName === roomDetails.host) {
 
@@ -936,41 +943,59 @@ function Game() {
 
 
 	useEffect(() => {
-		// runs when guesser guesses
+
+		// runs when guesser guesses correctly
 		socket.on("receiveUpdateScore" , () => {
+
 			// calculate number of hints eliminated
 			let numRemovedHints = 0;
 
 			let removedHints = [];
+
 			results.map(result => {
-				if(result.visible == false) {
+
+				if (result.visible === false) {
+
 					removedHints.push(result.hint);
+
 				}
+
 			});
 
 			numRemovedHints = removedHints.length;
-			
-			setScores(
-				(prev) => prev.map(player => {
-					if(player.playerName === guesser) {
-						return {...player, 
-							score: player.score + numRemovedHints + 1, 
+
+			setTempScores(
+
+				scores.map((player) => {
+
+					if (player.playerName === guesser) {
+
+						return {
+
+							...player,
+							score: player.score + numRemovedHints + 1,
 							correctGuesses: player.correctGuesses + 1
-							}
+
+						}
+
 					} else {
+
 						return player;
+
 					}
+
 				})
+
 			);
 			
-		})
+		});
 
-		const sortedScores = [...scores].sort((a,b) => b.score - a.score);
-		setSortedScores(sortedScores);
+		// const sortedScores = [...scores].sort((a,b) => b.score - a.score);
+		// setSortedScores(sortedScores);
 
 		return () => socket.removeAllListeners("receiveUpdateScore");
 
-	}, [guesser, submitted, results, socket]);
+	}, [socket, guesser, submitted, results, scores]);
 
 
 	const validateWord = (w) => {
@@ -1111,6 +1136,7 @@ function Game() {
 					revealCallsignState={[revealCallsign, setRevealCallsign]}
 					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
 					showScoreState={[showScore, setShowScore]}
+					tempScoresState={[tempScores, setTempScores]}
 				/>
 
 		}

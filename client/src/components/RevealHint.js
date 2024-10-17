@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
@@ -34,6 +34,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [showScore, setShowScore] = showScoreState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
+    const [tempScores, setTempScores] = tempScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
     const [isLastRound, setIsLastRound] = isLastRoundState;
     const [showEndGame, setShowEndGame] = showEndGameState;
@@ -46,6 +47,18 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const nextRoundBtnRef = useRef(null);
 
     const navigate = useNavigate();
+
+    const updateGuesserScore = () => {
+
+        setScores(tempScores);
+
+        const sorted = [...tempScores].sort((a,b) => b.score - a.score);
+
+        console.log(tempScores);
+
+		setSortedScores(sorted);
+
+    }
 
     useEffect(() => {
 
@@ -108,6 +121,12 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             setPrepRevCallsign(false);
 
+            if (correctGuess) {
+
+                updateGuesserScore();
+
+            }
+
             if (currentRound === roomDetails.numRounds) {
 
                 setTimeout(() => {
@@ -115,8 +134,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                     setIsLastRound(true);
 
                     if (playerName === guesser) {
-
-                        console.log("fadecallsign1");
 
                         setRevealCallsign([true, false, false]);
 
@@ -143,8 +160,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                     setShowReadyState(true);
 
                     if (playerName === guesser) {
-
-                        console.log("fadecallsign2");
 
                         setRevealCallsign([true, false, false]);
 
