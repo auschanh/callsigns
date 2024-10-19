@@ -78,30 +78,59 @@ function JoinRoom() {
             })();
         }
 
-        // if not already in lobby
-        if (isFoundRoom || (username && !inLobby.find(({playerName}) => { return playerName === username }))) {
+        // if username is not yet set
+        if (!username) {
 
-            console.log("username triggered");
+            if (isFoundRoom) {
 
-            setIsFoundRoom(false);
+                console.log("joining room");
 
-            (async () => {
+                setIsFoundRoom(false);
 
-                try {
+                (async () => {
 
-                    await socket.emit("joinRoom", roomID, username);
+                    try {
 
-                } catch (error) {
+                        await socket.emit("joinRoom", roomID, username);
 
-                    throw error;
+                    } catch (error) {
 
-                }
+                        throw error;
 
-            })();
+                    }
+
+                })();
+
+            }            
 
         } else {
 
-            console.log("not gonna try to join room");
+            // if not already in lobby
+            if (!inLobby.find(({playerName}) => { return playerName === username })) {
+
+                console.log("registering username");
+
+                // setIsFoundRoom(false);
+
+                (async () => {
+
+                    try {
+
+                        await socket.emit("joinRoom", roomID, username);
+
+                    } catch (error) {
+
+                        throw error;
+
+                    }
+
+                })();
+
+            } else {
+
+                console.log("not gonna try to join room");
+
+            }
 
         }
 

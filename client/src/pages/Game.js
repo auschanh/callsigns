@@ -349,9 +349,15 @@ function Game() {
 
         }
 
+	}, [roomDetails, roomID]);
+
+	useEffect(() => {
+
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
 			if (othersInLobby && playerName !== undefined) {
+
+				setRoomDetails(roomDetails);
 
 				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
 
@@ -438,8 +444,6 @@ function Game() {
 				setScores(resetScores);
 
 				setSortedScores(resetScores);
-
-                setRoomDetails(roomDetails);
 
 				setRemainingGuesses(roomDetails.numGuesses);
 
@@ -702,7 +706,7 @@ function Game() {
 
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
+    }, [socket, roomDetails, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
 
 	// consolidate into just inGame
 	// disconnect protection
