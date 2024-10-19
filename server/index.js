@@ -519,61 +519,21 @@ io.on("connection", (socket) => {
 
 		} else {
 
-			const selectedInOrder = joinOrder.filter((playerName) => { return selectedPlayers.includes(playerName) });
+			let index = 0;
+			let guesser = {};
 
-			const prevGuesserIndex = selectedInOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
+			do {
 
-			console.log(prevGuesserIndex);
+				index = Math.floor(Math.random() * selectedPlayers.length);
 
-			if (prevGuesserIndex !== -1) {
+				guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
 
-				const currentGuesser = usernames.find(({ username }) => { return username === selectedInOrder[(prevGuesserIndex + 1) % selectedInOrder.length] });
+				console.log(guesser.username, "is the new randomly selected guesser");
 
-				if (currentGuesser) {
+			} while (findRoom.guesserID === guesser.socketID);
 
-					// next to be guesser
-					findRoom.guesser = currentGuesser.username;
-					findRoom.guesserID = currentGuesser.socketID;
-
-					console.log("previous guesser: " + selectedInOrder[prevGuesserIndex]);
-
-					console.log("current guesser: " + currentGuesser.username);
-
-					console.log(findRoom);
-
-				} else {
-
-					console.log("currentGuesser fail");
-
-					const index = Math.floor(Math.random() * selectedPlayers.length);
-
-					const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
-
-					findRoom.guesser = guesser.username;
-					findRoom.guesserID = guesser.socketID;
-
-				}
-
-			} else {
-
-				console.log("prevGuesser fail");
-
-				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
-
-				let offset = 1;
-
-				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
-
-					offset += 1;
-
-				}
-
-				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
-
-				findRoom.guesser = guesser.username;
-				findRoom.guesserID = guesser.socketID;
-
-			}
+			findRoom.guesser = guesser.username;
+			findRoom.guesserID = guesser.socketID;
 
 		}
 
