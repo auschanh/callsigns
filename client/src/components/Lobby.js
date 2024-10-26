@@ -610,18 +610,18 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 													<ContextMenuSeparator className="m-0" />
 													<ContextMenuItem
-														disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
+														// disabled={regPlayerCount + gameInfo.aiPlayers <= 3}
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-red-500 focus:text-slate-50"
 														onClick={() => {
 															handleRemovePlayer(`player-${player.playerName}`);
 														}}
 													>
-														{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+														{/* {(regPlayerCount + gameInfo.aiPlayers > 3 && ( */}
 															<>
 																<X size={16} />
 																<p>Remove from Lobby</p>
 															</>
-														)) || <p className="pl-2">Minimum 3 players</p>}
+														{/* )) || <p className="pl-2">Minimum 3 players</p>} */}
 													</ContextMenuItem>
 												</ContextMenuContent>
 											</ContextMenu>
