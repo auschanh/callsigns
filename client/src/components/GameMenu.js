@@ -131,7 +131,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
                 </div>
             </PopoverTrigger>
 
-            <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-6 p-4">
+            <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-8 p-4">
 
                 <div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 [&:hover:not(:has(button:hover))]:bg-slate-200">
 

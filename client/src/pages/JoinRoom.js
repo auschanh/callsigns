@@ -756,7 +756,11 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat username={username} roomName={roomDetails.roomName} roomID={roomID} />
+                            <div className={`overflow-hidden pb-12 ${chatExpanded ? "h-full w-full" : "w-0"}`}>
+
+                                <Chat username={username} roomName={roomDetails.roomName} roomID={roomID} />
+
+                            </div>
 
                         </div>
 
