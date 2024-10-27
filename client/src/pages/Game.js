@@ -1220,7 +1220,7 @@ function Game() {
 										</div>
 									</div>
 									</PopoverTrigger>
-									<PopoverContent className="w-fit h-fit mr-40">
+									<PopoverContent className="w-fit h-fit mr-[9.25rem]">
 										<div className="text-black mt-1 mr-2">
 											{generateScoreTable('black', 'black')}
 										</div>
@@ -1241,9 +1241,15 @@ function Game() {
 									</div>
 								</PopoverTrigger>
 
-								<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
+								<PopoverContent className="w-96 h-[80vh] mr-[5.5rem] p-4">
 
-									<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+									<div className="w-full h-[96%]">
+
+										<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+
+									</div>
+
+									<h4 className="text-[10px] text-center mt-2">The Stranded Agent will not be able to see these messages.</h4>
 
 								</PopoverContent>
 
