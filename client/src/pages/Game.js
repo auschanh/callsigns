@@ -755,6 +755,19 @@ function Game() {
 
 		);
 
+		// remove disconnected players from score table
+		setScores(
+
+			scores?.filter((player) => { return inGame.includes(player.playerName) })
+
+		);
+
+		setSortedScores(
+
+			sortedScores?.filter((player) => { return inGame.includes(player.playerName) })
+
+		);
+
 		// we don't want to wait for a disconnected guesser to guess on the last slide
 
 
@@ -1060,13 +1073,13 @@ function Game() {
 					<span>{` guess their callsign.`}</span>
 				</p>,
 
-			content:  
+			content:
 
 				<SubmitHint 
 					enterHintState={[enterHint, setEnterHint]} 
 					roomDetails={roomDetails} 
 					hintState={[hint, setHint]} 
-					submissionsState={[submissions, setSubmissions]} 
+					resultsState={[results, setResults]}
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord}

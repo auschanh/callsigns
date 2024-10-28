@@ -711,6 +711,10 @@ video {
   top: 50%;
 }
 
+.bottom-4 {
+  bottom: 1rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -737,10 +741,6 @@ video {
 
 .m-0 {
   margin: 0px;
-}
-
-.m-2 {
-  margin: 0.5rem;
 }
 
 .-mx-1 {
@@ -849,20 +849,24 @@ video {
   margin-right: 0.5rem;
 }
 
-.mr-20 {
-  margin-right: 5rem;
-}
-
 .mr-3 {
   margin-right: 0.75rem;
 }
 
-.mr-40 {
-  margin-right: 10rem;
-}
-
 .mr-6 {
   margin-right: 1.5rem;
+}
+
+.mr-8 {
+  margin-right: 2rem;
+}
+
+.mr-\[5\.5rem\] {
+  margin-right: 5.5rem;
+}
+
+.mr-\[9\.25rem\] {
+  margin-right: 9.25rem;
 }
 
 .mt-1 {
@@ -903,42 +907,6 @@ video {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mr-32 {
-  margin-right: 8rem;
-}
-
-.mr-36 {
-  margin-right: 9rem;
-}
-
-.mr-24 {
-  margin-right: 6rem;
-}
-
-.mr-\[5\.5rem\] {
-  margin-right: 5.5rem;
-}
-
-.mr-\[9\.5rem\] {
-  margin-right: 9.5rem;
-}
-
-.mr-\[9\.25rem\] {
-  margin-right: 9.25rem;
-}
-
-.mr-4 {
-  margin-right: 1rem;
-}
-
-.mr-8 {
-  margin-right: 2rem;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
 }
 
 .box-border {
@@ -1109,6 +1077,10 @@ video {
   height: 93%;
 }
 
+.h-\[96\%\] {
+  height: 96%;
+}
+
 .h-\[var\(--radix-select-trigger-height\)\] {
   height: var(--radix-select-trigger-height);
 }
@@ -1129,18 +1101,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[95\%\] {
-  height: 95%;
-}
-
-.h-\[97\%\] {
-  height: 97%;
-}
-
-.h-\[96\%\] {
-  height: 96%;
 }
 
 .max-h-96 {
@@ -1307,10 +1267,6 @@ video {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-\[80\%\] {
-  width: 80%;
 }
 
 .min-w-36 {
@@ -1608,28 +1564,12 @@ video {
   overflow: hidden;
 }
 
-.overflow-clip {
-  overflow: clip;
-}
-
 .overflow-visible {
   overflow: visible;
 }
 
-.overflow-scroll {
-  overflow: scroll;
-}
-
-.overflow-x-auto {
-  overflow-x: auto;
-}
-
 .overflow-x-hidden {
   overflow-x: hidden;
-}
-
-.overflow-y-hidden {
-  overflow-y: hidden;
 }
 
 .overflow-y-scroll {
@@ -2363,6 +2303,10 @@ video {
   font-size: 0.7rem;
 }
 
+.text-\[10px\] {
+  font-size: 10px;
+}
+
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -2386,28 +2330,6 @@ video {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.text-\[6px\] {
-  font-size: 6px;
-}
-
-.text-\[10px\] {
-  font-size: 10px;
-}
-
-.text-\[8px\] {
-  font-size: 8px;
-}
-
-.text-\[10px\]\/6 {
-  font-size: 10px;
-  line-height: 1.5rem;
-}
-
-.text-\[10px\]\/3 {
-  font-size: 10px;
-  line-height: .75rem;
 }
 
 .font-bold {
