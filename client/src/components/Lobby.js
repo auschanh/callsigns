@@ -387,7 +387,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 						</div>
 
-						<div className="flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
+						<div className="flex flex-row items-center w-full p-4 pr-14 mb-6 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
 							<p className="text-sm break-all">{sessionUrl}</p>
 							<Button
 								className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500"
@@ -396,6 +396,16 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 							>
 								{(!copied && <Copy size={12} />) || <Check size={14} />}
 							</Button>
+						</div>
+
+						<div className="text-xs">
+
+							<h2 className="underline font-semibold mb-1">Game Settings</h2>
+							<p>Number of Guesses: <span className="font-semibold">{`${Number(gameInfo.numGuesses) !== 11 ? Number(gameInfo.numGuesses) : "Unlimited"}`}</span></p>
+							<p>Number of Rounds: <span className="font-semibold">{`${Number(gameInfo.numRounds) !== 11 ? Number(gameInfo.numRounds) : "Unlimited"}`}</span></p>
+							<p>Timer: <span className="font-semibold">{`${Number(gameInfo.timeLimit) !== 0 ? ((Math.floor(Number(gameInfo.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(gameInfo.timeLimit) / 60)) + "m ")) + ((Number(gameInfo.timeLimit) % 60) + "s") : "Off"}`}</span></p>
+							<p>Scoring: <span className="font-semibold">{`${gameInfo.keepScore ? "On" : "Off"}`}</span></p>
+
 						</div>
 
 					</div>
@@ -501,7 +511,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														onClick={() => {handleSelectGuesser(player.playerName)}}
 													>
 														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-														<p>Remove as stranded agent</p>
+														<p>Remove as Stranded Agent</p>
 													</ContextMenuItem>
 													
 												) || (
@@ -512,7 +522,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														onClick={() => {handleSelectGuesser(player.playerName)}}
 													>
 														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-														<p>Select as stranded agent</p>
+														<p>Select as Stranded Agent</p>
 													</ContextMenuItem>
 
 												)}
@@ -592,7 +602,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 															onClick={() => {handleSelectGuesser(player.playerName)}}
 														>
 															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-															<p>Remove as stranded agent</p>
+															<p>Remove as Stranded Agent</p>
 														</ContextMenuItem>
 														
 													) || (
@@ -603,7 +613,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 															onClick={() => {handleSelectGuesser(player.playerName)}}
 														>
 															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-															<p>Select as stranded agent</p>
+															<p>Select as Stranded Agent</p>
 														</ContextMenuItem>
 
 													)}

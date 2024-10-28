@@ -514,6 +514,16 @@ function JoinRoom() {
                                         
                                     </div>
 
+                                    <div className="mb-6 text-xs">
+
+                                        <h2 className="underline font-semibold mb-1">Game Settings</h2>
+                                        <p>Number of Guesses: <span className="font-semibold">{`${Number(roomDetails.numGuesses) !== 11 ? Number(roomDetails.numGuesses) : "Unlimited"}`}</span></p>
+                                        <p>Number of Rounds: <span className="font-semibold">{`${Number(roomDetails.numRounds) !== 11 ? Number(roomDetails.numRounds) : "Unlimited"}`}</span></p>
+                                        <p>Timer: <span className="font-semibold">{`${Number(roomDetails.timeLimit) !== 0 ? ((Math.floor(Number(roomDetails.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(roomDetails.timeLimit) / 60)) + "m ")) + ((Number(roomDetails.timeLimit) % 60) + "s") : "Off"}`}</span></p>
+                                        <p>Scoring: <span className="font-semibold">{`${roomDetails.keepScore ? "On" : "Off"}`}</span></p>
+
+                                    </div>
+
                                     <div className="mb-6">
 
                                         <h1 className="text-sm font-semibold mb-2">
