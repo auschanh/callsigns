@@ -711,10 +711,6 @@ video {
   top: 50%;
 }
 
-.bottom-4 {
-  bottom: 1rem;
-}
-
 .z-10 {
   z-index: 10;
 }
@@ -1562,10 +1558,6 @@ video {
 
 .overflow-hidden {
   overflow: hidden;
-}
-
-.overflow-visible {
-  overflow: visible;
 }
 
 .overflow-x-hidden {

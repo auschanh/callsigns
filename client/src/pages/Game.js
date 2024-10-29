@@ -743,8 +743,20 @@ function Game() {
 		// we don't want to wait for disconnected players to vote
 		// filter out has-voted-status of disconnected players
 		setIsVoted(
-		
-			isVoted?.filter((player) => { return inGame.includes(player.playerName) })
+
+			isVoted?.filter((player) => {
+
+				if (player.voted) {
+
+					return player;
+
+				} else {
+
+					return inGame.includes(player.playerName);
+
+				}
+
+			})
 
 		);
 
@@ -1095,7 +1107,7 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Decide which hints are too similar or illegal. Hints with `}</span>
-					<span className="font-bold">{Math.ceil((inGame?.length - 1) / 2)}</span>
+					<span className="font-bold">{Math.ceil((isVoted?.length - 1) / 2)}</span>
 					<span>{` or more votes will be eliminated.`}</span>
 				</p>,
 
