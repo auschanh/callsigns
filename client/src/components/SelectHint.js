@@ -179,7 +179,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                             <p className="mb-6 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
 
                             <Progress
-                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (results.length-1) * 100}
+                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (isVoted.length - 1) * 100}
                                 max={100}
                             /> 
 
