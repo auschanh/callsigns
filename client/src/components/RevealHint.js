@@ -455,9 +455,9 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                             
                             <div className="flex flex-col items-center w-full">
 
-                                <h1 className="text-indigo-600 text-3xl mb-8">Scores</h1>
+                                <h1 className="text-amber-500 text-3xl mb-8">Scores</h1>
 
-                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
+                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500">
 
                                     <div className="max-w-[80%]">
                                         
@@ -497,7 +497,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 <div className='mt-8 left-0'>
                                     <Button 
                                         ref={scoreBtnRef} 
-                                        variant="indigo" 
+                                        variant="red" 
                                         // className={`w-36 transition-all ease-in-out duration-200`}
                                         className={`w-36`}
                                         onClick={() => {setShowScore(prev => !prev)}}
@@ -545,28 +545,60 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                         {readyNextRound.map((playerObj, index) => {
 
-                                            return (
+                                            if (playerObj.playerName === roomDetails.guesser) {
 
-                                                <Button
-                                                    key={index}
-                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                    variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                                    // onClick={e => readyToggle(e, playerObj)}
-                                                >
-                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                        {roomDetails.guesser === playerObj.playerName && (
-                                                            <AgentIcon className="aspect-square h-5" />
-                                                        ) || playerObj.readyNext && (
-                                                            <Check className="text-slate-900" size={14} />
-                                                        ) || (
-                                                            // <Ellipsis className="text-slate-900" size={14} />
-                                                            <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-xs">{playerObj.playerName}</p>
-                                                </Button>
+                                                return (
 
-                                            )
+                                                    <TooltipProvider>
+                                                        <Tooltip delayDuration={0}>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    key={index}
+                                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                                    variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                                    // onClick={e => readyToggle(e, playerObj)}
+                                                                >
+                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                        <AgentIcon className="aspect-square h-5" />
+                                                                    </div>
+                                                                    <p className="text-xs">{playerObj.playerName}</p>
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent sideOffset={12}>
+                                                                <p>
+                                                                    <span className="font-semibold">{playerObj.playerName}</span>
+                                                                    {` is the next Stranded Agent!`}
+                                                                </p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+    
+                                                )
+
+                                            } else {
+
+                                                return (
+                                                    
+                                                    <Button
+                                                        key={index}
+                                                        className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                        variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                        // onClick={e => readyToggle(e, playerObj)}
+                                                    >
+                                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                            {playerObj.readyNext && (
+                                                                <Check className="text-slate-900" size={14} />
+                                                            ) || (
+                                                                // <Ellipsis className="text-slate-900" size={14} />
+                                                                <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs">{playerObj.playerName}</p>
+                                                    </Button>
+
+                                                )
+
+                                            }
 
                                         })}
 
@@ -596,9 +628,9 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                             <Button 
                                                 ref={scoreBtnRef} 
-                                                variant="indigo" 
+                                                variant="amber" 
                                                 // className={`w-36 transition-all ease-in-out duration-200`}
-                                                className={`w-36`}
+                                                className={`w-36 bg-[#dc940f]`}
                                                 onClick={() => {setShowScore(prev => !prev)}}
                                             >
                                                 View Scores
