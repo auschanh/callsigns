@@ -254,7 +254,7 @@ function App() {
 
 				toast(
 
-					user === guesser && inGame.includes(user) ? "Your guesser, " + user + ", has disconnected." : user + " has disconnected.", {
+					user === guesser && inGame.includes(user) ? "The Stranded Agent, " + user + ", has disconnected." : user + " has disconnected.", {
 						unstyled: true,
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser && inGame.includes(user) ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
@@ -284,7 +284,7 @@ function App() {
 
 				toast(
 
-					user === guesser ? "Your guesser, " + user + ", is back in the lobby." : user + " is back in the lobby.", {
+					user === guesser ? "The Stranded Agent, " + user + ", is back in the lobby." : user + " is back in the lobby.", {
 						unstyled: true,
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,

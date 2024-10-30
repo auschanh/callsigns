@@ -784,12 +784,7 @@ function Game() {
 
 
 
-		// if there are less than 3 players left in the game, players will need to return to lobby
-		if (inGame?.length < 3) {
 
-
-
-		}
 
 	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);

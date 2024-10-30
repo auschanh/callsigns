@@ -31,6 +31,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
+    const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
     const [showScore, setShowScore] = showScoreState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
@@ -232,6 +233,22 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
         }
 
     }, [correctGuess]);
+
+    useEffect(() => {
+
+        // if there are less than 3 players left in the game, players will need to return to lobby
+		if (inGame?.length < 3) {
+
+			setNotEnoughPlayers(true);
+
+            setReadyNextRound(prev => prev.forEach((player) => { player.readyNext = false }));
+
+			console.log("not enough players");
+
+		}
+
+	// live list of players currently in the game (not just in the lobby)
+	}, [inGame]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -535,11 +552,11 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-opacity ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
+                                    className={`flex flex-none flex-col w-full h-36 transition-opacity ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
-                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4'>
+                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4 mb-8'>
 
                                         {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
 
@@ -549,11 +566,10 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                                 return (
 
-                                                    <TooltipProvider>
+                                                    <TooltipProvider key={index}>
                                                         <Tooltip delayDuration={0}>
                                                             <TooltipTrigger asChild>
                                                                 <Button
-                                                                    key={index}
                                                                     className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
                                                                     variant={`${playerObj.readyNext ? "green" : "grey"}`}
                                                                     // onClick={e => readyToggle(e, playerObj)}
@@ -622,33 +638,47 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                     </div>
 
-                                    <div className={`text-center flex gap-8 mx-auto`}>
+                                    <div className={`text-center flex flex-col mx-auto gap-4`}>
 
-                                        {roomDetails.keepScore && (
+                                        <div className="h-4">
+
+                                            {notEnoughPlayers && (
+                                                
+                                                <h4 className="text-red-500 text-xs">Minimum 3 players to continue</h4>
+
+                                            )}
+
+                                        </div>
+
+                                        <div className="flex gap-8">
+
+                                            {roomDetails.keepScore && (
+
+                                                <Button 
+                                                    ref={scoreBtnRef} 
+                                                    variant="amber" 
+                                                    // className={`w-36 transition-all ease-in-out duration-200`}
+                                                    className={`w-36 bg-[#dc940f]`}
+                                                    onClick={() => {setShowScore(prev => !prev)}}
+                                                >
+                                                    View Scores
+                                                </Button>
+
+                                            )}
 
                                             <Button 
-                                                ref={scoreBtnRef} 
-                                                variant="amber" 
+                                                ref={nextRoundBtnRef} 
+                                                variant={`${ notEnoughPlayers ? "red" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
                                                 // className={`w-36 transition-all ease-in-out duration-200`}
-                                                className={`w-36 bg-[#dc940f]`}
-                                                onClick={() => {setShowScore(prev => !prev)}}
+                                                className={`w-36`}
+                                                // onClick={handleNext}
+                                                // onClick={showEndGame ? handleReturnLobby : toggleReady}
+                                                onClick={notEnoughPlayers ? handleReturnLobby : toggleReady}
                                             >
-                                                View Scores
+                                                {`${ notEnoughPlayers ? "Return to Lobby" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : showEndGame ? "Play Again" : "Ready Up" }`}
                                             </Button>
 
-                                        )}
-
-                                        <Button 
-                                            ref={nextRoundBtnRef} 
-                                            variant={`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
-                                            // className={`w-36 transition-all ease-in-out duration-200`}
-                                            className={`w-36`}
-                                            // onClick={handleNext}
-                                            // onClick={showEndGame ? handleReturnLobby : toggleReady}
-                                            onClick={toggleReady}
-                                        >
-                                            {`${ readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : showEndGame ? "Play Again" : "Ready Up" }`}
-                                        </Button>
+                                        </div>
                                     
                                     </div>
 
