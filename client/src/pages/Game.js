@@ -107,6 +107,8 @@ function Game() {
 
 	const [encryptedCallsign, setEncryptedCallsign] = useState();
 
+	const [isLoadingNextRound, setIsLoadingNextRound] = useState(false);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -154,13 +156,9 @@ function Game() {
 
 			setTempScores([]);
 
-			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
-
-			setInGame(playing);
-
 			setSubmissions(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 	
 					return ({
 		
@@ -175,7 +173,7 @@ function Game() {
 
 			setResults(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 
 					return ({
 
@@ -194,7 +192,7 @@ function Game() {
 
 			setIsVoted(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 
 					return ({
 
@@ -213,7 +211,7 @@ function Game() {
 
 				setReadyNextRound(
 
-					playing.map((player) => {
+					inGame.map((player) => {
 		
 						return ({
 		
@@ -240,7 +238,7 @@ function Game() {
 
 				setScores( 
 
-					playing.map((player) => {
+					inGame.map((player) => {
 
 						return ({
 
@@ -624,6 +622,8 @@ function Game() {
 
 			if (readyState.every((player) => { return player.readyNext })) {
 
+				setIsLoadingNextRound(true);
+
 				setGuesser(roomDetails.guesser);
 
 				setRevealCallsign([false, false, false]);
@@ -677,6 +677,8 @@ function Game() {
 					setStartFade(false);
 
 					setFadeBorder(false);
+
+					setIsLoadingNextRound(false);
 
 				}, 1000);
 
@@ -761,11 +763,39 @@ function Game() {
 		);
 
 		// we don't want to wait for disconnected players to ready up for the next round
-		setReadyNextRound(
+		const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
 
-			readyNextRound?.filter((player) => { return inGame.includes(player.playerName) })
+		setReadyNextRound(readyInGame);
 
-		);
+		if (!isLoadingNextRound && readyInGame.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
+
+			setIsLoadingNextRound(true);
+
+			setGuesser(roomDetails.guesser);
+
+			setRevealCallsign([false, false, false]);
+
+			if (playerName === roomDetails.host) {
+
+				console.log("TRIGGER NEXT ROUND");
+
+				(async () => {
+
+					try {
+		
+						await socket.emit("generateNewCallsign");
+		
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
+
+			}
+
+		}
 
 		// remove disconnected players from score table
 		setScores(
@@ -849,7 +879,7 @@ function Game() {
 
 			console.log(votedOutResults.map(result => {
 				return result.visible === false ? result.playerName : null;
-			}))
+			}));
 
 			const newScores = scores.map((player => {
 
@@ -1021,6 +1051,17 @@ function Game() {
 
 	}, [socket, guesser, submitted, results, scores]);
 
+	useEffect(() => {
+
+		if (isLoadingNextRound === false) {
+
+			const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
+
+			setReadyNextRound(readyInGame);
+
+		}
+
+	}, [isLoadingNextRound]);
 
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
