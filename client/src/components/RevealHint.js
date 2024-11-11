@@ -8,6 +8,7 @@ import AgentIndicator from './AgentIndicator';
 import { toast } from "sonner";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -18,6 +19,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
     const [readyNextRound, setReadyNextRound] = readyNextRoundState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
@@ -435,7 +437,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                         )}
                         { submissionText2 && (
                             <>
-                                <p>{`% Signalling friendly agents:${selectedPlayers.map((player) => { return ` ${player}`})}`}</p>
+                                <p>{`% Signalling friendly agents:${inLobby.map(({playerName}) => playerName).filter((player) => selectedPlayers.includes(player)).map((player) => { return ` ${player}`})}`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>

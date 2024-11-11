@@ -361,7 +361,11 @@ function Game() {
 
 				setRoomDetails(roomDetails);
 
-				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+				const order = inLobby.map(({playerName}) => playerName).filter(player => selectedPlayers.includes(player));
+
+				const playing = order.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+
+				console.log(order);
 
 				setInGame(playing);
 

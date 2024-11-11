@@ -317,7 +317,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
 
                             <div className="flex flex-row flex-none flex-wrap justify-center w-full mt-6 px-24 gap-4">
 
-                                {results?.map((result, index) => {
+                                {/* {results?.map((result, index) => {
 
                                     if (result.playerName === playerName && playerName !== guesser) {
 
@@ -351,11 +351,11 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
 
                                     }
 
-                                })}
+                                })} */}
 
                                 {results?.map((result, index) => {
 
-                                    if (result.playerName !== playerName && result.playerName !== guesser) {
+                                    if (result.playerName !== guesser) {
 
                                         return (
 
