@@ -11,7 +11,7 @@ import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-reac
 
 const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState, hintArrayState }) => {
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 

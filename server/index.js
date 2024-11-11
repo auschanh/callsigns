@@ -737,15 +737,22 @@ io.on("connection", (socket) => {
 
 				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-				let offset = 1;
+				console.log(joinOrder, prevIndex);
 
-				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
+				let offset = 0;
+				let guesser = {};
 
-					offset += 1;
+				do {
 
-				}
+					offset++;
 
-				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
+					guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
+
+					console.log(guesser);
+
+				} while (!guesser || !selectedPlayers.includes(guesser.username));
+
+				console.log(guesser, offset, selectedPlayers, usernames);
 
 				findRoom.guesser = guesser.username;
 				findRoom.guesserID = guesser.socketID;
@@ -823,9 +830,7 @@ io.on("connection", (socket) => {
 
 					if (socket.username === findRoom.guesser) {
 
-						findRoom.guesser = "";
-						findRoom.guesserID = "";
-						findRoom.setGuesser = false;
+						socket.to(room).emit("guesserDisconnected", socket.username);
 	
 					}
 	

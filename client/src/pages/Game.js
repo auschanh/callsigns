@@ -32,7 +32,7 @@ function Game() {
 
 	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
@@ -108,6 +108,8 @@ function Game() {
 	const [encryptedCallsign, setEncryptedCallsign] = useState();
 
 	const [isLoadingNextRound, setIsLoadingNextRound] = useState(false);
+
+	const [isDisconnectedGuesser, setIsDisconnectedGuesser] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -208,6 +210,8 @@ function Game() {
 			setTimeout(() => {
 
 				setCorrectGuess(false);
+
+				setIsDisconnectedGuesser(false);
 
 				setReadyNextRound(
 
@@ -613,6 +617,8 @@ function Game() {
 
 			setRoomDetails(roomDetails);
 
+			setNextGuesser(roomDetails.guesser);
+
 		});
 
 		// update toggle for all users
@@ -692,6 +698,77 @@ function Game() {
 
 		});
 
+		socket.on("guesserDisconnected", (guesser) => {
+
+			if (!isDisconnectedGuesser) {
+
+				setStartFade(true);
+
+				setTimeout(() => {
+
+					setIsDisconnectedGuesser(true);
+
+					setPrepRevCallsign(true);
+
+					if (currentIndex === 2 && !submitted && validate) {
+
+						setTimeout(() => {
+
+							setStartFade(false);
+	
+						}, 1300);
+
+					} else {
+
+						setCurrentIndex(2);
+
+						setSubmitted(false);
+
+						setValidate(true);
+
+						setTimeout(() => {
+
+							setStartFade(false);
+	
+						}, 500);
+
+					}
+
+				}, 1000);
+
+			}
+
+			// host only, pick the next guesser
+			if (playerName === roomDetails.host) {
+
+				(async () => {
+
+					try {
+
+						const joinOrder = inLobby.map((player) => { return player.playerName });
+
+						console.log(joinOrder);
+
+						setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+		
+						await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
+
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
+
+			} else {
+
+				setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+			}
+
+		});
+
         return () => {
 			
             socket.removeAllListeners("roomExists");
@@ -705,6 +782,7 @@ function Game() {
 			socket.removeAllListeners("receiveToggle");
 			socket.removeAllListeners("receiveNextRound");
 			socket.removeAllListeners("receiveHintArray");
+			socket.removeAllListeners("guesserDisconnected");
 
         }
 
@@ -1202,6 +1280,7 @@ function Game() {
 					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
 					showScoreState={[showScore, setShowScore]}
 					tempScoresState={[tempScores, setTempScores]}
+					isDisconnectedGuesser={isDisconnectedGuesser}
 				/>
 
 		}
@@ -1386,9 +1465,11 @@ function Game() {
 												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
 												: isLastRound
 													? "border-stone-800 duration-1000"
-													: correctGuess
-														? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
-														: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+													: isDisconnectedGuesser
+														? "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+														: correctGuess
+															? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
+															: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
 						

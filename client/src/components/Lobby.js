@@ -20,7 +20,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 

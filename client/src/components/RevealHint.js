@@ -14,10 +14,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser }) => {
 
     const [socket, setSocket] = useSocketContext();
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
     const [readyNextRound, setReadyNextRound] = readyNextRoundState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
@@ -162,7 +162,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                     setShowReadyState(true);
 
-                    if (playerName === guesser) {
+                    if (!isDisconnectedGuesser && (playerName === guesser)) {
 
                         setRevealCallsign([true, false, false]);
 
@@ -176,7 +176,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                     
                             }, 500);
                 
-                        }, 500);
+                        }, 500);            
 
                     }
     
@@ -190,11 +190,11 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             setIsLastRound(false);
             setShowReadyState(false);
-            setRevealCallsign([false, false, false]);
+            // setRevealCallsign([false, false, false]);
 
         }
 
-    }, [roomDetails, submitted, validate, currentRound, playerName, guesser, prepRevCallsign]);
+    }, [submitted, validate, currentRound, playerName, guesser, prepRevCallsign]);
 
     useEffect(() => {
 
@@ -534,15 +534,15 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
-                                    <h2 className={`text-lg mb-2 text-center ${showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+                                    <h2 className={`text-lg mb-2 text-center ${isDisconnectedGuesser ? 'text-red-900' : showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
-                                        {`${showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+                                        {`${isDisconnectedGuesser ? '% CONNECTION TERMINATED %' : showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
                                     </h2>
 
-                                    <h1 className={`text-6xl text-center ${showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                    <h1 className={`text-6xl text-center ${isDisconnectedGuesser ? 'text-red-700' : showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
                                         
-                                        {`${showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                        {`${isDisconnectedGuesser ? 'AGENT DISCONNECTED' : showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
                                         
                                     </h1>
 

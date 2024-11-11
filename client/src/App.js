@@ -49,6 +49,8 @@ function App() {
 
 	const [guesser, setGuesser] = useState();
 
+	const [nextGuesser, setNextGuesser] = useState();
+
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
 	const [regPlayerCount, setRegPlayerCount] = useState();
@@ -244,9 +246,27 @@ function App() {
 
 			console.log(`${user} has left the lobby`);
 
-            setInLobby(inLobby.filter(({playerName}) => { return playerName !== user }));
+			if (user !== guesser) {
 
-			setInGame(inGame?.filter((player) => { return player !== user }));
+				if (user !== nextGuesser) {
+
+					console.log("not guesser", guesser, nextGuesser);
+
+					setInLobby(inLobby.filter(({playerName}) => { return playerName !== user }));
+
+				} else {
+
+					console.log("nextGuesser", user);
+
+				}
+
+			} else {
+
+				console.log("guesser", user);
+
+			}
+
+			setInGame(inGame.filter((player) => { return player !== user }));
 
 			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 
@@ -460,7 +480,7 @@ function App() {
 
 					<LobbyContext.Provider value={[[inLobby, setInLobby], regPlayerCount]}>
 
-						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]]}>
 
 							<Toaster />
 							

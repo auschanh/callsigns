@@ -15,7 +15,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
