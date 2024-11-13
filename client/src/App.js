@@ -266,7 +266,7 @@ function App() {
 
 			}
 
-			setInGame(inGame.filter((player) => { return player !== user }));
+			setInGame(inGame?.filter((player) => { return player !== user }));
 
 			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 

@@ -283,7 +283,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         footer: 
             <div>
-                Each round will have a new stranded agent who will not know what their callsign is.
+                Each round will have a new Stranded Agent who will not know what the callsign is.
             </div>
 
     }, {
@@ -341,7 +341,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         footer:
             <div>
-                Players must submit just one word to help the stranded agent determine what their callsign is.
+                Players must submit just one word to help the Stranded Agent determine what their callsign is.
             </div>
 
     }, {
@@ -463,8 +463,8 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                     <AccordionContent>
                         <ul className="list-disc ml-4">
                             <li>Not too closely related to the callsign because other members of your team might have the same idea</li>
-                            <li>Not too obscure unless you're sure the stranded agent can figure it out</li>
-                            <li>References that the stranded agent can pick up on</li>
+                            <li>Not too obscure unless you're sure the Stranded Agent can figure it out</li>
+                            <li>References that the Stranded Agent can pick up on</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
@@ -485,7 +485,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
         footer:
             <div>
                 {/* Check out these tips if you need any help coming up with good hints. */}
-                Hints that are either too similar to one another or illegal will not be revealed to the stranded agent.
+                Hints that are either too similar to one another or illegal will not be revealed to the Stranded Agent.
             </div>
 
     }, {
@@ -553,13 +553,13 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
                 </div>
 
-                <h1 className="text-base text-center font-medium text-slate-200">Now it's up to the stranded agent to figure out their callsign...</h1>
+                <h1 className="text-base text-center font-medium text-slate-200">Now it's up to the Stranded Agent to figure out their callsign...</h1>
 
             </div>,
 
         footer: 
             <div>
-                Finally, all of the approved hints will be revealed to the stranded agent who must then use only these hints to successfully guess their callsign.
+                Finally, all of the approved hints will be revealed to the Stranded Agent who must then use only these hints to successfully guess their callsign.
             </div>
 
     }];

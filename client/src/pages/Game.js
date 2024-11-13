@@ -111,6 +111,8 @@ function Game() {
 
 	const [isDisconnectedGuesser, setIsDisconnectedGuesser] = useState(false);
 
+	const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -632,34 +634,42 @@ function Game() {
 
 			if (readyState.every((player) => { return player.readyNext })) {
 
-				setIsLoadingNextRound(true);
+				console.log(inGame);
 
-				setGuesser(roomDetails.guesser);
+				if (inGame.includes(roomDetails.guesser)) {
 
-				setRevealCallsign([false, false, false]);
+					setIsLoadingNextRound(true);
 
-				if (playerName === roomDetails.host) {
+					setGuesser(roomDetails.guesser);
 
-					console.log("TRIGGER NEXT ROUND");
-	
-					(async () => {
-	
-						try {
-			
-							await socket.emit("generateNewCallsign");
-			
-						} catch (error) {
-			
-							throw error;
-			
-						}
-			
-					})();
-	
+					setRevealCallsign([false, false, false]);
+
+					if (playerName === roomDetails.host) {
+
+						console.log("TRIGGER NEXT ROUND");
+		
+						(async () => {
+		
+							try {
+				
+								await socket.emit("generateNewCallsign");
+				
+							} catch (error) {
+				
+								throw error;
+				
+							}
+				
+						})();
+		
+					}
+
+				} else {
+
+					console.log("nextGuesser not here");
+
 				}
-
 			}
-
         });
 
 		socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
@@ -706,6 +716,8 @@ function Game() {
 
 			if (!isDisconnectedGuesser) {
 
+				console.log("start fade");
+
 				setStartFade(true);
 
 				setTimeout(() => {
@@ -714,7 +726,11 @@ function Game() {
 
 					setPrepRevCallsign(true);
 
+					setShowScore(false);
+
 					if (currentIndex === 2 && !submitted && validate) {
+
+						setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
 
 						setTimeout(() => {
 
@@ -739,6 +755,16 @@ function Game() {
 					}
 
 				}, 1000);
+
+			} else {
+
+				if (currentIndex === 2 && !submitted && validate) {
+
+					setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+					console.log("clear ready");
+	
+				}
 
 			}
 
@@ -847,36 +873,88 @@ function Game() {
 		// we don't want to wait for disconnected players to ready up for the next round
 		const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
 
-		setReadyNextRound(readyInGame);
+		if (!isDisconnectedGuesser && currentIndex === 2 && !submitted && validate && !inGame.includes(roomDetails.guesser)) {
 
-		if (!isLoadingNextRound && readyInGame.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
+			setTimeout(() => {
 
-			setIsLoadingNextRound(true);
+				// if there are less than 3 players left in the game, players will need to return to lobby
+				if (inGame.length < 3) {
 
-			setGuesser(roomDetails.guesser);
+					setNotEnoughPlayers(true);
 
-			setRevealCallsign([false, false, false]);
+					setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-			if (playerName === roomDetails.host) {
+					console.log("not enough players");
 
-				console.log("TRIGGER NEXT ROUND");
+				} else {
 
-				(async () => {
+					setReadyNextRound(readyInGame);
 
-					try {
+					console.log(readyInGame);
+
+				}
+
+			}, 1000);
 		
-						await socket.emit("generateNewCallsign");
-		
-					} catch (error) {
-		
-						throw error;
-		
-					}
-		
-				})();
+		} else {
+
+			// if there are less than 3 players left in the game, players will need to return to lobby
+			if (inGame?.length < 3) {
+
+				setNotEnoughPlayers(true);
+
+				setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+
+				console.log("not enough players");
+
+			} else {
+
+				setReadyNextRound(readyInGame);
+
+				console.log(readyInGame);
 
 			}
 
+		}
+
+		console.log(isLoadingNextRound);
+
+		if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
+
+			console.log(inGame);
+
+			if (inGame.includes(roomDetails.guesser)) {
+
+				setIsLoadingNextRound(true);
+
+				setGuesser(roomDetails.guesser);
+
+				setRevealCallsign([false, false, false]);
+
+				if (playerName === roomDetails.host) {
+
+					console.log("TRIGGER NEXT ROUND");
+
+					(async () => {
+
+						try {
+			
+							await socket.emit("generateNewCallsign");
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+			
+					})();
+				}
+
+			} else {
+
+				console.log("nextGuesser not here");
+
+			}
 		}
 
 		// remove disconnected players from score table
@@ -894,12 +972,51 @@ function Game() {
 
 		// we don't want to wait for a disconnected guesser to guess on the last slide
 
+	
+
+		
+
+	
+	
+
 
 
 
 
 	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);
+
+	useEffect(() => {
+
+		if (!isLoadingNextRound && inGame && !inGame.includes(guesser)) {
+
+			console.log(inGame, guesser);
+
+			setStartFade(true);
+
+			setTimeout(() => {
+
+				setIsDisconnectedGuesser(true);
+
+				setPrepRevCallsign(true);
+
+				setCurrentIndex(2);
+
+				setSubmitted(false);
+
+				setValidate(true);
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+				}, 500);
+
+			}, 1000);
+
+		}
+
+	}, [isLoadingNextRound]);
 
 	useEffect(() => {
 
@@ -1285,6 +1402,7 @@ function Game() {
 					showScoreState={[showScore, setShowScore]}
 					tempScoresState={[tempScores, setTempScores]}
 					isDisconnectedGuesser={isDisconnectedGuesser}
+					notEnoughPlayers={notEnoughPlayers}
 				/>
 
 		}

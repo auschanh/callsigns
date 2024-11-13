@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser, notEnoughPlayers }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
@@ -33,7 +33,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
-    const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
     const [showScore, setShowScore] = showScoreState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
@@ -235,22 +234,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
         }
 
     }, [correctGuess]);
-
-    useEffect(() => {
-
-        // if there are less than 3 players left in the game, players will need to return to lobby
-		if (inGame?.length < 3) {
-
-			setNotEnoughPlayers(true);
-
-            setReadyNextRound(prev => prev.forEach((player) => { player.readyNext = false }));
-
-			console.log("not enough players");
-
-		}
-
-	// live list of players currently in the game (not just in the lobby)
-	}, [inGame]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -472,11 +455,11 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                         
                         {showScore && (
                             
-                            <div className="flex flex-col items-center w-full">
+                            <div className="flex flex-col items-center w-full mt-[3%]">
 
-                                <h1 className="text-amber-500 text-3xl mb-8">Scores</h1>
+                                {/* <h1 className="text-amber-500 text-3xl mb-8">Scores</h1> */}
 
-                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500">
+                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
 
                                     <div className="max-w-[80%]">
                                         
@@ -532,7 +515,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                             <div className="space-y-16">
 
                                 <div
-                                    className={`font-mono ${showEndGame ? "" : isLastRound ? "opacity-0" : ""}`}
+                                    className={`font-mono transition-opacity ${showEndGame ? "" : isLastRound ? "opacity-0" : ""}`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
@@ -562,7 +545,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                         {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
 
-                                        {readyNextRound.map((playerObj, index) => {
+                                        {readyNextRound?.map((playerObj, index) => {
 
                                             if (playerObj.playerName === roomDetails.guesser) {
 
@@ -658,9 +641,10 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                                 <Button 
                                                     ref={scoreBtnRef} 
-                                                    variant="amber" 
+                                                    variant="indigo" 
                                                     // className={`w-36 transition-all ease-in-out duration-200`}
-                                                    className={`w-36 bg-[#dc940f]`}
+                                                    // className={`w-36 bg-[#dc940f]`}
+                                                    className={`w-36`}
                                                     onClick={() => {setShowScore(prev => !prev)}}
                                                 >
                                                     View Scores
