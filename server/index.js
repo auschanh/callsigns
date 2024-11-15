@@ -1,23 +1,29 @@
-const express = require("express");
+import express from 'express';
 const app = express();
-const wordFile = require("./words/words.json");
 
-const http = require("http");
+import http from "http";
 const server = http.createServer(app);
 
-const io = require("socket.io")(server, {
+import cors from "cors";
+
+import { Server as ioServer } from "socket.io";
+
+const io = new ioServer(server, {
 	cors: {
 		origin: "*",
 		methods: ["GET", "POST"],
-	},
+	}
 });
 
-const cors = require("cors");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const wordFile = require("./words/words.json");
+
+import csvJSON from "./words/convertCsv.js";
+
 app.use(cors());
 
 app.use(express.json());
-
-const { csvJSON } = require("./words/convertCsv");
 
 server.listen(3001, () => {
 	console.log("SERVER RUNNING");

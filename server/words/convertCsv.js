@@ -1,5 +1,8 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import * as url from "url";
+
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 const csvPath = path.join(__dirname, "./words.csv");
 
@@ -29,4 +32,4 @@ const csvJSON = () => {
   // fs.writeFileSync(jsonPath, JSON.stringify(result), 'utf8', (err) => {console.log(err)});
 };
 
-module.exports = { csvJSON };
+export default csvJSON;

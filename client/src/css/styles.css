@@ -897,8 +897,8 @@ video {
   margin-top: 2rem;
 }
 
-.mt-\[5\%\] {
-  margin-top: 5%;
+.mt-\[3\%\] {
+  margin-top: 3%;
 }
 
 .mt-\[5vh\] {
@@ -907,14 +907,6 @@ video {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mt-0 {
-  margin-top: 0px;
-}
-
-.mt-\[3\%\] {
-  margin-top: 3%;
 }
 
 .box-border {
