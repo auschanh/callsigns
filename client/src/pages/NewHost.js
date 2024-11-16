@@ -133,7 +133,7 @@ function NewHost() {
                 <AlertDialogContent className="gap-12 w-[30vw]">
 
                     <AlertDialogHeader className="space-y-2">
-                        <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
+                        <AlertDialogTitle>Welcome to Callsigns!</AlertDialogTitle>
                     </AlertDialogHeader>
 
                     {roomDetails && (

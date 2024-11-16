@@ -582,17 +582,21 @@ io.on("connection", (socket) => {
 
 		console.log(`${playerName} is returning to lobby`);
 
+		let roomName = roomID === null ? socket.roomID : roomID;
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomName });
+
+		io.to(roomName).emit("notifyReturnToLobby", playerName);
+
+		if (playerName === findRoom.guesser) {
+
+			socket.to(roomName).emit("guesserDisconnected", playerName, true);
+
+		}
+
 		if (roomID === null) {
 
-			const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
-
-			io.to(socket.roomID).emit("notifyReturnToLobby", playerName);
-
 			socket.emit("navigateLobby", socket.roomID, findRoom.host);
-
-		} else {
-
-			io.to(roomID).emit("notifyReturnToLobby", playerName);
 
 		}
 
@@ -836,7 +840,7 @@ io.on("connection", (socket) => {
 
 					if (socket.username === findRoom.guesser) {
 
-						socket.to(room).emit("guesserDisconnected", socket.username);
+						socket.to(room).emit("guesserDisconnected", socket.username, false);
 	
 					}
 	

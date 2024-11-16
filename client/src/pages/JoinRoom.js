@@ -57,6 +57,16 @@ function JoinRoom() {
 
     const invalidUsernameRef = useRef(null);
 
+	useEffect(() => {
+
+        if (!username) {
+
+            setOpen(true);
+
+        }
+
+	}, [open]);
+
     useEffect(() => {
 
         if (roomDetails === undefined && !isClosedRoom && !beenRemoved) {
@@ -143,6 +153,8 @@ function JoinRoom() {
                 setSuccess(1);
 
                 setInLobby(othersInLobby);
+
+                console.log("roomExists", othersInLobby);
 
                 setSessionUrl(sessionUrl);
 
@@ -315,6 +327,14 @@ function JoinRoom() {
 
         });
 
+        socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
+
+            setRoomDetails(roomDetails);
+
+			setGuesser(roomDetails.guesser);
+
+		});
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -326,6 +346,7 @@ function JoinRoom() {
             socket.removeAllListeners("receiveInGame");
             socket.removeAllListeners("newHost");
             socket.removeAllListeners("exitLobby");
+            socket.removeAllListeners("receiveNextRound");
 
         }
 
@@ -666,7 +687,7 @@ function JoinRoom() {
 
                                             })}
 
-                                            {inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
+                                            {/* {inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
 
                                                 return (
 
@@ -677,7 +698,7 @@ function JoinRoom() {
 
                                                 );
 
-                                            })}
+                                            })} */}
 
                                             {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
@@ -788,7 +809,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-0 mb-8">
-                                <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle>Welcome to Callsigns!</AlertDialogTitle>
                                 <AlertDialogDescription>
                                     You'll be joining {roomDetails.roomName}
                                 </AlertDialogDescription>
@@ -833,7 +854,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
@@ -848,7 +869,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
@@ -863,7 +884,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">

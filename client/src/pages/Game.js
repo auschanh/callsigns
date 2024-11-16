@@ -712,49 +712,57 @@ function Game() {
 
 		});
 
-		socket.on("guesserDisconnected", (guesser) => {
+		socket.on("guesserDisconnected", (guesser, returnedToLobby) => {
 
 			if (!isDisconnectedGuesser) {
 
-				console.log("start fade");
+				if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
 
-				setStartFade(true);
+					console.log("start fade");
 
-				setTimeout(() => {
+					setStartFade(true);
 
-					setIsDisconnectedGuesser(true);
+					setTimeout(() => {
 
-					setPrepRevCallsign(true);
+						setIsDisconnectedGuesser(true);
 
-					setShowScore(false);
+						setPrepRevCallsign(true);
 
-					if (currentIndex === 2 && !submitted && validate) {
+						setShowScore(false);
 
-						setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+						if (currentIndex === 2 && !submitted && validate) {
 
-						setTimeout(() => {
+							setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
 
-							setStartFade(false);
-	
-						}, 1300);
+							setTimeout(() => {
 
-					} else {
+								setStartFade(false);
 
-						setCurrentIndex(2);
+							}, 1300);
 
-						setSubmitted(false);
+						} else {
 
-						setValidate(true);
+							setCurrentIndex(2);
 
-						setTimeout(() => {
+							setSubmitted(false);
 
-							setStartFade(false);
-	
-						}, 500);
+							setValidate(true);
 
-					}
+							setTimeout(() => {
 
-				}, 1000);
+								setStartFade(false);
+
+							}, 500);
+
+						}
+
+					}, 1000);
+
+				} else {
+
+					console.log("skip animation");
+
+				}
 
 			} else {
 
@@ -779,7 +787,13 @@ function Game() {
 
 						console.log(joinOrder);
 
-						setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+						if (!returnedToLobby) {
+
+							setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+							console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+						}
 		
 						await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
 
@@ -793,7 +807,13 @@ function Game() {
 
 			} else {
 
-				setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+				if (!returnedToLobby) {
+
+					setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+					console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+				}
 
 			}
 
@@ -875,26 +895,36 @@ function Game() {
 
 		if (!isDisconnectedGuesser && currentIndex === 2 && !submitted && validate && !inGame.includes(roomDetails.guesser)) {
 
-			setTimeout(() => {
+			if (inGame.length < 2) {
 
-				// if there are less than 3 players left in the game, players will need to return to lobby
-				if (inGame.length < 3) {
+				setReadyNextRound(readyInGame);
 
-					setNotEnoughPlayers(true);
+				console.log("skip animation");
 
-					setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+			} else {
 
-					console.log("not enough players");
+				setTimeout(() => {
 
-				} else {
+					// if there are less than 3 players left in the game, players will need to return to lobby
+					if (inGame.length < 3) {
 
-					setReadyNextRound(readyInGame);
+						setNotEnoughPlayers(true);
 
-					console.log(readyInGame);
+						setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-				}
+						console.log("not enough players");
 
-			}, 1000);
+					} else {
+
+						setReadyNextRound(readyInGame);
+
+						console.log(readyInGame);
+
+					}
+
+				}, 1000);
+
+			}
 		
 		} else {
 
@@ -969,19 +999,6 @@ function Game() {
 			sortedScores?.filter((player) => { return inGame.includes(player.playerName) })
 
 		);
-
-		// we don't want to wait for a disconnected guesser to guess on the last slide
-
-	
-
-		
-
-	
-	
-
-
-
-
 
 	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);
@@ -1316,7 +1333,7 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Come up with a one-word hint to help `}</span>
-					<span className="font-bold">{roomDetails?.guesser}</span>
+					<span className="font-bold">{guesser}</span>
 					<span>{` guess their callsign.`}</span>
 				</p>,
 
@@ -1368,7 +1385,7 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Reveal all approved hints to `}</span>
-					<span className="font-bold">{roomDetails?.guesser}</span>
+					<span className="font-bold">{guesser}</span>
 					.
 				</p>,		
 
@@ -1618,7 +1635,7 @@ function Game() {
 				<AlertDialogContent className="gap-0">
 
 					<AlertDialogHeader className="space-y-2">
-						<AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+						<AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
 					</AlertDialogHeader>
 					
 					{(isClosedRoom === null) && (

@@ -215,6 +215,8 @@ function App() {
 
 			setInLobby(roomList);
 
+			console.log(roomList);
+
 			if (isGameStarted) {
 
 				setIsPlayerWaiting(true);
@@ -252,7 +254,7 @@ function App() {
 
 					console.log("not guesser", guesser, nextGuesser);
 
-					setInLobby(inLobby.filter(({playerName}) => { return playerName !== user }));
+					setInLobby(prev => prev.filter(({playerName}) => { return playerName !== user }));
 
 				} else {
 
@@ -261,6 +263,12 @@ function App() {
 				}
 
 			} else {
+
+				if (!inGame.includes(playerName)) {
+
+					setInLobby(prev => prev.filter(({playerName}) => { return playerName !== user }));
+
+				}
 
 				console.log("guesser", user);
 

@@ -547,7 +547,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                         {readyNextRound?.map((playerObj, index) => {
 
-                                            if (playerObj.playerName === roomDetails.guesser) {
+                                            if (playerObj.playerName === roomDetails.guesser && inGame.length >= 3) {
 
                                                 return (
 
@@ -566,10 +566,23 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                                 </Button>
                                                             </TooltipTrigger>
                                                             <TooltipContent sideOffset={12}>
-                                                                <p>
-                                                                    <span className="font-semibold">{playerObj.playerName}</span>
-                                                                    {` is the next Stranded Agent!`}
-                                                                </p>
+
+                                                                {playerObj.playerName === playerName && (
+
+                                                                    <p>
+                                                                        <span className="font-semibold">You</span>
+                                                                        {` are the next Stranded Agent!`}
+                                                                    </p>
+
+                                                                ) || (
+                                                                
+                                                                    <p>
+                                                                        <span className="font-semibold">{playerObj.playerName}</span>
+                                                                        {` is the next Stranded Agent!`}
+                                                                    </p>
+                                                                
+                                                                )}
+                                                                
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     </TooltipProvider>
