@@ -111,6 +111,8 @@ function Game() {
 
 	const [isDisconnectedGuesser, setIsDisconnectedGuesser] = useState(false);
 
+	const [isDisconnectedTeam, setIsDisconnectedTeam] = useState(false);
+
 	const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
 
 	const navigate = useNavigate();
@@ -716,7 +718,7 @@ function Game() {
 
 			if (!isDisconnectedGuesser) {
 
-				if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
+				if (!(currentIndex === 2 && !submitted && validate && notEnoughPlayers)) {
 
 					console.log("start fade");
 
@@ -1000,6 +1002,58 @@ function Game() {
 
 		);
 
+		if (inGame?.length === 1 && playerName === guesser) {
+
+			if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
+
+				console.log("fade team disconnect");
+
+				setStartFade(true);
+
+				setTimeout(() => {
+
+					setIsDisconnectedTeam(true);
+
+					setPrepRevCallsign(true);
+
+					setShowScore(false);
+
+					if (currentIndex === 2 && !submitted && validate) {
+
+						setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+						setTimeout(() => {
+
+							setStartFade(false);
+
+						}, 1300);
+
+					} else {
+
+						setCurrentIndex(2);
+
+						setSubmitted(false);
+
+						setValidate(true);
+
+						setTimeout(() => {
+
+							setStartFade(false);
+
+						}, 500);
+
+					}
+
+				}, 1000);
+
+			} else {
+
+				console.log("skip animation");
+
+			}
+
+		}
+
 	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);
 
@@ -1030,6 +1084,35 @@ function Game() {
 				}, 500);
 
 			}, 1000);
+
+		}
+
+		if (inGame?.length === 1 && playerName === guesser) {
+
+			console.log("team disconnect");
+
+			setStartFade(true);
+
+			setTimeout(() => {
+
+				setIsDisconnectedTeam(true);
+
+				setPrepRevCallsign(true);
+
+				setCurrentIndex(2);
+
+				setSubmitted(false);
+
+				setValidate(true);
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+				}, 500);
+
+			}, 1000);
+
 
 		}
 
@@ -1419,6 +1502,7 @@ function Game() {
 					showScoreState={[showScore, setShowScore]}
 					tempScoresState={[tempScores, setTempScores]}
 					isDisconnectedGuesser={isDisconnectedGuesser}
+					isDisconnectedTeam={isDisconnectedTeam}
 					notEnoughPlayers={notEnoughPlayers}
 				/>
 
