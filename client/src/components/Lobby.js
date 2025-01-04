@@ -247,21 +247,25 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	const handleSelectGuesser = async (newGuesser) => {
 
-		try {
+		if (!isGameStarted) {
 
-			if (newGuesser !== guesser) {
+			try {
 
-				await socket.emit("selectGuesser", newGuesser);
-
-			} else {
-
-				await socket.emit("selectGuesser", "");
-
+				if (newGuesser !== guesser) {
+	
+					await socket.emit("selectGuesser", newGuesser);
+	
+				} else {
+	
+					await socket.emit("selectGuesser", "");
+	
+				}
+	
+			} catch (error) {
+	
+				throw error;
+	
 			}
-
-		} catch (error) {
-
-			throw error;
 
 		}
 
@@ -509,6 +513,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 													<ContextMenuItem 
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 														onClick={() => {handleSelectGuesser(player.playerName)}}
+														disabled={isGameStarted}
 													>
 														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
 														<p>Remove as Stranded Agent</p>
@@ -517,7 +522,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												) || (
 
 													<ContextMenuItem 
-														disabled={!selectedPlayers.includes(player.playerName)}
+														disabled={isGameStarted || !selectedPlayers.includes(player.playerName)}
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 														onClick={() => {handleSelectGuesser(player.playerName)}}
 													>
@@ -600,6 +605,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														<ContextMenuItem 
 															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 															onClick={() => {handleSelectGuesser(player.playerName)}}
+															disabled={isGameStarted}
 														>
 															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
 															<p>Remove as Stranded Agent</p>
@@ -608,7 +614,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 													) || (
 
 														<ContextMenuItem 
-															disabled={!selectedPlayers.includes(player.playerName)}
+															disabled={isGameStarted || !selectedPlayers.includes(player.playerName)}
 															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 															onClick={() => {handleSelectGuesser(player.playerName)}}
 														>
