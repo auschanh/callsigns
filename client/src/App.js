@@ -278,7 +278,7 @@ function App() {
 
 			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 
-			if (user !== playerName && inGame?.includes(playerName)) {
+			if (user && user !== playerName && inGame?.includes(playerName)) {
 
 				toast(
 
