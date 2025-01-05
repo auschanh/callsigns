@@ -43,7 +43,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
         }
 
-    }, [isPopoverOpen, setIsPlayerWaiting, isWaitingOpen, isPlayerWaiting]);
+    }, [isPopoverOpen, isWaitingOpen, isPlayerWaiting]);
 
     const handleCopy = async () => {
 

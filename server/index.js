@@ -316,13 +316,23 @@ io.on("connection", (socket) => {
 
 			console.log(socket.username + " is changing their username to " + username);
 
+			const isNull = socket.username === null;
+
 			socket.username = username;
 
 			getSocketInfo();
 
 			const roomList = getPlayersInLobby(roomName);
 
-			io.to(roomName).emit("getRoomList", roomList);
+			if (isNull) {
+
+				io.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
+
+			} else {
+
+				io.to(roomName).emit("getRoomList", roomList);
+
+			}
 
 		} else if (findRoom && !findRoom.isClosedRoom) {
 
@@ -342,8 +352,6 @@ io.on("connection", (socket) => {
 			if (roomList.some(({ playerName }) => { return playerName === username })) {
 
 				socket.emit("getLobby", roomList, findRoom);
-
-				socket.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 
