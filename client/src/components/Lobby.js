@@ -92,9 +92,16 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		});
 
+		socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
+
+			setGuesser(roomDetails.guesser);
+
+		});
+
 		return () => {
 
 			socket.removeAllListeners("sendSelectedPlayers");
+			socket.removeAllListeners("receiveNextRound");
 
 		}
 

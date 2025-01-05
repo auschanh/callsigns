@@ -140,6 +140,8 @@ function App() {
 					(async () => {
 
 						try {
+
+							console.log("host is excluded");
 			
 							await socket.emit("roomCheck", roomID, true);
 			
@@ -174,8 +176,21 @@ function App() {
 
 				try {
 
+					const info = {
+
+						username: roomDetails.host,
+						roomName: roomDetails.roomName,
+						numPlayers: roomDetails.numPlayers,
+						aiPlayers: roomDetails.aiPlayers,
+						numGuesses: roomDetails.numGuesses,
+						numRounds: roomDetails.numRounds,
+						timeLimit: roomDetails.timeLimit,
+						keepScore: roomDetails.keepScore
+
+					}
+
 					// for the host (DialogPlay)
-					await socket.emit("gameInfo", { username: roomDetails.host, roomName: roomDetails.roomName, numPlayers: roomDetails.numPlayers, aiPlayers: roomDetails.aiPlayers }, true, false);
+					await socket.emit("gameInfo", info, true, false);
 	
 					await socket.emit("announceGameStart", playing, roomDetails);
 	
@@ -214,8 +229,6 @@ function App() {
 		socket.on("getRoomList", (roomList, isGameStarted) => {
 
 			setInLobby(roomList);
-
-			console.log(roomList);
 
 			if (isGameStarted) {
 

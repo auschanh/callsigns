@@ -311,7 +311,7 @@ function Game() {
 		}, 1000);
 
 		// host only, pick the next guesser
-		if (playerName === roomDetails.host) {
+		if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 			(async () => {
 
@@ -646,7 +646,7 @@ function Game() {
 
 					setRevealCallsign([false, false, false]);
 
-					if (playerName === roomDetails.host) {
+					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 						console.log("TRIGGER NEXT ROUND");
 		
@@ -688,7 +688,7 @@ function Game() {
 
 				setValidate(false);
 
-				if (playerName === roomDetails.host) {
+				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 					handleNext();
 
@@ -949,8 +949,6 @@ function Game() {
 
 		}
 
-		console.log(isLoadingNextRound);
-
 		if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
 
 			console.log(inGame);
@@ -963,7 +961,7 @@ function Game() {
 
 				setRevealCallsign([false, false, false]);
 
-				if (playerName === roomDetails.host) {
+				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 					console.log("TRIGGER NEXT ROUND");
 
@@ -1122,31 +1120,34 @@ function Game() {
 
 		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
 
-		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
+		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
-			// every submitted a hint, create hint Array
-			const tempHintArray = excludeGuesser.map((player, index) => {
-				return player.hint
-			});
+			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
+				// every submitted a hint, create hint Array
+				const tempHintArray = excludeGuesser.map((player, index) => {
+					return player.hint
+				});
 
-			const duplicates = tempHintArray.filter((currHint, index) => {
-				return tempHintArray.some((hint, i) => {
-					return currHint === hint && index !== i 
-				})
-			});
+				const duplicates = tempHintArray.filter((currHint, index) => {
+					return tempHintArray.some((hint, i) => {
+						return currHint === hint && index !== i 
+					})
+				});
 
-			console.log(duplicates);
+				console.log(duplicates);
 
-			socket.emit("sendHintArray", roomDetails.roomID, duplicates);
+				socket.emit("sendHintArray", roomDetails.roomID, duplicates);
 
-			if (currentIndex === 0) {
+				if (currentIndex === 0) {
 
-				console.log("HOST set current index: 1");
+					console.log("HOST set current index: 1");
 
-				handleNext();
+					handleNext();
 
-			}
+				}
+
+			} 
 
 		}
 
@@ -1204,7 +1205,7 @@ function Game() {
 			const sorted = [...newScores].sort((a,b) => b.score - a.score);
 			setSortedScores(sorted);
 
-			if (playerName === roomDetails.host) {
+			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 				if (currentIndex === 1) {
 
