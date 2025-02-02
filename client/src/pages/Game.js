@@ -1183,18 +1183,18 @@ function Game() {
 
 			const newScores = scores.map((player => {
 				console.log("Voted out Results:", votedOutResults);
-				if(votedOutResults.map(result => {
-					return result.visible === true ? result.playerName : null;}).includes(player.playerName)
+				if(votedOutResults.map(result => { // if hint was not removed and they are not the guesser
+					return result.beenRemoved === false ? result.playerName : null;}).includes(player.playerName)
 					&& player.playerName !== guesser
 				){
 						console.log("voted out here")
 						return {...player, score: player.score + 1, goodHints: player.goodHints + 1}
 
 				} else if(player.playerName !== guesser) {
-
+					// if hint was removed
 					return {...player, badHints: player.badHints + 1};
 
-				} else {
+				} else { // if guesser?
 					return player;
 				}
 
@@ -1308,7 +1308,7 @@ function Game() {
 
 			results.map(result => {
 
-				if (result.visible === false) {
+				if (result.visible === false || result.beenRemoved) {
 
 					removedHints.push(result.hint);
 
@@ -1317,31 +1317,20 @@ function Game() {
 			});
 
 			numRemovedHints = removedHints.length;
-
+			// calculate guesser score
 			setTempScores(
-
 				scores.map((player) => {
-
 					if (player.playerName === guesser) {
-
 						return {
-
 							...player,
 							score: player.score + numRemovedHints + 1,
 							correctGuesses: player.correctGuesses + 1
-
 						}
-
 					} else {
-
 						return player;
-
 					}
-
 				})
-
 			);
-			
 		});
 
 		// const sortedScores = [...scores].sort((a,b) => b.score - a.score);
