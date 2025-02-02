@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Chat from "../components/Chat";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
@@ -26,9 +26,9 @@ function JoinRoom() {
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [username, setUsername] = useState();
 
@@ -39,6 +39,8 @@ function JoinRoom() {
     const [copied, setCopied] = useState(false);
 
     const [roomDetails, setRoomDetails] = useState();
+
+    const [isFoundRoom, setIsFoundRoom] = useState(false);
 
     const [isReady, setIsReady] = useState(false);
 
@@ -52,6 +54,18 @@ function JoinRoom() {
     const { roomID } = useParams();
 
     const navigate = useNavigate();
+
+    const invalidUsernameRef = useRef(null);
+
+	useEffect(() => {
+
+        if (!username) {
+
+            setOpen(true);
+
+        }
+
+	}, [open]);
 
     useEffect(() => {
 
@@ -74,27 +88,59 @@ function JoinRoom() {
             })();
         }
 
-        if (username && !inLobby.find(({playerName}) => { return playerName === username })) {
+        // if username is not yet set
+        if (!username) {
 
-            console.log("username triggered");
+            if (isFoundRoom) {
 
-            (async () => {
+                console.log("joining room");
 
-                try {
+                setIsFoundRoom(false);
 
-                    await socket.emit("joinRoom", roomID, username);
+                (async () => {
 
-                } catch (error) {
+                    try {
 
-                    throw error;
+                        await socket.emit("joinRoom", roomID, username);
 
-                }
+                    } catch (error) {
 
-            })();
+                        throw error;
+
+                    }
+
+                })();
+
+            }            
 
         } else {
 
-            console.log("not gonna try to join room");
+            // if not already in lobby
+            if (!inLobby.find(({playerName}) => { return playerName === username })) {
+
+                console.log("registering username");
+
+                // setIsFoundRoom(false);
+
+                (async () => {
+
+                    try {
+
+                        await socket.emit("joinRoom", roomID, username);
+
+                    } catch (error) {
+
+                        throw error;
+
+                    }
+
+                })();
+
+            } else {
+
+                console.log("not gonna try to join room");
+
+            }
 
         }
 
@@ -102,9 +148,13 @@ function JoinRoom() {
 
             if (othersInLobby) {
 
+                setIsFoundRoom(true);
+
                 setSuccess(1);
 
                 setInLobby(othersInLobby);
+
+                console.log("roomExists", othersInLobby);
 
                 setSessionUrl(sessionUrl);
 
@@ -277,6 +327,14 @@ function JoinRoom() {
 
         });
 
+        socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
+
+            setRoomDetails(roomDetails);
+
+			setGuesser(roomDetails.guesser);
+
+		});
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -288,10 +346,11 @@ function JoinRoom() {
             socket.removeAllListeners("receiveInGame");
             socket.removeAllListeners("newHost");
             socket.removeAllListeners("exitLobby");
+            socket.removeAllListeners("receiveNextRound");
 
         }
 
-    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved, playerName]);
+    }, [socket, roomID, username, inLobby, navigate, roomDetails, isClosedRoom, beenRemoved, playerName, isFoundRoom]);
 
     useEffect(() => {
 
@@ -315,8 +374,34 @@ function JoinRoom() {
 
     function onSubmit(values) {
 
+        // username cannot be blank
+        if (values.username === "") {
+
+            invalidUsernameRef.current.innerText = "Please enter a username.";
+
+        // username cannot contain any spaces
+        } else if (/\s/.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username cannot contain spaces."
+
+        // username must be at least 3 characters
+        } else if (!/.{3,}/.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username must be at least 3 characters long.";
+
+        // username must contain at least one letter
+        } else if (!/(.*[a-z]){1}/i.test(values.username)) {
+
+            invalidUsernameRef.current.innerText = "Username must contain at least one letter.";
+
         // cannot enter an existing username
-        if (values.username !== "") {
+        } else if (values.username !== username && inLobby.some((player) => { return player.playerName === values.username })) {
+
+            invalidUsernameRef.current.innerText = "This username has already been taken.";
+
+        } else {
+
+            invalidUsernameRef.current.innerText = "";
 
             console.log(values.username);
 
@@ -450,6 +535,16 @@ function JoinRoom() {
                                         
                                     </div>
 
+                                    <div className="mb-6 text-xs">
+
+                                        <h2 className="underline font-semibold mb-1">Game Settings</h2>
+                                        <p>Number of Guesses: <span className="font-semibold">{`${Number(roomDetails.numGuesses) !== 11 ? Number(roomDetails.numGuesses) : "Unlimited"}`}</span></p>
+                                        <p>Number of Rounds: <span className="font-semibold">{`${Number(roomDetails.numRounds) !== 11 ? Number(roomDetails.numRounds) : "Unlimited"}`}</span></p>
+                                        <p>Timer: <span className="font-semibold">{`${Number(roomDetails.timeLimit) !== 0 ? ((Math.floor(Number(roomDetails.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(roomDetails.timeLimit) / 60)) + "m ")) + ((Number(roomDetails.timeLimit) % 60) + "s") : "Off"}`}</span></p>
+                                        <p>Scoring: <span className="font-semibold">{`${roomDetails.keepScore ? "On" : "Off"}`}</span></p>
+
+                                    </div>
+
                                     <div className="mb-6">
 
                                         <h1 className="text-sm font-semibold mb-2">
@@ -496,7 +591,7 @@ function JoinRoom() {
                                                                                 ) || (
 
                                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                        {player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                                     </p>
 
                                                                                 )}
@@ -517,7 +612,7 @@ function JoinRoom() {
 
                                                 } else {
 
-                                                    if (!inGame?.includes(player.playerName)) {
+                                                    if (player.playerName && !inGame?.includes(player.playerName)) {
 
                                                         return (
 
@@ -544,7 +639,7 @@ function JoinRoom() {
                                                                                 ) || (
 
                                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                                        {player.playerName.charAt(0).toUpperCase()}
+                                                                                        {player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                                     </p>
 
                                                                                 )}
@@ -572,17 +667,17 @@ function JoinRoom() {
                                                 }
                                             })}
 
-                                            {inLobby && Array.from({ length: roomDetails.numPlayers - inLobby.length }, (_, index) => {
+                                            {inLobby && Array.from({ length: roomDetails.numPlayers - regPlayerCount }, (_, index) => {
 
                                                 if (!inGame) {
 
-                                                    if (inLobby.length < roomDetails.numPlayers) {
+                                                    if (regPlayerCount < roomDetails.numPlayers) {
 
                                                         return (
 
                                                             <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                                 <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                                <p>Player {inLobby.length + index + 1}</p>
+                                                                <p>Player {regPlayerCount + index + 1}</p>
                                                             </Badge>
                                 
                                                         );
@@ -592,13 +687,13 @@ function JoinRoom() {
 
                                             })}
 
-                                            {/* {inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+                                            {/* {inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < roomDetails.numPlayers) && Array.from({ length: roomDetails.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
 
                                                 return (
 
                                                     <Badge className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer" variant="empty" key={index}>
                                                         <div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-                                                        <p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+                                                        <p>Player {(regPlayerCount - inGame.length) + index + 1}</p>
                                                     </Badge>
 
                                                 );
@@ -650,7 +745,7 @@ function JoinRoom() {
                                                                 ) || (
 
                                                                     <p className="text-slate-900 text-xs font-semibold">
-                                                                        {player.charAt(0).toUpperCase()}
+                                                                        {player.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
                                                                     </p>
 
                                                                 )}
@@ -692,7 +787,11 @@ function JoinRoom() {
 
                             </div>
 
-                            <Chat username={username} roomName={roomDetails.roomName} roomID={roomID} />
+                            <div className={`overflow-hidden pb-12 ${chatExpanded ? "h-full w-full" : "w-0"}`}>
+
+                                <Chat username={username} roomName={roomDetails.roomName} roomID={roomID} />
+
+                            </div>
 
                         </div>
 
@@ -710,14 +809,14 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-0 mb-8">
-                                <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle>Welcome to Callsigns!</AlertDialogTitle>
                                 <AlertDialogDescription>
                                     You'll be joining {roomDetails.roomName}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
 
                             <Form {...form}>
-                                <form className="flex flex-col gap-12" onSubmit={form.handleSubmit(onSubmit)}>
+                                <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
                                     <FormField
                                         defaultValue={''}
                                         control={form.control}
@@ -738,7 +837,13 @@ function JoinRoom() {
                                             </FormItem>
                                         )}
                                     />
+
+                                    <div className="my-2 h-8">
+                                        <p className="text-xs text-red-500" ref={invalidUsernameRef}></p>
+                                    </div>
+                                    
                                     <Button className="flex flex-row self-end" type="submit">Submit</Button>
+
                                 </form>
                             </Form>
 
@@ -749,7 +854,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
@@ -764,7 +869,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">
@@ -779,7 +884,7 @@ function JoinRoom() {
                         <>
 
                             <AlertDialogHeader className="space-y-2">
-                                <AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+                                <AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
                             </AlertDialogHeader>
 
                             <div className="flex flex-col flex-none h-[20vh] pt-12 items-center text-slate-700">

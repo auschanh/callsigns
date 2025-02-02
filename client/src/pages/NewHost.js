@@ -10,7 +10,7 @@ function NewHost() {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [playOpen, setPlayOpen] = useState(false);
 
@@ -133,7 +133,7 @@ function NewHost() {
                 <AlertDialogContent className="gap-12 w-[30vw]">
 
                     <AlertDialogHeader className="space-y-2">
-                        <AlertDialogTitle>Welcome to Just One!</AlertDialogTitle>
+                        <AlertDialogTitle>Welcome to Callsigns!</AlertDialogTitle>
                     </AlertDialogHeader>
 
                     {roomDetails && (

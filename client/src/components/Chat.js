@@ -13,11 +13,11 @@ function Chat({ username, roomName, roomID }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [message, setMessage] = useState('');
 
@@ -179,7 +179,7 @@ function Chat({ username, roomName, roomID }) {
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-                
+
                 <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{roomName}</h2>
 
                 <DropdownMenu className="relative">
@@ -231,7 +231,7 @@ function Chat({ username, roomName, roomID }) {
                                 )}
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
-                                    <p className={`leading-none text-sm break-words ${playerName === guesser && (username !== messageContent.author)  ? 'blur' : ''} } `}>{messageContent.message}</p>
+                                    <p className={`leading-none text-sm break-words ${isGameStarted && (username === guesser) && (username !== messageContent.author) ? 'blur' : ''} } `}>{messageContent.message}</p>
 
                                 </div>
 

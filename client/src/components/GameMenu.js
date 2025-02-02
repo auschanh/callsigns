@@ -15,9 +15,9 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
     const [socket, setSocket] = useSocketContext();
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
-    const [inLobby, setInLobby] = useLobbyContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
     const [isClosedRoom, setIsClosedRoom] = isClosedRoomState;
 
@@ -43,7 +43,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
         }
 
-    }, [isPopoverOpen, setIsPlayerWaiting, isWaitingOpen, isPlayerWaiting]);
+    }, [isPopoverOpen, isWaitingOpen, isPlayerWaiting]);
 
     const handleCopy = async () => {
 
@@ -131,12 +131,12 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
                 </div>
             </PopoverTrigger>
 
-            <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-6 p-4">
+            <PopoverContent className="w-96 max-h-[80vh] overflow-auto mr-8 p-4">
 
                 <div className="flex flex-row items-center bg-slate-100 p-4 rounded-lg transition-colors duration-300 [&:hover:not(:has(button:hover))]:bg-slate-200">
 
                     <div className="flex items-center justify-center h-10 aspect-square rounded-full bg-slate-900">
-                        <p className="text-slate-50 text-xl">{playerName.charAt(0).toUpperCase()}</p>
+                        <p className="text-slate-50 text-xl">{playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
                     </div>
 
                     <h3 className="text-lg text-slate-900 px-6 break-all">{playerName}</h3>

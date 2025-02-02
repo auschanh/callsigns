@@ -49,7 +49,11 @@ function App() {
 
 	const [guesser, setGuesser] = useState();
 
+	const [nextGuesser, setNextGuesser] = useState();
+
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+	const [regPlayerCount, setRegPlayerCount] = useState();
 
 	const navigate = useNavigate();
 
@@ -136,6 +140,8 @@ function App() {
 					(async () => {
 
 						try {
+
+							console.log("host is excluded");
 			
 							await socket.emit("roomCheck", roomID, true);
 			
@@ -170,8 +176,21 @@ function App() {
 
 				try {
 
+					const info = {
+
+						username: roomDetails.host,
+						roomName: roomDetails.roomName,
+						numPlayers: roomDetails.numPlayers,
+						aiPlayers: roomDetails.aiPlayers,
+						numGuesses: roomDetails.numGuesses,
+						numRounds: roomDetails.numRounds,
+						timeLimit: roomDetails.timeLimit,
+						keepScore: roomDetails.keepScore
+
+					}
+
 					// for the host (DialogPlay)
-					await socket.emit("gameInfo", { username: roomDetails.host, roomName: roomDetails.roomName, numPlayers: roomDetails.numPlayers, aiPlayers: roomDetails.aiPlayers }, true, false);
+					await socket.emit("gameInfo", info, true, false);
 	
 					await socket.emit("announceGameStart", playing, roomDetails);
 	
@@ -242,17 +261,41 @@ function App() {
 
 			console.log(`${user} has left the lobby`);
 
-            setInLobby(inLobby.filter(({playerName}) => { return playerName !== user }));
+			if (user !== guesser) {
+
+				if (user !== nextGuesser) {
+
+					console.log("not guesser", guesser, nextGuesser);
+
+					setInLobby(prev => prev.filter(({playerName}) => { return playerName !== user }));
+
+				} else {
+
+					console.log("nextGuesser", user);
+
+				}
+
+			} else {
+
+				if (!inGame.includes(playerName)) {
+
+					setInLobby(prev => prev.filter(({playerName}) => { return playerName !== user }));
+
+				}
+
+				console.log("guesser", user);
+
+			}
 
 			setInGame(inGame?.filter((player) => { return player !== user }));
 
 			setSelectedPlayers(selectedPlayers.filter((value) => { return value !== user }));
 
-			if (user !== playerName && inGame?.includes(playerName)) {
+			if (user && user !== playerName && inGame?.includes(playerName)) {
 
 				toast(
 
-					user === guesser && inGame.includes(user) ? "Your guesser, " + user + ", has disconnected." : user + " has disconnected.", {
+					user === guesser && inGame.includes(user) ? "The Stranded Agent, " + user + ", has disconnected." : user + " has disconnected.", {
 						unstyled: true,
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser && inGame.includes(user) ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
@@ -282,7 +325,7 @@ function App() {
 
 				toast(
 
-					user === guesser ? "Your guesser, " + user + ", is back in the lobby." : user + " is back in the lobby.", {
+					user === guesser ? "The Stranded Agent, " + user + ", is back in the lobby." : user + " is back in the lobby.", {
 						unstyled: true,
 						classNames: {
 							toast: `flex flex-row flex-none items-center justify-center w-full p-4 border border-solid ${user === guesser ? "bg-amber-500 border-black" : "bg-slate-100 border-black"}`,
@@ -367,10 +410,8 @@ function App() {
 				(async () => {
 
 					try {
-
-						const joinOrder = inLobby.map((player) => { return player.playerName });
 		
-						await socket.emit("sendNextRound", selectedPlayers, joinOrder);
+						await socket.emit("sendNextRound");
 						
 					} catch (error) {
 		
@@ -412,6 +453,30 @@ function App() {
 
     }, [chatExpanded]);
 
+	useEffect(() => {
+
+		// count players that have entered a username
+		setRegPlayerCount(
+
+			inLobby.reduce((accumulator, currentValue) => {
+				
+				// if playerName is not null
+				if (currentValue.playerName) { 
+					
+					return accumulator + 1; 
+				
+				} else {
+					
+					return accumulator;
+
+				} 
+			
+			}, 0)
+
+		)
+
+	}, [inLobby]);
+
 	const handleReturnLobby = async () => {
 
 		try {
@@ -434,9 +499,9 @@ function App() {
 
 				<MessageContext.Provider value={[[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]]}>
 
-					<LobbyContext.Provider value={[inLobby, setInLobby]}>
+					<LobbyContext.Provider value={[[inLobby, setInLobby], regPlayerCount]}>
 
-						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]]}>
+						<GameInfoContext.Provider value={[playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]]}>
 
 							<Toaster />
 							

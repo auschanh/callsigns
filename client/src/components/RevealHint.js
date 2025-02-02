@@ -8,14 +8,18 @@ import AgentIndicator from './AgentIndicator';
 import { toast } from "sonner";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
+import { useLobbyContext } from "../contexts/LobbyContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 
-const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, readyNextRoundState, scoresState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound }) => {
+
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser, isDisconnectedTeam, notEnoughPlayers }) => {
 
     const [socket, setSocket] = useSocketContext();
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
+    const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
     const [readyNextRound, setReadyNextRound] = readyNextRoundState;
     const [results, setResults] = resultsState;
     const [guess, setGuess] = guessState;
@@ -29,11 +33,15 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
-    const [showScore, setShowScore] = useState(false);
+    const [showScore, setShowScore] = showScoreState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
+    const [tempScores, setTempScores] = tempScoresState;
     const [menuScore, setMenuScore] = menuScoreState;
-    const [showEndGame, setShowEndGame] = useState(false);
+    const [isLastRound, setIsLastRound] = isLastRoundState;
+    const [showEndGame, setShowEndGame] = showEndGameState;
+    const [revealCallsign, setRevealCallsign] = revealCallsignState;
+    const [prepRevCallsign, setPrepRevCallsign] = prepRevCallsignState;
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -41,6 +49,16 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
     const nextRoundBtnRef = useRef(null);
 
     const navigate = useNavigate();
+
+    const updateGuesserScore = () => {
+
+        setScores(tempScores);
+
+        const sorted = [...tempScores].sort((a,b) => b.score - a.score);
+
+		setSortedScores(sorted);
+
+    }
 
     useEffect(() => {
 
@@ -81,6 +99,16 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                     setSubmitted(false);
 
+                    if (correctGuess) {
+
+                        setTimeout(() => {
+
+                            updateGuesserScore();
+
+                        }, 1500);
+
+                    }
+
                 }, 1000);
 
             }, 6000);
@@ -99,11 +127,83 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
     useEffect(() => {
 
-        if (submitted === false && validate === true) {
+        if (prepRevCallsign === true && (submitted === false && validate === true)) {
+
+            setPrepRevCallsign(false);
+
+            if (currentRound === roomDetails.numRounds) {
+
+                setTimeout(() => {
+
+                    setIsLastRound(true);
+
+                    if (playerName === guesser) {
+
+                        setRevealCallsign([true, false, false]);
+
+                        setTimeout(() => {
+
+                            setRevealCallsign([true, true, false]);
+
+                            setTimeout(() => {
+
+                                setRevealCallsign([true, true, true]);
+                    
+                            }, 500);
+                
+                        }, 500);
+
+                    }
+    
+                }, 3000);
+
+            } else {
+
+                setTimeout(() => {
+
+                    setShowReadyState(true);
+
+                    if (!isDisconnectedGuesser && (playerName === guesser)) {
+
+                        setRevealCallsign([true, false, false]);
+
+                        setTimeout(() => {
+
+                            setRevealCallsign([true, true, false]);
+
+                            setTimeout(() => {
+
+                                setRevealCallsign([true, true, true]);
+                    
+                            }, 500);
+                
+                        }, 500);            
+
+                    }
+    
+                }, 2000);
+
+            }
+
+        }
+
+        return () => {
+
+            setIsLastRound(false);
+            setShowReadyState(false);
+            // setRevealCallsign([false, false, false]);
+
+        }
+
+    }, [submitted, validate, currentRound, playerName, guesser, prepRevCallsign]);
+
+    useEffect(() => {
+
+        if (isLastRound) {
 
             setTimeout(() => {
 
-                setShowReadyState(true);
+                setShowEndGame(true);
 
             }, 2000);
 
@@ -111,11 +211,15 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         return () => {
 
-            setShowReadyState(false);
+            setTimeout(() => {
+
+                setShowEndGame(false);
+
+            }, 2000);
 
         }
 
-    }, [submitted, validate]);
+    }, [isLastRound]);
 
     useEffect(() => {
 
@@ -130,22 +234,6 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
         }
 
     }, [correctGuess]);
-
-    useEffect(() => {
-
-        if (currentRound === roomDetails.numRounds && showReadyState) {
-
-            setShowEndGame(true);
-
-        }
-
-        return () => {
-
-            setShowEndGame(false);
-
-        }
-
-    }, [currentRound, showReadyState]);
 
     const handleChange =  (e) => {
         e.preventDefault();
@@ -317,7 +405,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className={`h-full flex flex-none flex-col justify-center items-center w-full transition-all ease-in-out duration-500`}>
+            <div className={`h-full flex flex-none flex-col justify-center items-center w-full`}>
     
                 {submitted && (
 
@@ -332,7 +420,7 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                         )}
                         { submissionText2 && (
                             <>
-                                <p>{`% Signalling friendly agents:${selectedPlayers.map((player) => { return ` ${player}`})}`}</p>
+                                <p>{`% Signalling friendly agents:${inLobby.map(({playerName}) => playerName).filter((player) => selectedPlayers.includes(player)).map((player) => { return ` ${player}`})}`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -363,69 +451,83 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
 
                 {!submitted && validate && (
                     
-                    <div className='h-[40vh] px-24 flex flex-none flex-col justify-center text-xs transition-all ease-in-out duration-500 w-full text-center gap-16'>
+                    <div className={`h-[40vh] px-24 flex flex-none flex-col justify-center text-xs w-full text-center gap-16 validate`}>
                         
                         {showScore && (
                             
-                            <div>
-                                <div className='mb-10 left-0'>
+                            <div className="flex flex-col items-center w-full mt-[3%]">
+
+                                {/* <h1 className="text-amber-500 text-3xl mb-8">Scores</h1> */}
+
+                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
+
+                                    <div className="max-w-[80%]">
+                                        
+                                        {generateScoreTable('white', '#94a3b8')}
+
+                                    </div>
+
+                                    {/* <Table className="text-white">
+                                        <TableHeader className="text-center">
+
+                                            <TableRow className="">
+                                            <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
+                                            <TableHead className="text-center text-green-600">Score</TableHead>
+                                            <TableHead className="text-center  text-green-600">Good Hints</TableHead>
+                                            <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+                                            </TableRow>
+
+                                        </TableHeader>
+                                        <TableBody className="text-center">
+                                            
+                                            {
+                                                sortedScores.map((player, index) => {
+                                                return (<TableRow key={index}>
+                                                    <TableCell className="font-medium">{player.playerName}</TableCell>
+                                                    <TableCell classList="font-extrabold">{player.score}</TableCell>
+                                                    <TableCell>{player.goodHints}</TableCell>
+                                                    <TableCell>{player.badHints}</TableCell>
+                                                    </TableRow>)
+                                                })
+                                            }
+                                            
+                                        </TableBody>
+                                    </Table> */}
+
+                                </div>
+
+                                <div className='mt-8 left-0'>
                                     <Button 
                                         ref={scoreBtnRef} 
-                                        variant="indigo" 
+                                        variant="red" 
                                         // className={`w-36 transition-all ease-in-out duration-200`}
                                         className={`w-36`}
                                         onClick={() => {setShowScore(prev => !prev)}}
                                     >
                                         Back
                                     </Button>
-                                </div>
-                                <div>
-                                {generateScoreTable('white', 'amber-400')}
-
-                                </div>
-                                {/* <Table className="text-white">
-                                    <TableHeader className="text-center">
-
-                                        <TableRow className="">
-                                        <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
-                                        <TableHead className="text-center text-green-600">Score</TableHead>
-                                        <TableHead className="text-center  text-green-600">Good Hints</TableHead>
-                                        <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
-                                        </TableRow>
-
-                                    </TableHeader>
-                                    <TableBody className="text-center">
-                                        
-                                        {
-                                            sortedScores.map((player, index) => {
-                                               return (<TableRow key={index}>
-                                                <TableCell className="font-medium">{player.playerName}</TableCell>
-                                                <TableCell classList="font-extrabold">{player.score}</TableCell>
-                                                <TableCell>{player.goodHints}</TableCell>
-                                                <TableCell>{player.badHints}</TableCell>
-                                                </TableRow>)
-                                            })
-                                        }
-                                        
-                                    </TableBody>
-                                </Table> */}
+                                </div>  
+                                    
                             </div>
 
                         ) || (
 
-                            <>
+                            <div className="space-y-16">
 
-                                <div className={`validate font-mono`}>
+                                <div
+                                    className={`font-mono transition-opacity ${showEndGame ? "" : isLastRound ? "opacity-0" : ""}`}
+                                    style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
+                                >
 
-                                    <h2 className={`text-lg mb-2 text-center ${correctGuess ? 'text-green-900' : 'text-red-900'}`}>
+                                    <h2 className={`text-lg mb-2 text-center ${isDisconnectedGuesser ? 'text-red-900' : showEndGame ? 'text-amber-400/50' : correctGuess ? 'text-green-900' : 'text-red-900'}`}>
 
-                                        {`${correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
+                                        {`${isDisconnectedTeam ? '% CONNECTION TERMINATED %' : isDisconnectedGuesser ? '% CONNECTION TERMINATED %' : showEndGame ? '% REPORT BACK TO HQ %' : correctGuess ? '% CALLSIGN ACCEPTED %' : '% FATAL SYSTEM ERROR %'}`}
 
                                     </h2>
 
-                                    <h1 className={`text-6xl text-center ${correctGuess ? 'text-green-600' : 'text-red-700'}`}>
+                                    <h1 className={`text-6xl text-center ${isDisconnectedGuesser ? 'text-red-700' : showEndGame ? 'text-amber-400' : correctGuess ? 'text-green-600' : 'text-red-700'}`}>
                                         
-                                        {`${correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
+                                        {`${isDisconnectedTeam ? 'TEAM DISCONNECTED' : isDisconnectedGuesser ? 'AGENT DISCONNECTED' : showEndGame ? 'END OF MISSION' : correctGuess ? 'AUTHENTICATION COMPLETE' : 'FAILED TO AUTHENTICATE'}`}
                                         
                                     </h1>
 
@@ -435,103 +537,153 @@ const RevealHint = ({ resultsState, roomDetails, handleNext, guessState, submitt
                                 </div>
 
                                 <div 
-                                    className={`flex flex-none flex-col gap-16 w-full h-36 transition-all ease-in-out ${showReadyState ? "" : "opacity-0" }`}
+                                    className={`flex flex-none flex-col w-full h-36 transition-opacity ease-in-out ${isLastRound ? (showEndGame ? "" : "opacity-0") : (showReadyState ? "" : "opacity-0") }`}
                                     style={{ transitionDuration: "2000ms", animationDuration: "2000ms" }}
                                 >
 
-                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4'>
+                                    <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4 mb-8'>
 
-                                        {!showEndGame && (
+                                        {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
 
-                                            <>
+                                        {readyNextRound?.map((playerObj, index) => {
 
-                                                {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
+                                            if (playerObj.playerName === roomDetails.guesser && inGame.length >= 3) {
 
-                                                {readyNextRound.map((playerObj, index) => {
+                                                return (
 
-                                                    return (
+                                                    <TooltipProvider key={index}>
+                                                        <Tooltip delayDuration={0}>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                                    variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                                    // onClick={e => readyToggle(e, playerObj)}
+                                                                >
+                                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                                        <AgentIcon className="aspect-square h-5" />
+                                                                    </div>
+                                                                    <p className="text-xs">{playerObj.playerName}</p>
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent sideOffset={12}>
 
-                                                        <Button
-                                                            key={index}
-                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                            variant={`${playerObj.readyNext ? "green" : "grey"}`}
-                                                            // onClick={e => readyToggle(e, playerObj)}
-                                                        >
-                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                {playerObj.readyNext && (
-                                                                    <Check className="text-slate-900" size={14} />
+                                                                {playerObj.playerName === playerName && (
+
+                                                                    <p>
+                                                                        <span className="font-semibold">You</span>
+                                                                        {` are the next Stranded Agent!`}
+                                                                    </p>
+
                                                                 ) || (
-                                                                    // <Ellipsis className="text-slate-900" size={14} />
-                                                                    <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.charAt(0).toUpperCase()}</p>
+                                                                
+                                                                    <p>
+                                                                        <span className="font-semibold">{playerObj.playerName}</span>
+                                                                        {` is the next Stranded Agent!`}
+                                                                    </p>
+                                                                
                                                                 )}
-                                                            </div>
-                                                            <p className="text-xs">{playerObj.playerName}</p>
-                                                        </Button>
+                                                                
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+    
+                                                )
 
-                                                    )
+                                            } else {
 
-                                                })}
-
-                                                {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
-
-                                                    return (
-
-                                                        <Button
-                                                            key={index}
-                                                            className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
-                                                            variant="green"
-                                                        >
-                                                            <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                return (
+                                                    
+                                                    <Button
+                                                        key={index}
+                                                        className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                        variant={`${playerObj.readyNext ? "green" : "grey"}`}
+                                                        // onClick={e => readyToggle(e, playerObj)}
+                                                    >
+                                                        <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                            {playerObj.readyNext && (
                                                                 <Check className="text-slate-900" size={14} />
-                                                            </div>
-                                                            <p className="text-xs">{`Bot ${index + 1}`}</p>
-                                                        </Button>
-                                                    )
+                                                            ) || (
+                                                                // <Ellipsis className="text-slate-900" size={14} />
+                                                                <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs">{playerObj.playerName}</p>
+                                                    </Button>
 
-                                                })} */}
+                                                )
 
-                                            </>
+                                            }
 
-                                        ) || (
+                                        })}
 
-                                            <h1 className={`text-amber-400 font-mono text-2xl`}>{`<<< END OF MISSION >>>`}</h1>
+                                        {/* {Array.from({ length: roomDetails.aiPlayers }, (_, index) => {
 
-                                        )}
+                                            return (
+
+                                                <Button
+                                                    key={index}
+                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                    variant="green"
+                                                >
+                                                    <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                        <Check className="text-slate-900" size={14} />
+                                                    </div>
+                                                    <p className="text-xs">{`Bot ${index + 1}`}</p>
+                                                </Button>
+                                            )
+
+                                        })} */}
 
                                     </div>
 
-                                    <div className={`text-center flex gap-8 mx-auto`}>
+                                    <div className={`text-center flex flex-col mx-auto gap-4`}>
 
-                                        {roomDetails.keepScore && (
+                                        <div className="h-4">
+
+                                            {notEnoughPlayers && (
+                                                
+                                                <h4 className="text-red-500 text-xs">Minimum 3 players to continue</h4>
+
+                                            )}
+
+                                        </div>
+
+                                        <div className="flex gap-8">
+
+                                            {roomDetails.keepScore && (
+
+                                                <Button 
+                                                    ref={scoreBtnRef} 
+                                                    variant="indigo" 
+                                                    // className={`w-36 transition-all ease-in-out duration-200`}
+                                                    // className={`w-36 bg-[#dc940f]`}
+                                                    className={`w-36`}
+                                                    onClick={() => {setShowScore(prev => !prev)}}
+                                                >
+                                                    View Scores
+                                                </Button>
+
+                                            )}
 
                                             <Button 
-                                                ref={scoreBtnRef} 
-                                                variant="indigo" 
+                                                ref={nextRoundBtnRef} 
+                                                variant={`${ notEnoughPlayers ? "red" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
                                                 // className={`w-36 transition-all ease-in-out duration-200`}
                                                 className={`w-36`}
-                                                onClick={() => {setShowScore(prev => !prev)}}
+                                                // onClick={handleNext}
+                                                // onClick={showEndGame ? handleReturnLobby : toggleReady}
+                                                onClick={notEnoughPlayers ? handleReturnLobby : toggleReady}
                                             >
-                                                View Scores
+                                                {`${ notEnoughPlayers ? "Return to Lobby" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : showEndGame ? "Play Again" : "Ready Up" }`}
                                             </Button>
 
-                                        )}
-
-                                        <Button 
-                                            ref={nextRoundBtnRef} 
-                                            variant={`${ showEndGame ? "red" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "grey" : "green" }`}
-                                            // className={`w-36 transition-all ease-in-out duration-200`}
-                                            className={`w-36`}
-                                            // onClick={handleNext}
-                                            onClick={showEndGame ? handleReturnLobby : toggleReady}
-                                        >
-                                            {`${ showEndGame ? "Return to Lobby" : readyNextRound.find((player) => { return (player.playerName === playerName) })?.readyNext ? "Ready!" : "Ready Up" }`}
-                                        </Button>
+                                        </div>
                                     
                                     </div>
 
                                 </div>
                                 
-                            </>
+                            </div>
 
                         )}
 

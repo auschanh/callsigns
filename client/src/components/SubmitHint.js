@@ -9,7 +9,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 import { Check, Ellipsis } from "lucide-react";
 
-const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade }) => {
+const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade }) => {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -17,13 +17,13 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
     const hintValidationRef = useRef(null);
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [enterHint, setEnterHint] = enterHintState;
 
     const [hint, setHint] = hintState;
 
-    const [submissions, setSubmissions] = submissionsState;
+    const [results, setResults] = resultsState;
 
     const [intro1, setIntro1] = useState(false);
 
@@ -120,10 +120,10 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
         } else if (singularizeWord(stemmedHint) === singularizeWord(stemmerWord(cleanedCallSign))) {
 
-         hintInputRef.current.classList.add("border-2");
-         hintInputRef.current.classList.remove("border-slate-400");
-         hintInputRef.current.classList.add("border-red-500");
-         hintValidationRef.current.innerText = "Your hint cannot be the callsign"
+            hintInputRef.current.classList.add("border-2");
+            hintInputRef.current.classList.remove("border-slate-400");
+            hintInputRef.current.classList.add("border-red-500");
+            hintValidationRef.current.innerText = "Your hint cannot be the callsign"
 
 		} else if (checkHint.includes(cleanedCallSign)) {
 
@@ -259,12 +259,12 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                                 <div className="mb-8">
 
-                                    <p className="mb-6 text-center">{submissions.filter(vote => vote.hint).length} {submissions.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
+                                    <p className="mb-6 text-center">{results.filter(vote => vote.hint).length} {results.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
 
                                     <Progress 
                                         value={
-                                            ((submissions.filter((vote) => { return vote.hint && playerName === guesser })).length 
-                                            / (submissions.length - 1)) * 100
+                                            ((results.filter((vote) => { return vote.hint && playerName === guesser })).length 
+                                            / (results.length - 1)) * 100
                                         }
                                         max={100}
                                     />
@@ -297,7 +297,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
                                         />
 
                                         <Button 
-                                            className={`ml-2 w-24 ${hint[1] ? "hover:bg-slate-500" : ""}`}
+                                            className={`ml-2 w-24 ${hint[1] ? "hover:bg-red-600" : ""}`}
                                             variant={hint[1] ? "green" : "default"} 
                                             type="button"
                                             onClick={hint[1] ? (isUndo ? handleUndoSubmit : (() => {})) : handleSubmit}
@@ -317,21 +317,21 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                             <div className="flex flex-row flex-none flex-wrap justify-center w-full mt-6 px-24 gap-4">
 
-                                {submissions?.map((submission, index) => {
+                                {/* {results?.map((result, index) => {
 
-                                    if (submission.playerName === playerName && playerName !== guesser) {
+                                    if (result.playerName === playerName && playerName !== guesser) {
 
                                         return (
 
                                             <Button
                                                 key={index}
                                                 className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                                variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                                variant={`${result.hint !== "" ? "green" : "grey"}`}
                                             >
 
                                                 <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
 
-                                                    {submission.hint !== "" && (
+                                                    {result.hint !== "" && (
 
                                                         <Check className="text-slate-900" size={14} />
 
@@ -343,7 +343,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                                                 </div>
 
-                                                <p className="text-xs">{submission.playerName}</p>
+                                                <p className="text-xs">{result.playerName}</p>
                                                 
                                             </Button>
 
@@ -351,23 +351,23 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
 
                                     }
 
-                                })}
+                                })} */}
 
-                                {submissions?.map((submission, index) => {
+                                {results?.map((result, index) => {
 
-                                    if (submission.playerName !== playerName && submission.playerName !== guesser) {
+                                    if (result.playerName !== guesser) {
 
                                         return (
 
                                             <Button
                                                 key={index}
                                                 className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
-                                                variant={`${submission.hint !== "" ? "green" : "grey"}`}
+                                                variant={`${result.hint !== "" ? "green" : "grey"}`}
                                             >
         
                                                 <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
         
-                                                    {submission.hint !== "" && (
+                                                    {result.hint !== "" && (
         
                                                         <Check className="text-slate-900" size={14} />
         
@@ -379,7 +379,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, submissionsState, 
         
                                                 </div>
         
-                                                <p className="text-xs">{submission.playerName}</p>
+                                                <p className="text-xs">{result.playerName}</p>
                                                 
                                             </Button>
         

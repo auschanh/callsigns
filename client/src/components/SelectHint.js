@@ -11,7 +11,7 @@ import { Check, Ellipsis, Trash2, X, RotateCcw, ChevronRight } from "lucide-reac
 
 const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVoted, currentIndex, setTimeLimitReached, setStartFade, scoresState, hintArrayState }) => {
 
-    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+    const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [results, setResults] = resultsState; // voting array of objects hints, for hints to eliminate
 
@@ -193,7 +193,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                             <p className="mb-6 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
 
                             <Progress
-                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (results.length-1) * 100}
+                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (isVoted.length - 1) * 100}
                                 max={100}
                             /> 
 
@@ -320,7 +320,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
 
                                     <>
 
-                                        <Button onClick={handleRemove} variant={voted ? "green" : "red"} className="flex flex-row w-44 transition-all ease-in-out duration-150">
+                                        <Button onClick={handleRemove} variant={voted ? "green" : isNoneSelected ? "disabledRed" : "red"} className={`flex flex-row w-44 transition-all ease-in-out duration-150 ${ isNoneSelected ? "cursor-not-allowed" : ""}`}>
 
                                             {voted && (
 

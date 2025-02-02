@@ -18,9 +18,9 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 	
 	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-	const [inLobby, setInLobby] = useLobbyContext();
+	const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
 	const [isClosedRoom, setIsClosedRoom] = useState(prevClosedRoom);
 
@@ -92,9 +92,16 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		});
 
+		socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
+
+			setGuesser(roomDetails.guesser);
+
+		});
+
 		return () => {
 
 			socket.removeAllListeners("sendSelectedPlayers");
+			socket.removeAllListeners("receiveNextRound");
 
 		}
 
@@ -247,21 +254,25 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	const handleSelectGuesser = async (newGuesser) => {
 
-		try {
+		if (!isGameStarted) {
 
-			if (newGuesser !== guesser) {
+			try {
 
-				await socket.emit("selectGuesser", newGuesser);
-
-			} else {
-
-				await socket.emit("selectGuesser", "");
-
+				if (newGuesser !== guesser) {
+	
+					await socket.emit("selectGuesser", newGuesser);
+	
+				} else {
+	
+					await socket.emit("selectGuesser", "");
+	
+				}
+	
+			} catch (error) {
+	
+				throw error;
+	
 			}
-
-		} catch (error) {
-
-			throw error;
 
 		}
 
@@ -387,7 +398,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 						</div>
 
-						<div className="flex flex-row items-center w-full p-4 pr-14 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
+						<div className="flex flex-row items-center w-full p-4 pr-14 mb-6 rounded-md border border-slate-400 bg-white dark:border-slate-800 dark:bg-slate-950 relative">
 							<p className="text-sm break-all">{sessionUrl}</p>
 							<Button
 								className="flex absolute right-3 h-fit p-2 transition-colors ease-out duration-500"
@@ -396,6 +407,16 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 							>
 								{(!copied && <Copy size={12} />) || <Check size={14} />}
 							</Button>
+						</div>
+
+						<div className="text-xs">
+
+							<h2 className="underline font-semibold mb-1">Game Settings</h2>
+							<p>Number of Guesses: <span className="font-semibold">{`${Number(gameInfo.numGuesses) !== 11 ? Number(gameInfo.numGuesses) : "Unlimited"}`}</span></p>
+							<p>Number of Rounds: <span className="font-semibold">{`${Number(gameInfo.numRounds) !== 11 ? Number(gameInfo.numRounds) : "Unlimited"}`}</span></p>
+							<p>Timer: <span className="font-semibold">{`${Number(gameInfo.timeLimit) !== 0 ? ((Math.floor(Number(gameInfo.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(gameInfo.timeLimit) / 60)) + "m ")) + ((Number(gameInfo.timeLimit) % 60) + "s") : "Off"}`}</span></p>
+							<p>Scoring: <span className="font-semibold">{`${gameInfo.keepScore ? "On" : "Off"}`}</span></p>
+
 						</div>
 
 					</div>
@@ -477,7 +498,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																	) || (
 
 																		<p className="text-slate-900 text-xs font-semibold">
-																			{player.playerName.charAt(0).toUpperCase()}
+																			{player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 																		</p>
 
 																	)}
@@ -499,20 +520,21 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 													<ContextMenuItem 
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 														onClick={() => {handleSelectGuesser(player.playerName)}}
+														disabled={isGameStarted}
 													>
 														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-														<p>Remove as stranded agent</p>
+														<p>Remove as Stranded Agent</p>
 													</ContextMenuItem>
 													
 												) || (
 
 													<ContextMenuItem 
-														disabled={!selectedPlayers.includes(player.playerName)}
+														disabled={isGameStarted || !selectedPlayers.includes(player.playerName)}
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 														onClick={() => {handleSelectGuesser(player.playerName)}}
 													>
 														<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-														<p>Select as stranded agent</p>
+														<p>Select as Stranded Agent</p>
 													</ContextMenuItem>
 
 												)}
@@ -532,7 +554,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 								} else {
 
-									if (!inGame?.includes(player.playerName)) {
+									if (player.playerName && !inGame?.includes(player.playerName)) {
 
 										return (
 
@@ -563,7 +585,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																		) || (
 
 																			<p className="text-slate-900 text-xs font-semibold">
-																				{player.playerName.charAt(0).toUpperCase()}
+																				{player.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 																			</p>
 
 																		)}
@@ -590,38 +612,39 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														<ContextMenuItem 
 															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 															onClick={() => {handleSelectGuesser(player.playerName)}}
+															disabled={isGameStarted}
 														>
 															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-															<p>Remove as stranded agent</p>
+															<p>Remove as Stranded Agent</p>
 														</ContextMenuItem>
 														
 													) || (
 
 														<ContextMenuItem 
-															disabled={!selectedPlayers.includes(player.playerName)}
+															disabled={isGameStarted || !selectedPlayers.includes(player.playerName)}
 															className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-blue-900 focus:text-slate-50 group"
 															onClick={() => {handleSelectGuesser(player.playerName)}}
 														>
 															<AgentIcon className="aspect-square h-12 group-hover:fill-white" />
-															<p>Select as stranded agent</p>
+															<p>Select as Stranded Agent</p>
 														</ContextMenuItem>
 
 													)}
 
 													<ContextMenuSeparator className="m-0" />
 													<ContextMenuItem
-														disabled={gameInfo.numPlayers + gameInfo.aiPlayers <= 3}
+														// disabled={regPlayerCount + gameInfo.aiPlayers <= 3}
 														className="cursor-pointer gap-3 pr-4 pl-3 focus:bg-red-500 focus:text-slate-50"
 														onClick={() => {
 															handleRemovePlayer(`player-${player.playerName}`);
 														}}
 													>
-														{(gameInfo.numPlayers + gameInfo.aiPlayers > 3 && (
+														{/* {(regPlayerCount + gameInfo.aiPlayers > 3 && ( */}
 															<>
 																<X size={16} />
 																<p>Remove from Lobby</p>
 															</>
-														)) || <p className="pl-2">Minimum 3 players</p>}
+														{/* )) || <p className="pl-2">Minimum 3 players</p>} */}
 													</ContextMenuItem>
 												</ContextMenuContent>
 											</ContextMenu>
@@ -634,11 +657,11 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 							})}
 
-							{inLobby && Array.from({ length: gameInfo.numPlayers - inLobby.length }, (_, index) => {
+							{inLobby && Array.from({ length: gameInfo.numPlayers - regPlayerCount }, (_, index) => {
 
 								if (!inGame) {
 
-									if (inLobby.length < gameInfo.numPlayers) {
+									if (regPlayerCount < gameInfo.numPlayers) {
 
 										return (
 
@@ -650,7 +673,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 														key={index}
 													>
 														<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-														<p>Player {inLobby.length + index + 1}</p>
+														<p>Player {regPlayerCount + index + 1}</p>
 													</Badge>
 												</ContextMenuTrigger>
 												<ContextMenuContent className="p-0 border-0">
@@ -681,7 +704,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 							})}
 
-							{inGame && !inGame.includes(playerName) && ((inLobby.length - inGame.length) < gameInfo.numPlayers) && Array.from({ length: gameInfo.numPlayers - (inLobby.length - inGame.length) }, (_, index) => {
+							{inGame && !inGame.includes(playerName) && ((regPlayerCount - inGame.length) < gameInfo.numPlayers) && Array.from({ length: gameInfo.numPlayers - (regPlayerCount - inGame.length) }, (_, index) => {
 
 								return (
 
@@ -693,7 +716,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												key={index}
 											>
 												<div className="flex aspect-square h-full bg-slate-400 rounded-full items-center justify-center mr-3" />
-												<p>Player {(inLobby.length - inGame.length) + index + 1}</p>
+												<p>Player {(regPlayerCount - inGame.length) + index + 1}</p>
 											</Badge>
 										</ContextMenuTrigger>
 										<ContextMenuContent className="p-0 border-0">
@@ -789,7 +812,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												) || (
 
 													<p className="text-slate-900 text-xs font-semibold">
-														{player.charAt(0).toUpperCase()}
+														{player.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}
 													</p>
 
 												)}

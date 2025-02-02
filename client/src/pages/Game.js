@@ -32,11 +32,11 @@ function Game() {
 
 	const [[messageList, setMessageList], [chatExpanded, setChatExpanded], [newMessage, setNewMessage]] = useMessageContext();
 
-	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser]] = useGameInfoContext();
+	const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
 	const [sessionUrl, setSessionUrl] = useState();
 
-	const [inLobby, setInLobby] = useLobbyContext();
+	const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 
@@ -83,16 +83,37 @@ function Game() {
 
 	const [validate, setValidate] = useState(false);
 
+	const [isLastRound, setIsLastRound] = useState(false);
+
+    const [showEndGame, setShowEndGame] = useState(false);
+
+	const [revealCallsign, setRevealCallsign] = useState([false, false, false]);
+
+	const [prepRevCallsign, setPrepRevCallsign] = useState(false);
+
 	const [scores, setScores] = useState([]);
 
 	const [sortedScores, setSortedScores] = useState([]);
 
+	const [tempScores, setTempScores] = useState([]);
+
 	const [menuScore, setMenuScore] = useState(false);
+
+	const [showScore, setShowScore] = useState(false);
 
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const [hintArray, setHintArray] = useState([]);
+
 	const [encryptedCallsign, setEncryptedCallsign] = useState();
+
+	const [isLoadingNextRound, setIsLoadingNextRound] = useState(false);
+
+	const [isDisconnectedGuesser, setIsDisconnectedGuesser] = useState(false);
+
+	const [isDisconnectedTeam, setIsDisconnectedTeam] = useState(false);
+
+	const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -139,13 +160,11 @@ function Game() {
 
 			setMenuScore(false);
 
-			const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
-
-			setInGame(playing);
+			setTempScores([]);
 
 			setSubmissions(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 	
 					return ({
 		
@@ -160,7 +179,7 @@ function Game() {
 
 			setResults(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 
 					return ({
 
@@ -179,7 +198,7 @@ function Game() {
 
 			setIsVoted(
 
-				playing.map((player) => {
+				inGame.map((player) => {
 
 					return ({
 
@@ -196,9 +215,11 @@ function Game() {
 
 				setCorrectGuess(false);
 
+				setIsDisconnectedGuesser(false);
+
 				setReadyNextRound(
 
-					playing.map((player) => {
+					inGame.map((player) => {
 		
 						return ({
 		
@@ -217,11 +238,35 @@ function Game() {
 
 			setRemainingGuesses(roomDetails.numGuesses);
 
-			setGuesser(roomDetails.guesser);
-
 			setIsClosedRoom(roomDetails.isClosedRoom);
 
 			setInLobby(othersInLobby);
+
+			if (currentRound === roomDetails.numRounds) {
+
+				setScores( 
+
+					inGame.map((player) => {
+
+						return ({
+
+							playerName: player,
+							score: 0,
+							correctGuesses: 0,
+							goodHints: 0,
+							badHints: 0
+
+						});
+
+					})
+
+				);
+
+				setSortedScores([]);
+
+				setCurrentRound(0);
+
+			}
 
 		} else {
 
@@ -253,6 +298,41 @@ function Game() {
 
     }
 
+	const triggerEndRound = () => {
+
+		setStartFade(true);
+
+		setTimeout(() => {
+
+			setStartFade(false);
+
+			setSubmitted(true);
+
+		}, 1000);
+
+		// host only, pick the next guesser
+		if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+
+			(async () => {
+
+				try {
+
+					const joinOrder = inLobby.map((player) => { return player.playerName });
+	
+					await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
+	
+				} catch (error) {
+	
+					throw error;
+	
+				}
+	
+			})();
+
+		}
+
+	}
+
 	useEffect(() => {
 
 		if (roomDetails === undefined) {
@@ -275,11 +355,21 @@ function Game() {
 
         }
 
+	}, [roomDetails, roomID]);
+
+	useEffect(() => {
+
         socket.on("roomExists", (othersInLobby, sessionUrl, roomDetails, inRoom, isClosedRoom) => {
 
 			if (othersInLobby && playerName !== undefined) {
 
-				const playing = selectedPlayers.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+				setRoomDetails(roomDetails);
+
+				const order = inLobby.map(({playerName}) => playerName).filter(player => selectedPlayers.includes(player));
+
+				const playing = order.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
+
+				console.log(order);
 
 				setInGame(playing);
 
@@ -347,25 +437,23 @@ function Game() {
 		
 				);
 
-				setScores( 
+				const resetScores = playing.map((player) => {
 
-					playing.map((player) => {
+					return ({
 
-						return ({
+						playerName: player,
+						score: 0,
+						correctGuesses: 0,
+						goodHints: 0,
+						badHints: 0
 
-							playerName: player,
-							score: 0,
-							correctGuesses: 0,
-							goodHints: 0,
-							badHints: 0
+					});
 
-						});
+				});
 
-					})
+				setScores(resetScores);
 
-				);
-
-                setRoomDetails(roomDetails);
+				setSortedScores(resetScores);
 
 				setRemainingGuesses(roomDetails.numGuesses);
 
@@ -502,15 +590,7 @@ function Game() {
 
                 setCorrectGuess(true);
 
-				setStartFade(true);
-
-				setTimeout(() => {
-
-					setStartFade(false);
-
-					setSubmitted(true);
-
-				}, 1000);
+				triggerEndRound();
 
             } else {
 
@@ -541,31 +621,57 @@ function Game() {
 
 		});
 
+		socket.on("receiveNextGuesser", (roomDetails) => {
+
+			setRoomDetails(roomDetails);
+
+			setNextGuesser(roomDetails.guesser);
+
+		});
+
 		// update toggle for all users
         socket.on("receiveToggle", (readyState) => {
 
             setReadyNextRound(readyState);
 
-            if (playerName === roomDetails.host && readyState.every((player) => { return player.readyNext })) {
+			if (readyState.every((player) => { return player.readyNext })) {
 
-                console.log("TRIGGER NEXT ROUND");
+				console.log(inGame);
 
-				(async () => {
+				if (inGame.includes(roomDetails.guesser)) {
 
-					try {
+					setIsLoadingNextRound(true);
+
+					setGuesser(roomDetails.guesser);
+
+					setRevealCallsign([false, false, false]);
+
+					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+
+						console.log("TRIGGER NEXT ROUND");
 		
-						await socket.emit("generateNewCallsign");
+						(async () => {
 		
-					} catch (error) {
-		
-						throw error;
+							try {
+				
+								await socket.emit("generateNewCallsign");
+				
+							} catch (error) {
+				
+								throw error;
+				
+							}
+				
+						})();
 		
 					}
-		
-				})();
 
-            }
+				} else {
 
+					console.log("nextGuesser not here");
+
+				}
+			}
         });
 
 		socket.on("receiveNextRound", (othersInLobby, roomDetails) => {
@@ -578,9 +684,11 @@ function Game() {
 
 			setTimeout(() => {
 
+				setShowScore(false);
+
 				setValidate(false);
 
-				if (playerName === roomDetails.host) {
+				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 					handleNext();
 
@@ -592,6 +700,8 @@ function Game() {
 
 					setFadeBorder(false);
 
+					setIsLoadingNextRound(false);
+
 				}, 1000);
 
 			}, 1000);
@@ -601,6 +711,114 @@ function Game() {
 		socket.on("receiveHintArray", (duplicates) => {
 
 			setHintArray(duplicates);
+
+		});
+
+		socket.on("guesserDisconnected", (guesser, returnedToLobby) => {
+
+			if (!isDisconnectedGuesser) {
+
+				if (!(currentIndex === 2 && !submitted && validate && notEnoughPlayers)) {
+
+					console.log("start fade");
+
+					setStartFade(true);
+
+					setTimeout(() => {
+
+						setIsDisconnectedGuesser(true);
+
+						setPrepRevCallsign(true);
+
+						setShowScore(false);
+
+						if (currentIndex === 2 && !submitted && validate) {
+
+							setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+							setTimeout(() => {
+
+								setStartFade(false);
+
+							}, 1300);
+
+						} else {
+
+							setCurrentIndex(2);
+
+							setSubmitted(false);
+
+							setValidate(true);
+
+							setTimeout(() => {
+
+								setStartFade(false);
+
+							}, 500);
+
+						}
+
+					}, 1000);
+
+				} else {
+
+					console.log("skip animation");
+
+				}
+
+			} else {
+
+				if (currentIndex === 2 && !submitted && validate) {
+
+					setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+					console.log("clear ready");
+	
+				}
+
+			}
+
+			// host only, pick the next guesser
+			if (playerName === roomDetails.host) {
+
+				(async () => {
+
+					try {
+
+						const joinOrder = inLobby.map((player) => { return player.playerName });
+
+						console.log(joinOrder);
+
+						if (!returnedToLobby) {
+
+							setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+							console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+						}
+		
+						await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
+
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
+
+			} else {
+
+				if (!returnedToLobby) {
+
+					setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+					console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+
+				}
+
+			}
+
 		});
 
         return () => {
@@ -612,13 +830,15 @@ function Game() {
 			socket.removeAllListeners("receiveVote");
 			socket.removeAllListeners("receiveSubmitGuess");
 			socket.removeAllListeners("receiveNextSlide");
+			socket.removeAllListeners("receiveNextGuesser");
 			socket.removeAllListeners("receiveToggle");
 			socket.removeAllListeners("receiveNextRound");
 			socket.removeAllListeners("receiveHintArray");
+			socket.removeAllListeners("guesserDisconnected");
 
         }
 
-    }, [socket, roomDetails, roomID, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
+    }, [socket, roomDetails, selectedPlayers, sendSelected, playerName, submissions, results, isVoted, remainingGuesses, handleNext, resetRound, currentIndex]);
 
 	// consolidate into just inGame
 	// disconnect protection
@@ -655,26 +875,180 @@ function Game() {
 		// we don't want to wait for disconnected players to vote
 		// filter out has-voted-status of disconnected players
 		setIsVoted(
-		
-			isVoted?.filter((player) => { return inGame.includes(player.playerName) })
+
+			isVoted?.filter((player) => {
+
+				if (player.voted) {
+
+					return player;
+
+				} else {
+
+					return inGame.includes(player.playerName);
+
+				}
+
+			})
 
 		);
 
 		// we don't want to wait for disconnected players to ready up for the next round
-		setReadyNextRound(
+		const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
 
-			readyNextRound?.filter((player) => { return inGame.includes(player.playerName) })
+		if (!isDisconnectedGuesser && currentIndex === 2 && !submitted && validate && !inGame.includes(roomDetails.guesser)) {
+
+			if (inGame.length < 2) {
+
+				setReadyNextRound(readyInGame);
+
+				console.log("skip animation");
+
+			} else {
+
+				setTimeout(() => {
+
+					// if there are less than 3 players left in the game, players will need to return to lobby
+					if (inGame.length < 3) {
+
+						setNotEnoughPlayers(true);
+
+						setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+
+						console.log("not enough players");
+
+					} else {
+
+						setReadyNextRound(readyInGame);
+
+						console.log(readyInGame);
+
+					}
+
+				}, 1000);
+
+			}
+		
+		} else {
+
+			// if there are less than 3 players left in the game, players will need to return to lobby
+			if (inGame?.length < 3) {
+
+				setNotEnoughPlayers(true);
+
+				setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+
+				console.log("not enough players");
+
+			} else {
+
+				setReadyNextRound(readyInGame);
+
+				console.log(readyInGame);
+
+			}
+
+		}
+
+		if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
+
+			console.log(inGame);
+
+			if (inGame.includes(roomDetails.guesser)) {
+
+				setIsLoadingNextRound(true);
+
+				setGuesser(roomDetails.guesser);
+
+				setRevealCallsign([false, false, false]);
+
+				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+
+					console.log("TRIGGER NEXT ROUND");
+
+					(async () => {
+
+						try {
+			
+							await socket.emit("generateNewCallsign");
+			
+						} catch (error) {
+			
+							throw error;
+			
+						}
+			
+					})();
+				}
+
+			} else {
+
+				console.log("nextGuesser not here");
+
+			}
+		}
+
+		// remove disconnected players from score table
+		setScores(
+
+			scores?.filter((player) => { return inGame.includes(player.playerName) })
 
 		);
 
-		// we don't want to wait for a disconnected guesser to guess on the last slide
+		setSortedScores(
 
+			sortedScores?.filter((player) => { return inGame.includes(player.playerName) })
 
+		);
 
-		// if there are less than 3 players left in the game, players will need to return to lobby
-		if (inGame?.length < 3) {
+		if (inGame?.length === 1 && playerName === guesser) {
 
+			if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
 
+				console.log("fade team disconnect");
+
+				setStartFade(true);
+
+				setTimeout(() => {
+
+					setIsDisconnectedTeam(true);
+
+					setPrepRevCallsign(true);
+
+					setShowScore(false);
+
+					if (currentIndex === 2 && !submitted && validate) {
+
+						setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+						setTimeout(() => {
+
+							setStartFade(false);
+
+						}, 1300);
+
+					} else {
+
+						setCurrentIndex(2);
+
+						setSubmitted(false);
+
+						setValidate(true);
+
+						setTimeout(() => {
+
+							setStartFade(false);
+
+						}, 500);
+
+					}
+
+				}, 1000);
+
+			} else {
+
+				console.log("skip animation");
+
+			}
 
 		}
 
@@ -683,33 +1057,97 @@ function Game() {
 
 	useEffect(() => {
 
+		if (!isLoadingNextRound && inGame && !inGame.includes(guesser)) {
+
+			console.log(inGame, guesser);
+
+			setStartFade(true);
+
+			setTimeout(() => {
+
+				setIsDisconnectedGuesser(true);
+
+				setPrepRevCallsign(true);
+
+				setCurrentIndex(2);
+
+				setSubmitted(false);
+
+				setValidate(true);
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+				}, 500);
+
+			}, 1000);
+
+		}
+
+		if (inGame?.length === 1 && playerName === guesser) {
+
+			console.log("team disconnect");
+
+			setStartFade(true);
+
+			setTimeout(() => {
+
+				setIsDisconnectedTeam(true);
+
+				setPrepRevCallsign(true);
+
+				setCurrentIndex(2);
+
+				setSubmitted(false);
+
+				setValidate(true);
+
+				setTimeout(() => {
+
+					setStartFade(false);
+
+				}, 500);
+
+			}, 1000);
+
+
+		}
+
+	}, [isLoadingNextRound]);
+
+	useEffect(() => {
+
 		const excludeGuesser = submissions?.filter((submission) => { return submission.playerName !== guesser });
 
-		if (enterHint && playerName === roomDetails.host && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
+		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
-			// every submitted a hint, create hint Array
-			const tempHintArray = excludeGuesser.map((player, index) => {
-				return player.hint
-			});
+			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
+				// every submitted a hint, create hint Array
+				const tempHintArray = excludeGuesser.map((player, index) => {
+					return player.hint
+				});
 
-			const duplicates = tempHintArray.filter((currHint, index) => {
-				return tempHintArray.some((hint, i) => {
-					return currHint === hint && index !== i 
-				})
-			});
+				const duplicates = tempHintArray.filter((currHint, index) => {
+					return tempHintArray.some((hint, i) => {
+						return currHint === hint && index !== i 
+					})
+				});
 
-			console.log(duplicates);
+				console.log(duplicates);
 
-			socket.emit("sendHintArray", roomDetails.roomID, duplicates);
+				socket.emit("sendHintArray", roomDetails.roomID, duplicates);
 
-			if (currentIndex === 0) {
+				if (currentIndex === 0) {
 
-				console.log("HOST set current index: 1");
+					console.log("HOST set current index: 1");
 
-				handleNext();
+					handleNext();
 
-			}
+				}
+
+			} 
 
 		}
 
@@ -740,19 +1178,19 @@ function Game() {
 			setResults(votedOutResults);
 
 			console.log(votedOutResults.map(result => {
-				return result.visible == false ? result.playerName : null;
-			}))
-			
-			// updates player scores based on if they were voted out or not
+				return result.visible === false ? result.playerName : null;
+			}));
+
 			const newScores = scores.map((player => {
 				console.log("Voted out Results:", votedOutResults);
 				if(votedOutResults.map(result => {
-					return result.visible == true ? result.playerName : null;}).includes(player.playerName)
-					&& player.playerName != guesser && results.beenRemoved != true
+					return result.visible === true ? result.playerName : null;}).includes(player.playerName)
+					&& player.playerName !== guesser
 				){
-						return {...player, score: player.score+1, goodHints: player.goodHints + 1}
+						console.log("voted out here")
+						return {...player, score: player.score + 1, goodHints: player.goodHints + 1}
 
-				} else if(player.playerName != guesser) {
+				} else if(player.playerName !== guesser) {
 
 					return {...player, badHints: player.badHints + 1};
 
@@ -764,7 +1202,10 @@ function Game() {
 
 			setScores(newScores);
 
-			if (playerName === roomDetails.host) {
+			const sorted = [...newScores].sort((a,b) => b.score - a.score);
+			setSortedScores(sorted);
+
+			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
 				if (currentIndex === 1) {
 
@@ -819,15 +1260,7 @@ function Game() {
 
         if (remainingGuesses === 0) {
 
-            setStartFade(true);
-
-			setTimeout(() => {
-
-				setStartFade(false);
-
-				setSubmitted(true);
-
-			}, 1000);
+			triggerEndRound();
 
         }
 
@@ -836,59 +1269,99 @@ function Game() {
 
 	useEffect(() => {
 
-		socket.on("receiveUpdateRound" , () => {
+        if (currentIndex === 1) {
 
-			const newIndex = (currentIndex + 1) % cards.length;
-			setCurrentIndex(newIndex);
+            setPrepRevCallsign(true);
 
-			if (newIndex === 0) {
-				setCurrentRound(currentRound => currentRound + 1);
+        }
 
-			}
-		})
+    }, [currentIndex]);
 
-		return () => socket.removeAllListeners("receiveUpdateRound");
 
-	}, [currentIndex, socket]);
+	// useEffect(() => {
+
+	// 	socket.on("receiveUpdateRound" , () => {
+
+	// 		const newIndex = (currentIndex + 1) % cards.length;
+	// 		setCurrentIndex(newIndex);
+
+	// 		if (newIndex === 0) {
+	// 			setCurrentRound(currentRound => currentRound + 1);
+
+	// 		}
+	// 	})
+
+	// 	return () => socket.removeAllListeners("receiveUpdateRound");
+
+	// }, [currentIndex, socket]);
 
 
 	useEffect(() => {
-		// runs when guesser guesses
+
+		// runs when guesser guesses correctly
 		socket.on("receiveUpdateScore" , () => {
+
 			// calculate number of hints eliminated
 			let numRemovedHints = 0;
 
 			let removedHints = [];
+
 			results.map(result => {
-				if(result.visible == false) {
+
+				if (result.visible === false) {
+
 					removedHints.push(result.hint);
+
 				}
+
 			});
 
 			numRemovedHints = removedHints.length;
-			
-			setScores(
-				(prev) => prev.map(player => {
-					if(player.playerName == guesser) {
-						return {...player, 
-							score: player.score + numRemovedHints + 1, 
+
+			setTempScores(
+
+				scores.map((player) => {
+
+					if (player.playerName === guesser) {
+
+						return {
+
+							...player,
+							score: player.score + numRemovedHints + 1,
 							correctGuesses: player.correctGuesses + 1
-							}
+
+						}
+
 					} else {
+
 						return player;
+
 					}
+
 				})
+
 			);
 			
-		})
+		});
 
-		const sortedScores = [...scores].sort((a,b) => b.score - a.score);
-		setSortedScores(sortedScores);
+		// const sortedScores = [...scores].sort((a,b) => b.score - a.score);
+		// setSortedScores(sortedScores);
 
 		return () => socket.removeAllListeners("receiveUpdateScore");
 
-	}, [guesser, submitted, results, socket]);
+	}, [socket, guesser, submitted, results, scores]);
 
+	useEffect(() => {
+
+		if (isLoadingNextRound === false) {
+
+			const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
+
+			setReadyNextRound(readyInGame);
+
+		}
+
+	}, [isLoadingNextRound]);
 
 	const validateWord = (w) => {
 		return !/^[a-z]+$/.test(w) // only one word, lowercase and no special chars
@@ -903,30 +1376,28 @@ function Game() {
 	}
 
 	const generateScoreTable = (cellColour, agentColour) => {
-		let table = <Table className={`text-${cellColour}`}>
-			<TableHeader className="text-center">
-
-				<TableRow className="">
-				<TableHead className="w-0"></TableHead>
-				<TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
-				<TableHead className="text-center text-green-600">Score</TableHead>
-				<TableHead className="text-center  text-green-600">Correct Guesses</TableHead>
-				<TableHead className="text-center  text-green-600">Good Hints</TableHead>
-				<TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+		let table = <Table className={`text-${cellColour} w-full h-full`}>
+			<TableHeader className="w-full h-full">
+				<TableRow className="w-full h-full text-xs">
+					<TableHead className="h-0 pb-4 text-center"></TableHead>
+					<TableHead className="h-0 pb-4 text-center">Player</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Score</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Correct Guesses</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Good Hints</TableHead>
+					<TableHead className="h-0 pb-4 text-center">Bad Hints</TableHead>
 				</TableRow>
-
 			</TableHeader>
 			<TableBody className="text-center">
 				
 				{
 					sortedScores.map((player, index) => {
-						return (<TableRow key={index}>
-						<TableCell className={`font-medium fill-${agentColour}`}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`} style={{fill: "#fbbf24"}}/> : ''}</TableCell>
-						<TableCell className="font-medium">{player.playerName}</TableCell>
-						<TableCell className="font-extrabold">{player.score}</TableCell>
-						<TableCell>{player.correctGuesses}</TableCell>
-						<TableCell>{player.goodHints}</TableCell>
-						<TableCell>{player.badHints}</TableCell>
+						return (<TableRow key={index} className={`${cellColour === "white" ? "hover:bg-gradient-to-r from-black from-10% via-slate-900 via-50% to-black to-90%" : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"}`}>
+						<TableCell className={`absolute -left-2 w-0 font-medium`} style={{ fill: agentColour }}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`}/> : ''}</TableCell>
+						<TableCell className="w-24 font-medium">{player.playerName}</TableCell>
+						<TableCell className="w-24 font-extrabold">{player.score}</TableCell>
+						<TableCell className="w-24">{player.correctGuesses}</TableCell>
+						<TableCell className="w-24">{player.goodHints}</TableCell>
+						<TableCell className="w-24">{player.badHints}</TableCell>
 						</TableRow>)
 					})
 				}
@@ -946,17 +1417,17 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Come up with a one-word hint to help `}</span>
-					<span className="font-bold">{roomDetails?.guesser}</span>
+					<span className="font-bold">{guesser}</span>
 					<span>{` guess their callsign.`}</span>
 				</p>,
 
-			content:  
+			content:
 
 				<SubmitHint 
 					enterHintState={[enterHint, setEnterHint]} 
 					roomDetails={roomDetails} 
 					hintState={[hint, setHint]} 
-					submissionsState={[submissions, setSubmissions]} 
+					resultsState={[results, setResults]}
 					validateWord={validateWord}
 					stemmerWord={stemmerWord}
 					singularizeWord={singularizeWord}
@@ -972,7 +1443,7 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Decide which hints are too similar or illegal. Hints with `}</span>
-					<span className="font-bold">{Math.ceil((inGame?.length - 1) / 2)}</span>
+					<span className="font-bold">{Math.ceil((isVoted?.length - 1) / 2)}</span>
 					<span>{` or more votes will be eliminated.`}</span>
 				</p>,
 
@@ -998,7 +1469,7 @@ function Game() {
 			phase: 
 				<p>
 					<span>{`Reveal all approved hints to `}</span>
-					<span className="font-bold">{roomDetails?.guesser}</span>
+					<span className="font-bold">{guesser}</span>
 					.
 				</p>,		
 
@@ -1025,6 +1496,15 @@ function Game() {
 					generateScoreTable={generateScoreTable}
 					encryptedCallsign={encryptedCallsign}
 					currentRound={currentRound}
+					isLastRoundState={[isLastRound, setIsLastRound]}
+					showEndGameState={[showEndGame, setShowEndGame]}
+					revealCallsignState={[revealCallsign, setRevealCallsign]}
+					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
+					showScoreState={[showScore, setShowScore]}
+					tempScoresState={[tempScores, setTempScores]}
+					isDisconnectedGuesser={isDisconnectedGuesser}
+					isDisconnectedTeam={isDisconnectedTeam}
+					notEnoughPlayers={notEnoughPlayers}
 				/>
 
 		}
@@ -1095,16 +1575,16 @@ function Game() {
 
 						{roomDetails.keepScore && (
 
-							<div className="mr-10">
+							<div className="mr-1">
 								<Popover>
 									<PopoverTrigger asChild>
 									<div className="">
 										<div className="relative">
-											<Button className="justify-right px-3 py-2 font-mono aspect-square mb-1 mr-4" variant="outline">Score: {scores.map(player => player.playerName == playerName ? player.score : "")}</Button>
+											<Button className="justify-right px-3 py-2 font-mono aspect-square mb-1" variant="outline">Score: {scores.map(player => player.playerName === playerName ? player.score : "")}</Button>
 										</div>
 									</div>
 									</PopoverTrigger>
-									<PopoverContent className="w-[36rem] mr-40">
+									<PopoverContent className="w-fit h-fit mr-[9.25rem]">
 										<div className="text-black mt-1 mr-2">
 											{generateScoreTable('black', 'black')}
 										</div>
@@ -1125,9 +1605,15 @@ function Game() {
 									</div>
 								</PopoverTrigger>
 
-								<PopoverContent className="w-96 h-[80vh] overflow-auto mr-20 p-4">
+								<PopoverContent className="w-96 h-[80vh] mr-[5.5rem] p-4">
 
-									<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+									<div className="w-full h-[96%]">
+
+										<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+
+									</div>
+
+									<h4 className="text-[10px] text-center mt-2">The Stranded Agent will not be able to see these messages.</h4>
 
 								</PopoverContent>
 
@@ -1148,11 +1634,15 @@ function Game() {
 								
 								{playerName !== guesser && (
 
-									<p className="text-sm text-center">{callsign}</p>
+									<p className={`text-sm text-center`}>{callsign}</p>
+
+								) || revealCallsign[1] && (
+
+									<p className={`text-sm text-center transition-opacity ease-in-out duration-500 ${revealCallsign[2] ? "" : "opacity-0"}`}>{callsign}</p>
 
 								) || (
 
-									<HiddenIcon className="aspect-square w-5" />
+									<HiddenIcon className={`aspect-square w-5 transition-opacity ease-in-out duration-500 ${revealCallsign[0] ? "opacity-0" : ""}`} />
 									// <p className="text-sm text-center">?</p>
 
 								)}
@@ -1165,13 +1655,13 @@ function Game() {
 							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
 								<p className="text-sm text-center">
 
-									{roomDetails.guesser.length > 20 && (
+									{guesser.length > 20 && (
 
-										`${roomDetails.guesser.substring(0, 20)}...`
+										`${guesser.substring(0, 20)}...`
 
 									) || (
 
-										roomDetails.guesser
+										guesser
 
 									)}
 
@@ -1195,9 +1685,15 @@ function Game() {
 												: (startFade || timeLimitReached) 
 													? "border-stone-800 duration-300" 
 													: "shadow-[inset_0rem_0rem_2rem_0.1rem_#7d7669] border-stone-500 duration-1000"
-											) : correctGuess 
-												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000" 
-												: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+											) : showEndGame 
+												? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
+												: isLastRound
+													? "border-stone-800 duration-1000"
+													: isDisconnectedGuesser
+														? "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
+														: correctGuess
+															? "shadow-[inset_0rem_0rem_2rem_0.1rem_#f59e0b] border-amber-500 duration-3000"
+															: "shadow-[inset_0rem_0rem_2rem_0.1rem_#991b1b] border-red-500 duration-3000"
 							}
 						`} />
 						
@@ -1224,7 +1720,7 @@ function Game() {
 				<AlertDialogContent className="gap-0">
 
 					<AlertDialogHeader className="space-y-2">
-						<AlertDialogTitle className="mb-8">Welcome to Just One!</AlertDialogTitle>
+						<AlertDialogTitle className="mb-8">Welcome to Callsigns!</AlertDialogTitle>
 					</AlertDialogHeader>
 					
 					{(isClosedRoom === null) && (

@@ -1,23 +1,29 @@
-const express = require("express");
+import express from 'express';
 const app = express();
-const wordFile = require("./words/words.json");
 
-const http = require("http");
+import http from "http";
 const server = http.createServer(app);
 
-const io = require("socket.io")(server, {
+import cors from "cors";
+
+import { Server as ioServer } from "socket.io";
+
+const io = new ioServer(server, {
 	cors: {
 		origin: "*",
 		methods: ["GET", "POST"],
-	},
+	}
 });
 
-const cors = require("cors");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const wordFile = require("./words/words.json");
+
+import csvJSON from "./words/convertCsv.js";
+
 app.use(cors());
 
 app.use(express.json());
-
-const { csvJSON } = require("./words/convertCsv");
 
 server.listen(3001, () => {
 	console.log("SERVER RUNNING");
@@ -310,13 +316,23 @@ io.on("connection", (socket) => {
 
 			console.log(socket.username + " is changing their username to " + username);
 
+			const isNull = socket.username === null;
+
 			socket.username = username;
 
 			getSocketInfo();
 
 			const roomList = getPlayersInLobby(roomName);
 
-			io.to(roomName).emit("getRoomList", roomList);
+			if (isNull) {
+
+				io.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
+
+			} else {
+
+				io.to(roomName).emit("getRoomList", roomList);
+
+			}
 
 		} else if (findRoom && !findRoom.isClosedRoom) {
 
@@ -332,11 +348,10 @@ io.on("connection", (socket) => {
 
 			const roomList = getPlayersInLobby(roomName);
 
+			// if successful
 			if (roomList.some(({ playerName }) => { return playerName === username })) {
 
 				socket.emit("getLobby", roomList, findRoom);
-
-				socket.to(roomName).emit("getRoomList", roomList, findRoom.isGameStarted);
 
 				socket.to(findRoom.hostID).emit("sendSelectedPlayers");
 
@@ -518,61 +533,21 @@ io.on("connection", (socket) => {
 
 		} else {
 
-			const selectedInOrder = joinOrder.filter((playerName) => { return selectedPlayers.includes(playerName) });
+			let index = 0;
+			let guesser = {};
 
-			const prevGuesserIndex = selectedInOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
+			do {
 
-			console.log(prevGuesserIndex);
+				index = Math.floor(Math.random() * selectedPlayers.length);
 
-			if (prevGuesserIndex !== -1) {
+				guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
 
-				const currentGuesser = usernames.find(({ username }) => { return username === selectedInOrder[(prevGuesserIndex + 1) % selectedInOrder.length] });
+				console.log(guesser.username, "is the new randomly selected guesser");
 
-				if (currentGuesser) {
+			} while (findRoom.guesserID === guesser.socketID);
 
-					// next to be guesser
-					findRoom.guesser = currentGuesser.username;
-					findRoom.guesserID = currentGuesser.socketID;
-
-					console.log("previous guesser: " + selectedInOrder[prevGuesserIndex]);
-
-					console.log("current guesser: " + currentGuesser.username);
-
-					console.log(findRoom);
-
-				} else {
-
-					console.log("currentGuesser fail");
-
-					const index = Math.floor(Math.random() * selectedPlayers.length);
-
-					const guesser = usernames.find(({ username }) => { return username === selectedPlayers[index] });
-
-					findRoom.guesser = guesser.username;
-					findRoom.guesserID = guesser.socketID;
-
-				}
-
-			} else {
-
-				console.log("prevGuesser fail");
-
-				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
-
-				let offset = 1;
-
-				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
-
-					offset += 1;
-
-				}
-
-				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
-
-				findRoom.guesser = guesser.username;
-				findRoom.guesserID = guesser.socketID;
-
-			}
+			findRoom.guesser = guesser.username;
+			findRoom.guesserID = guesser.socketID;
 
 		}
 
@@ -615,17 +590,21 @@ io.on("connection", (socket) => {
 
 		console.log(`${playerName} is returning to lobby`);
 
+		let roomName = roomID === null ? socket.roomID : roomID;
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomName });
+
+		io.to(roomName).emit("notifyReturnToLobby", playerName);
+
+		if (playerName === findRoom.guesser) {
+
+			socket.to(roomName).emit("guesserDisconnected", playerName, true);
+
+		}
+
 		if (roomID === null) {
 
-			const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
-
-			io.to(socket.roomID).emit("notifyReturnToLobby", playerName);
-
 			socket.emit("navigateLobby", socket.roomID, findRoom.host);
-
-		} else {
-
-			io.to(roomID).emit("notifyReturnToLobby", playerName);
 
 		}
 
@@ -677,34 +656,13 @@ io.on("connection", (socket) => {
 	});
 
 	// host only
-	socket.on("generateNewCallsign", () => {
+	socket.on("selectNextGuesser", (roomID, selectedPlayers, joinOrder) => {
 
-		const callsign = getMysteryWord();
-
-		socket.emit("receiveNewCallsign", callsign);
-
-	});
-
-	// host only
-	socket.on("sendNextCallsign", (callsign, generatedWords) => {
-
-		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
-
-		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
-
-	});
-
-	// host only
-	socket.on("sendNextRound", (selectedPlayers, joinOrder) => {
-
-		const roomList = getPlayersInLobby(socket.roomID);
-
-		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
 
 		// select next guesser
-
 		// get all socketIDs in lobby as strings
-		const socketsInLobby = [...io.sockets.adapter.rooms.get(socket.roomID)];
+		const socketsInLobby = [...io.sockets.adapter.rooms.get(roomID)];
 
 		const usernames = socketsInLobby.map((socketID) => {
 
@@ -797,15 +755,22 @@ io.on("connection", (socket) => {
 
 				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-				let offset = 1;
+				console.log(joinOrder, prevIndex);
 
-				while (!selectedPlayers.includes(joinOrder[(prevIndex + offset) % joinOrder.length])) {
+				let offset = 0;
+				let guesser = {};
 
-					offset += 1;
+				do {
 
-				}
+					offset++;
 
-				const guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
+					guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
+
+					console.log(guesser);
+
+				} while (!guesser || !selectedPlayers.includes(guesser.username));
+
+				console.log(guesser, offset, selectedPlayers, usernames);
 
 				findRoom.guesser = guesser.username;
 				findRoom.guesserID = guesser.socketID;
@@ -813,6 +778,35 @@ io.on("connection", (socket) => {
 			}
 
 		}
+
+		io.to(roomID).emit("receiveNextGuesser", findRoom);
+
+	});
+
+	// host only
+	socket.on("generateNewCallsign", () => {
+
+		const callsign = getMysteryWord();
+
+		socket.emit("receiveNewCallsign", callsign);
+
+	});
+
+	// host only
+	socket.on("sendNextCallsign", (callsign, generatedWords) => {
+
+		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
+
+		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
+
+	});
+
+	// host only
+	socket.on("sendNextRound", () => {
+
+		const roomList = getPlayersInLobby(socket.roomID);
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
 
 		io.to(socket.roomID).emit("receiveNextRound", roomList, findRoom);
 
@@ -854,9 +848,7 @@ io.on("connection", (socket) => {
 
 					if (socket.username === findRoom.guesser) {
 
-						findRoom.guesser = "";
-						findRoom.guesserID = "";
-						findRoom.setGuesser = false;
+						socket.to(room).emit("guesserDisconnected", socket.username, false);
 	
 					}
 	
