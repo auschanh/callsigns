@@ -1403,6 +1403,10 @@ video {
   cursor: not-allowed;
 }
 
+.cursor-none {
+  cursor: none;
+}
+
 .touch-none {
   touch-action: none;
 }
@@ -2520,6 +2524,10 @@ video {
 
 .line-through {
   text-decoration-line: line-through;
+}
+
+.decoration-2 {
+  text-decoration-thickness: 2px;
 }
 
 .underline-offset-4 {

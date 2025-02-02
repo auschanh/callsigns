@@ -270,22 +270,22 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                         
                                         // renders good hints
 
-                                        if (result.playerName !== guesser && result.hint !== "" && hintCount[result.hint] == 1) { // exclude guesser and blank hints
+                                        if (result.playerName !== guesser && result.hint !== "") { // exclude guesser and blank hints
                                             return (
 
                                                 <div key={index} className="flex flex-col min-w-36 items-center gap-2">
                                                     <Label className="text-sm">{result.playerName}</Label>
                                                     <div className="w-full relative">
         
-                                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.count ? "" : "invisible"}`}>
-                                                            <h3 className="text-xs text-slate-50 font-normal">{result.count}</h3>
+                                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.beenRemoved ? "" : "invisible" }`}>
+                                                            <h3 className={`text-xs text-slate-50 font-normal`}>{result.count ? result.count : <X size={12} />}</h3>
                                                         </div>
         
                                                         <Button 
                                                             onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
                                                             variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
-                                                            className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through" : ""}`} 
-                                                            disabled={voted}
+                                                            className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through bg-red-600" : ""}`} 
+                                                            disabled={voted || result.beenRemoved}
                                                         >
                                                             {result.hint}
                                                         </Button>
