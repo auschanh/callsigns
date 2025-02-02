@@ -157,7 +157,6 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
             // player.toRemove = true;
         }
     });
-    console.log(results);
     results.forEach(player => {
         if(hintCount[player.hint] > 1) {
             player.beenRemoved = true;
