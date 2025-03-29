@@ -335,6 +335,14 @@ function JoinRoom() {
 
 		});
 
+        socket.on("receiveNewHost", (roomDetails) => {
+
+			setRoomDetails(roomDetails);
+
+			console.log("The new host is " + roomDetails.host);
+
+		});
+
         return () => {
 
             socket.removeAllListeners("roomExists");
@@ -347,6 +355,7 @@ function JoinRoom() {
             socket.removeAllListeners("newHost");
             socket.removeAllListeners("exitLobby");
             socket.removeAllListeners("receiveNextRound");
+            socket.removeAllListeners("receiveNewHost");
 
         }
 
@@ -363,6 +372,16 @@ function JoinRoom() {
 		}
 
 	}, [inGame]);
+
+    useEffect(() => {
+
+        if (roomDetails && roomDetails.host === username) {
+
+            navigate(`/newhost/${roomID}`);
+
+        }
+
+    }, [roomDetails]);
 
     const handleChatExpansion = () => {
 

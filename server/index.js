@@ -868,6 +868,10 @@ io.on("connection", (socket) => {
 	
 							socket.to(foundSocket.id).emit("newHost");
 	
+						} else {
+
+							socket.to(room).emit("receiveNewHost", findRoom);
+
 						}
 					}
 					

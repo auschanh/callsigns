@@ -99,6 +99,8 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
             toast.dismiss();
 
+            console.log(roomDetails.host);
+
             if (playerName === roomDetails.host) {
 
                 navigate(`/newhost/${roomDetails.roomID}`);

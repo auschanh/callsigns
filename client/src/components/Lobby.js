@@ -298,9 +298,19 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 	}
 
-	const deselectAll = () => {
+	const deselectAll = async () => {
 
 		setSelectedPlayers([]);
+
+		try {
+
+			// await socket.emit("startGame", selectedPlayers, joinOrder);
+
+		} catch (error) {
+
+			throw error;
+
+		}
 
 	}
 

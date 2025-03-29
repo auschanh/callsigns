@@ -821,6 +821,14 @@ function Game() {
 
 		});
 
+		socket.on("receiveNewHost", (roomDetails) => {
+
+			setRoomDetails(roomDetails);
+
+			console.log("The new host is " + roomDetails.host);
+
+		});
+
         return () => {
 			
             socket.removeAllListeners("roomExists");
@@ -835,6 +843,7 @@ function Game() {
 			socket.removeAllListeners("receiveNextRound");
 			socket.removeAllListeners("receiveHintArray");
 			socket.removeAllListeners("guesserDisconnected");
+			socket.removeAllListeners("receiveNewHost");
 
         }
 

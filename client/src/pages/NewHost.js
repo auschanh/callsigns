@@ -66,18 +66,17 @@ function NewHost() {
                     }
     
                     setRoomDetails(roomDetails);
-
                     
-                    // ------ needs some work, the dialog doesn't pop up for legit new hosts
-                    if (playerName !== undefined) {
+                    // // ------ needs some work, the dialog doesn't pop up for legit new hosts
+                    // if (playerName !== undefined) {
 
-                        console.log("host returned to lobby");
+                    //     console.log("host returned to lobby");
 
-                        setAlertOpen(false);
+                    //     setAlertOpen(false);
 
-                        setPlayOpen(true);
+                    //     setPlayOpen(true);
 
-                    }
+                    // }
     
                     try {
         
@@ -113,7 +112,7 @@ function NewHost() {
 
         }
 
-    }, [socket, roomDetails, roomID, playerName])
+    }, [socket, roomDetails, roomID, playerName]);
 
     return (
 
