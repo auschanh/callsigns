@@ -136,33 +136,27 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
     }
 
     const handleClearSelection = () => {
-        setResults(
-            results.map((result) => {
-                return {...result, toRemove: false, beenRemoved: false};
+
+        setResults((prev) => {
+
+            return prev.map((result) => {
+
+                if (hintArray.includes(result.hint)) {
+
+                    return {...result, beenRemoved: true};
+
+                } else {
+
+                    return {...result, toRemove: false, beenRemoved: false};
+
+                }
+
             })
-        );
+
+        });
+
         setIsNoneSelected(true);
     }
-
-    // keep track of which hints appear exacly ONCE
-    // use hintCount as a conditional to render the appropriate hints
-    // any hintCount > 1 does not get rendered
-    const hintCount = {}
-    results.forEach(player => {
-        if(player.hint){
-            hintCount[player.hint] = (hintCount[player.hint] || 0) + 1;
-            // if(hintCount[player.hint] > 1) {
-            //     player.beenRemoved = true;
-            // }   
-            // player.toRemove = true;
-        }
-    });
-    results.forEach(player => {
-        if(hintCount[player.hint] > 1) {
-            player.beenRemoved = true;
-        }
-    })
-        
 
     return (
 
@@ -276,8 +270,8 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                                     <Label className="text-sm">{result.playerName}</Label>
                                                     <div className="w-full relative">
         
-                                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.beenRemoved ? "" : "invisible" }`}>
-                                                            <h3 className={`text-xs text-slate-50 font-normal`}>{result.count ? result.count : <X size={12} />}</h3>
+                                                        <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.beenRemoved || result.count ? "" : "invisible" }`}>
+                                                            <h3 className={`text-xs text-slate-50 font-normal`}>{result.count ? result.count : <X size={12} /> }</h3>
                                                         </div>
         
                                                         <Button 

@@ -712,6 +712,24 @@ function Game() {
 
 			setHintArray(duplicates);
 
+			setResults((prev) => {
+
+				return prev.map((result) => {
+
+					if (duplicates.includes(result.hint)) {
+
+						return {...result, beenRemoved: true};
+
+					} else {
+
+						return result;
+
+					}
+
+				})
+
+			});
+
 		});
 
 		socket.on("guesserDisconnected", (guesser, returnedToLobby) => {
@@ -1133,20 +1151,22 @@ function Game() {
 
 			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
-				// every submitted a hint, create hint Array
-				const tempHintArray = excludeGuesser.map((player, index) => {
-					return player.hint
+				// every submitted hint, create hint Array
+				const tempHintArray = excludeGuesser.map((player) => {
+					return player.hint;
 				});
 
 				const duplicates = tempHintArray.filter((currHint, index) => {
 					return tempHintArray.some((hint, i) => {
-						return currHint === hint && index !== i 
+						return hint === currHint && index !== i 
 					})
 				});
 
-				console.log(duplicates);
+				const duplicatesSet = new Set(duplicates);
 
-				socket.emit("sendHintArray", roomDetails.roomID, duplicates);
+				console.log([...duplicatesSet]);
+
+				socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
 
 				if (currentIndex === 0) {
 
@@ -1165,15 +1185,16 @@ function Game() {
 
 	useEffect(() => {
 
-			// removes guesser from pool, removes voted out hints, and calculates score
+		// removes guesser from pool, removes voted out hints, and calculates score
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
 			if (currentIndex === 1){
+
 				const votedOutResults = results.map((result) => {
 
-					if (result.count >= (Math.ceil(excludeGuesser.length / 2))) {
+					if (result.count >= (Math.ceil(excludeGuesser.length / 2)) || hintArray.includes(result.hint)) {
 	
 						return {...result, visible: false};
 	

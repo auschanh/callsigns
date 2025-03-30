@@ -719,7 +719,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 
                                     results.map((result, index) => {
 
-                                        if (result.playerName !== guesser && result.hint !== "" && (result.beenRemoved !== true) && (result.toRemove !== true)) {
+                                        if (result.playerName !== guesser && result.hint !== "") {
 
                                             return (
 
