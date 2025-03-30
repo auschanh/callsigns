@@ -142,7 +142,8 @@ io.on("connection", (socket) => {
 				isGameStarted: false,
 				guesser: "",
 				guesserID: "",
-				setGuesser: false
+				setGuesser: false,
+				newHostAssigned: false
 			});
 
 			socket.emit("getRoomInfo", `http://localhost:3000/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
@@ -610,6 +611,14 @@ io.on("connection", (socket) => {
 
 	});
 
+	socket.on("newHostNotified", (roomID) => {
+
+		const findRoom = roomLookup.find((room) => { return room.roomID === roomID });
+
+		findRoom.newHostAssigned = false;
+
+	});
+
 	socket.on("gameEnded", () => {
 
 		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID});
@@ -869,6 +878,8 @@ io.on("connection", (socket) => {
 							socket.to(foundSocket.id).emit("newHost");
 	
 						} else {
+
+							findRoom.newHostAssigned = true;
 
 							socket.to(room).emit("receiveNewHost", findRoom);
 

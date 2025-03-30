@@ -67,16 +67,27 @@ function NewHost() {
     
                     setRoomDetails(roomDetails);
                     
-                    // // ------ needs some work, the dialog doesn't pop up for legit new hosts
-                    // if (playerName !== undefined) {
+                    if (!roomDetails.newHostAssigned) {
 
-                    //     console.log("host returned to lobby");
+                        console.log("host has returned to lobby");
 
-                    //     setAlertOpen(false);
+                        setAlertOpen(false);
 
-                    //     setPlayOpen(true);
+                        setPlayOpen(true);
 
-                    // }
+                    } else {
+
+                        try {
+        
+                            socket.emit("newHostNotified", roomID);
+            
+                        } catch (error) {
+            
+                            throw error;
+            
+                        }
+
+                    }
     
                     try {
         

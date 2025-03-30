@@ -382,8 +382,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             toast.dismiss();
 
-            console.log(roomDetails.host);
-
             if (playerName === roomDetails.host) {
 
                 navigate(`/newhost/${roomDetails.roomID}`);
