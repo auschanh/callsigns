@@ -302,13 +302,17 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		setSelectedPlayers([]);
 
-		try {
+		if (guesser) {
 
-			// await socket.emit("startGame", selectedPlayers, joinOrder);
+			try {
 
-		} catch (error) {
-
-			throw error;
+				await socket.emit("selectGuesser", "");
+	
+			} catch (error) {
+	
+				throw error;
+	
+			}
 
 		}
 
