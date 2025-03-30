@@ -1149,34 +1149,34 @@ function Game() {
 
 		if (enterHint && excludeGuesser?.every((submission) => { return submission.hint !== "" })) {
 
-			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+			if (currentIndex === 0) {
 
-				// every submitted hint, create hint Array
-				const tempHintArray = excludeGuesser.map((player) => {
-					return player.hint;
-				});
+				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
-				const duplicates = tempHintArray.filter((currHint, index) => {
-					return tempHintArray.some((hint, i) => {
-						return hint === currHint && index !== i 
-					})
-				});
+					// every submitted hint, create hint Array
+					const tempHintArray = excludeGuesser.map((player) => {
+						return player.hint;
+					});
 
-				const duplicatesSet = new Set(duplicates);
+					const duplicates = tempHintArray.filter((currHint, index) => {
+						return tempHintArray.some((hint, i) => {
+							return hint === currHint && index !== i 
+						})
+					});
 
-				console.log([...duplicatesSet]);
+					const duplicatesSet = new Set(duplicates);
 
-				socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
+					console.log([...duplicatesSet]);
 
-				if (currentIndex === 0) {
+					socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
 
 					console.log("HOST set current index: 1");
 
 					handleNext();
 
-				}
+				} 
 
-			} 
+			}
 
 		}
 
@@ -1190,7 +1190,7 @@ function Game() {
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
 
-			if (currentIndex === 1){
+			if (currentIndex === 1) {
 
 				const votedOutResults = results.map((result) => {
 
@@ -1236,6 +1236,7 @@ function Game() {
 	
 				const sorted = [...newScores].sort((a,b) => b.score - a.score);
 				setSortedScores(sorted);
+
 			}
 			
 
