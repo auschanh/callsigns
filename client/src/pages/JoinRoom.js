@@ -1,15 +1,11 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Chat from "../components/Chat";
 import { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
@@ -31,6 +27,8 @@ function JoinRoom() {
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
 
     const [username, setUsername] = useState();
+
+    const [tempUsername, setTempUsername] = useState("");
 
     const [success, setSuccess] = useState(0);
 
@@ -62,6 +60,12 @@ function JoinRoom() {
         if (!username) {
 
             setOpen(true);
+
+        }
+
+        if (!open && username) {
+
+            setTempUsername(username);
 
         }
 
@@ -389,32 +393,38 @@ function JoinRoom() {
 
 	}
 
-    const form = useForm();
+    function handleInputChange(event) {
 
-    function onSubmit(values) {
+        setTempUsername(event.target.value);
+
+	}
+
+    function onSubmit(event) {
+
+        event.preventDefault();
 
         // username cannot be blank
-        if (values.username === "") {
+        if (tempUsername === "") {
 
             invalidUsernameRef.current.innerText = "Please enter a username.";
 
         // username cannot contain any spaces
-        } else if (/\s/.test(values.username)) {
+        } else if (/\s/.test(tempUsername)) {
 
             invalidUsernameRef.current.innerText = "Username cannot contain spaces."
 
         // username must be at least 3 characters
-        } else if (!/.{3,}/.test(values.username)) {
+        } else if (!/.{3,}/.test(tempUsername)) {
 
             invalidUsernameRef.current.innerText = "Username must be at least 3 characters long.";
 
         // username must contain at least one letter
-        } else if (!/(.*[a-z]){1}/i.test(values.username)) {
+        } else if (!/(.*[a-z]){1}/i.test(tempUsername)) {
 
             invalidUsernameRef.current.innerText = "Username must contain at least one letter.";
 
         // cannot enter an existing username
-        } else if (values.username !== username && inLobby.some((player) => { return player.playerName === values.username })) {
+        } else if (tempUsername !== username && inLobby.some((player) => { return player.playerName === tempUsername })) {
 
             invalidUsernameRef.current.innerText = "This username has already been taken.";
 
@@ -422,9 +432,9 @@ function JoinRoom() {
 
             invalidUsernameRef.current.innerText = "";
 
-            console.log(values.username);
+            console.log(tempUsername);
 
-            setUsername(values.username);
+            setUsername(tempUsername);
 
             setOpen(false);
 
@@ -830,41 +840,51 @@ function JoinRoom() {
                             <AlertDialogHeader className="space-y-0 mb-8">
                                 <AlertDialogTitle>Welcome to Callsigns!</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    You'll be joining {roomDetails.roomName}
+
+                                    {!username && (
+                                    
+                                        <>You'll be joining {roomDetails.roomName}</>
+                                    
+                                    ) || (
+
+                                        <>You're currently in {roomDetails.roomName}</>
+
+                                    )}
+                                    
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
 
-                            <Form {...form}>
-                                <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-                                    <FormField
-                                        defaultValue={''}
-                                        control={form.control}
-                                        name="username"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Username</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        autoFocus
-                                                        placeholder={"Enter Your Username"} 
-                                                        {...field}
-                                                        id="username"
-                                                        onFocus={(event) => event.target.select()}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                            <div className="space-y-1">
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    autoFocus
+                                    type="text"
+                                    placeholder={"Enter Your Username"}
+                                    id="username"
+                                    name="username"
+                                    onFocus={(event) => event.target.select()}
+                                    value={tempUsername}
+                                    onChange={handleInputChange}
+                                    onKeyPress={(e) => { if (e.key === "Enter") {onSubmit(e)}}}
+                                />
+                            </div>
+      
+                            <div className="my-2 h-8">
+                                <p className="text-xs text-red-500" ref={invalidUsernameRef}></p>
+                            </div>
+                               
 
-                                    <div className="my-2 h-8">
-                                        <p className="text-xs text-red-500" ref={invalidUsernameRef}></p>
-                                    </div>
-                                    
-                                    <Button className="flex flex-row self-end" type="submit">Submit</Button>
+                            <div className="flex flex-row justify-end gap-3">
 
-                                </form>
-                            </Form>
+                                {username && (
+
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                                )}
+
+                                <AlertDialogAction onClick={onSubmit}>Submit</AlertDialogAction>
+
+                            </div>
 
                         </>
 
