@@ -370,6 +370,14 @@ io.on("connection", (socket) => {
 
 	});
 
+	socket.on("setNewHost", (roomName, username) => {
+
+		const findRoom = roomLookup.find(({ roomID }) => { return roomID === roomName });
+
+		findRoom.host = username;
+
+	});
+
 	socket.on("sendIsReady", (roomID) => {
 
 		socket.isReady = !socket.isReady;
@@ -872,14 +880,13 @@ io.on("connection", (socket) => {
 	
 						findRoom.host = foundSocket.username;
 						findRoom.hostID = foundSocket.id;
+						findRoom.newHostAssigned = true;
 	
 						if (!findRoom.isGameStarted) {
 	
 							socket.to(foundSocket.id).emit("newHost");
 	
 						} else {
-
-							findRoom.newHostAssigned = true;
 
 							socket.to(room).emit("receiveNewHost", findRoom);
 

@@ -48,6 +48,8 @@ function JoinRoom() {
 
     const [open, setOpen] = useState(true);
 
+    const [isNewHost, setIsNewHost] = useState(false);
+
     // use %20 in address bar for space
     const { roomID } = useParams();
 
@@ -123,8 +125,6 @@ function JoinRoom() {
             if (!inLobby.find(({playerName}) => { return playerName === username })) {
 
                 console.log("registering username");
-
-                // setIsFoundRoom(false);
 
                 (async () => {
 
@@ -313,7 +313,15 @@ function JoinRoom() {
 
         socket.on("newHost", () => {
 
-            navigate(`/newhost/${roomID}`);
+            if (!username) {
+
+                setIsNewHost(true);
+
+            } else {
+
+                navigate(`/newhost/${roomID}`);
+
+            }
 
         });
 
@@ -386,6 +394,32 @@ function JoinRoom() {
         }
 
     }, [roomDetails]);
+
+    useEffect(() => {
+
+        if (isNewHost && username) {
+
+            setIsNewHost(false);
+
+            (async () => {
+
+                try {
+
+                    await socket.emit("setNewHost", roomID, username);
+
+                } catch (error) {
+
+                    throw error;
+
+                }
+
+            })();
+
+            navigate(`/newhost/${roomID}`);
+
+        }
+
+    }, [inLobby]);
 
     const handleChatExpansion = () => {
 
