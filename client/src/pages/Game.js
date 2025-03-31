@@ -115,6 +115,8 @@ function Game() {
 
 	const [notEnoughPlayers, setNotEnoughPlayers] = useState(false);
 
+	const [startNumPlayers, setStartNumPlayers] = useState();
+
 	const navigate = useNavigate();
 
 	const { roomID } = useParams();
@@ -338,6 +340,8 @@ function Game() {
 		if (roomDetails === undefined) {
 
             console.log("checking room");
+
+			setStartNumPlayers(selectedPlayers.length);
 
             (async () => {
 
@@ -872,212 +876,218 @@ function Game() {
 	// remove disconnected players so we don't have to wait for their input
 	useEffect(() => {
 
-		// we don't want to wait for disconnected players to submit a hint
-		// filter out submissions of disconnected players
-		setSubmissions(
+		if (inGame?.length !== startNumPlayers) {
 
-			submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
+			// we don't want to wait for disconnected players to submit a hint
+			// filter out submissions of disconnected players
+			setSubmissions(
 
-		);
+				submissions?.filter((submission) => { return inGame.includes(submission.playerName)})
 
-		// if a disconnected player has already submitted a hint, leave the hint
-		setResults(
-	
-			results?.filter((player) => {
+			);
 
-				if (player.hint !== "") {
-
-					return player;
-
-				} else {
-
-					return inGame.includes(player.playerName);
-
-				}
-
-			})
-
-		);
-
-		// we don't want to wait for disconnected players to vote
-		// filter out has-voted-status of disconnected players
-		setIsVoted(
-
-			isVoted?.filter((player) => {
-
-				if (player.voted) {
-
-					return player;
-
-				} else {
-
-					return inGame.includes(player.playerName);
-
-				}
-
-			})
-
-		);
-
-		// we don't want to wait for disconnected players to ready up for the next round
-		const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
-
-		if (!isDisconnectedGuesser && currentIndex === 2 && !submitted && validate && !inGame.includes(roomDetails.guesser)) {
-
-			if (inGame.length < 2) {
-
-				setReadyNextRound(readyInGame);
-
-				console.log("skip animation");
-
-			} else {
-
-				setTimeout(() => {
-
-					// if there are less than 3 players left in the game, players will need to return to lobby
-					if (inGame.length < 3) {
-
-						setNotEnoughPlayers(true);
-
-						setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
-
-						console.log("not enough players");
-
-					} else {
-
-						setReadyNextRound(readyInGame);
-
-						console.log(readyInGame);
-
-					}
-
-				}, 1000);
-
-			}
+			// if a disconnected player has already submitted a hint, leave the hint
+			setResults(
 		
-		} else {
+				results?.filter((player) => {
 
-			// if there are less than 3 players left in the game, players will need to return to lobby
-			if (inGame?.length < 3) {
+					if (player.hint !== "") {
 
-				setNotEnoughPlayers(true);
-
-				setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
-
-				console.log("not enough players");
-
-			} else {
-
-				setReadyNextRound(readyInGame);
-
-				console.log(readyInGame);
-
-			}
-
-		}
-
-		if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
-
-			console.log(inGame);
-
-			if (inGame.includes(roomDetails.guesser)) {
-
-				setIsLoadingNextRound(true);
-
-				setGuesser(roomDetails.guesser);
-
-				setRevealCallsign([false, false, false]);
-
-				if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
-
-					console.log("TRIGGER NEXT ROUND");
-
-					(async () => {
-
-						try {
-			
-							await socket.emit("generateNewCallsign");
-			
-						} catch (error) {
-			
-							throw error;
-			
-						}
-			
-					})();
-				}
-
-			} else {
-
-				console.log("nextGuesser not here");
-
-			}
-		}
-
-		// remove disconnected players from score table
-		setScores(
-
-			scores?.filter((player) => { return inGame.includes(player.playerName) })
-
-		);
-
-		setSortedScores(
-
-			sortedScores?.filter((player) => { return inGame.includes(player.playerName) })
-
-		);
-
-		if (inGame?.length === 1 && playerName === guesser) {
-
-			if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
-
-				console.log("fade team disconnect");
-
-				setStartFade(true);
-
-				setTimeout(() => {
-
-					setIsDisconnectedTeam(true);
-
-					setPrepRevCallsign(true);
-
-					setShowScore(false);
-
-					if (currentIndex === 2 && !submitted && validate) {
-
-						setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
-
-						setTimeout(() => {
-
-							setStartFade(false);
-
-						}, 1300);
+						return player;
 
 					} else {
 
-						setCurrentIndex(2);
-
-						setSubmitted(false);
-
-						setValidate(true);
-
-						setTimeout(() => {
-
-							setStartFade(false);
-
-						}, 500);
+						return inGame.includes(player.playerName);
 
 					}
 
-				}, 1000);
+				})
 
+			);
+
+			// we don't want to wait for disconnected players to vote
+			// filter out has-voted-status of disconnected players
+			setIsVoted(
+
+				isVoted?.filter((player) => {
+
+					if (player.voted) {
+
+						return player;
+
+					} else {
+
+						return inGame.includes(player.playerName);
+
+					}
+
+				})
+
+			);
+
+			// we don't want to wait for disconnected players to ready up for the next round
+			const readyInGame = readyNextRound?.filter((player) => { return inGame.includes(player.playerName) });
+
+			if (!isDisconnectedGuesser && currentIndex === 2 && !submitted && validate && !inGame.includes(roomDetails.guesser)) {
+
+				if (inGame.length < 2) {
+
+					setReadyNextRound(readyInGame);
+
+					console.log("skip animation");
+
+				} else {
+
+					setTimeout(() => {
+
+						// if there are less than 3 players left in the game, players will need to return to lobby
+						if (inGame.length < 3) {
+
+							setNotEnoughPlayers(true);
+
+							setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+
+							console.log("not enough players");
+
+						} else {
+
+							setReadyNextRound(readyInGame);
+
+							console.log(readyInGame);
+
+						}
+
+					}, 1000);
+
+				}
+			
 			} else {
 
-				console.log("skip animation");
+				// if there are less than 3 players left in the game, players will need to return to lobby
+				if (inGame?.length < 3) {
+
+					setNotEnoughPlayers(true);
+
+					setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
+
+					console.log("not enough players");
+
+				} else {
+
+					setReadyNextRound(readyInGame);
+
+					console.log(readyInGame);
+
+				}
 
 			}
 
-		}
+			if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
+
+				console.log(inGame);
+
+				if (inGame.includes(roomDetails.guesser)) {
+
+					setIsLoadingNextRound(true);
+
+					setGuesser(roomDetails.guesser);
+
+					setRevealCallsign([false, false, false]);
+
+					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+
+						console.log("TRIGGER NEXT ROUND");
+
+						(async () => {
+
+							try {
+				
+								await socket.emit("generateNewCallsign");
+				
+							} catch (error) {
+				
+								throw error;
+				
+							}
+				
+						})();
+					}
+
+				} else {
+
+					console.log("nextGuesser not here");
+
+				}
+			}
+
+			// remove disconnected players from score table
+			setScores(
+
+				scores?.filter((player) => { return inGame.includes(player.playerName) })
+
+			);
+
+			setSortedScores(
+
+				sortedScores?.filter((player) => { return inGame.includes(player.playerName) })
+
+			);
+
+			if (inGame?.length === 1 && playerName === guesser) {
+
+				if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
+
+					console.log("fade team disconnect");
+
+					setStartFade(true);
+
+					setTimeout(() => {
+
+						setIsDisconnectedTeam(true);
+
+						setPrepRevCallsign(true);
+
+						setShowScore(false);
+
+						if (currentIndex === 2 && !submitted && validate) {
+
+							setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
+
+							setTimeout(() => {
+
+								setStartFade(false);
+
+							}, 1300);
+
+						} else {
+
+							setCurrentIndex(2);
+
+							setSubmitted(false);
+
+							setValidate(true);
+
+							setTimeout(() => {
+
+								setStartFade(false);
+
+							}, 500);
+
+						}
+
+					}, 1000);
+
+				} else {
+
+					console.log("skip animation");
+
+				}
+
+			}
+
+			setStartNumPlayers(inGame.length);
+
+		} 
 
 	// live list of players currently in the game (not just in the lobby)
 	}, [inGame]);
