@@ -451,7 +451,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                 {!submitted && validate && (
                     
-                    <div className={`h-[40vh] px-24 flex flex-none flex-col justify-center text-xs w-full text-center gap-16 validate`}>
+                    <div className={`h-[40vh] px-20 flex flex-none flex-col justify-center text-xs w-full text-center gap-16 validate`}>
                         
                         {showScore && (
                             
@@ -709,7 +709,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                         
                         <Label className="mb-12 text-lg leading-none text-center">Your hints have been revealed!</Label>
 
-                        <div className="flex flex-row flex-wrap justify-center gap-4">
+                        <div className={`flex flex-row flex-wrap justify-center gap-4 ${results.length < 6 ? "w-full" : "sm:w-[80%] 2xl:w-[60%]" }`}>
 
                             <TooltipProvider>                    
 

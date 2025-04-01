@@ -162,7 +162,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
 
         <div className="flex flex-none w-full h-full justify-center items-center">
 
-            <div className="w-full relative py-12 px-24 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
+            <div className="w-full relative py-12 px-8 bg-gradient-to-tr from-slate-100 via-slate-300 to-slate-100 border border-solid border-slate-400 rounded-lg">
 
                 {playerName === guesser && (
 
@@ -183,15 +183,16 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                     {playerName === guesser && (
 
                         <>
-                            <p className="mb-6 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
-
-                            <Progress
-                                value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (isVoted.length - 1) * 100}
-                                max={100}
-                            /> 
+                            <div className="w-full px-16">
+                                <p className="mb-10 text-center">{isVoted.filter(player => player.voted).length} {isVoted.filter(player => player.voted).length === 1 ? "Agent has" : "Agents have"} submitted a vote.</p>
+                                <Progress
+                                    value={(isVoted.filter(player => player.voted && playerName === guesser)).length / (isVoted.length - 1) * 100}
+                                    max={100}
+                                /> 
+                            </div>
 
                             {/* render badges for player vote status */}
-                            <div className="flex flex-row flex-none flex-wrap mt-6 justify-center w-full px-24 gap-4">
+                            <div className="flex flex-row flex-none flex-wrap mt-12 justify-center w-full px-24 gap-4">
 
                                 {isVoted?.map((player, index) => {
                                     
@@ -253,9 +254,9 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                     
                         <>
 
-                            <Label className="mb-12 text-lg leading-none text-center">Select the hints that are too similar or illegal:</Label>
+                            <Label className="text-lg leading-none text-center mb-8">Select the hints that are too similar or illegal:</Label>
 
-                            <div className="flex flex-row flex-wrap justify-center gap-10">
+                            <div className={`flex flex-row flex-wrap justify-center gap-6 ${results.length < 6 ? "w-full" : "sm:w-[70%] 2xl:w-[60%]" }`}>
                             
                                 {results.some((result) => { return result.hint !== "" }) && (
 
@@ -301,13 +302,9 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
 
                             </div>
 
-                            <div className="mt-12">
+                            <h3 className="text-sm mt-12 mb-4">Hints with <span className="font-bold">{Math.ceil((isVoted.length - 1) / 2)}</span> or more votes will be eliminated</h3>
 
-                                <h3 className="text-sm">Hints with <span className="font-bold">{Math.ceil((isVoted.length - 1) / 2)}</span> or more votes will be eliminated</h3>
-
-                            </div>
-
-                            <div className="flex flex-row justify-center gap-4 mt-6">
+                            <div className="flex flex-row justify-center gap-4 mb-10">
 
                                 {results.some((result) => { return result.hint !== "" }) && (
 
@@ -384,6 +381,38 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                     </Button>
 
                                 )}
+
+                            </div>
+
+                            <div className="flex flex-row flex-none flex-wrap justify-center w-full mb-2 px-24 gap-4">
+
+                                {isVoted?.map((player, index) => {
+                                    
+                                    if (player.playerName !== guesser) {
+
+                                        return (
+
+                                            <Button
+                                                key={index}
+                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-auto"
+                                                variant={`${player.voted !== false ? "green" : "grey"}`}
+                                            >
+
+                                                <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
+                                                    {player.voted !== false && (
+                                                        <Check className="text-slate-900" size={14} />
+                                                    ) || (
+                                                        <Ellipsis className="text-slate-900" size={14} />
+                                                    )}
+                                                </div>
+
+                                                <p className="text-xs">{player.playerName}</p>
+
+                                            </Button>
+                                        );
+                                    }
+
+                                })}
 
                             </div>
                     

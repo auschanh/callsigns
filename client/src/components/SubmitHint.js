@@ -257,9 +257,9 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
 
                             {playerName === guesser && (
 
-                                <div className="mb-8">
+                                <div className="mb-12">
 
-                                    <p className="mb-6 text-center">{results.filter(vote => vote.hint).length} {results.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
+                                    <p className="mb-10 text-center">{results.filter(vote => vote.hint).length} {results.filter(vote => vote.hint).length === 1 ? "Agent has" : "Agents have"} submitted a hint.</p>
 
                                     <Progress 
                                         value={
@@ -315,7 +315,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
 
                             )}
 
-                            <div className="flex flex-row flex-none flex-wrap justify-center w-full mt-6 px-24 gap-4">
+                            <div className="flex flex-row flex-none flex-wrap justify-center w-full mt-6 gap-4">
 
                                 {/* {results?.map((result, index) => {
 
