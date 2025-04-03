@@ -63,7 +63,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         submissions.map((submission, index) => {
 
-            return index === 0 ? {...submission, toRemove: false, beenRemoved: false, visible: true} : {...submission, toRemove: false, beenRemoved: false, visible: false};
+            return index === 0 ? {...submission, toRemove: false, beenRemoved: false, visible: true} : index === 3 ? {...submission, toRemove: false, beenRemoved: false, visible: false} : {...submission, toRemove: false, beenRemoved: true, visible: false};
 
         })
 
@@ -216,7 +216,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
             results.map((result, index) => {
 
-                return index === 0 ? {...result, toRemove: false, beenRemoved: false, visible: true} : {...result, toRemove: false, beenRemoved: false};
+                return index === 0 ? {...result, toRemove: false, beenRemoved: false, visible: true} : index === 3 ? {...result, toRemove: false, beenRemoved: false} : result;
 
             })
 
@@ -232,9 +232,9 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         setResults(
 
-            results.map((result) => {
+            results.map((result, index) => {
 
-                return {...result, toRemove: false, beenRemoved: false};
+                return index === 1 || index === 2 ? result : {...result, toRemove: false, beenRemoved: false};
 
             })
 
@@ -370,9 +370,9 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                     <Label className="text-xs text-slate-300">{result.playerName}</Label>
                                     <Button 
                                         onClick={voted ? () => {} : () => selectToRemove(result.playerName)} 
-                                        variant={!result.toRemove ? "grey" : voted ? "red" : "amber"} 
+                                        variant={result.beenRemoved ? "red" : !result.toRemove ? "grey" : voted ? "red" : "amber"} 
                                         className={`flex mt-1 p-2 w-full max-w-sm justify-center ${result.beenRemoved ? "line-through" : ""}`} 
-                                        disabled={voted}
+                                        disabled={voted || result.beenRemoved}
                                     >
                                         {result.hint}
                                     </Button>
@@ -450,7 +450,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
         footer: 
             <div>
                 {/* Once all players have submitted their one-word hints, they must then determine if any of their hints are too similar to one another or to the mystery word itself. */}
-                Once all hints are submitted, players must then determine if any of the hints are too similar to one another or to the callsign itself.
+                Once all hints are submitted, players must then determine if any of the hints are too similar to one another or to the callsign itself. Identical hints will be removed automatically.
             </div>
 
     }, {
