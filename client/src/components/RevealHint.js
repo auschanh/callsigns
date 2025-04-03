@@ -457,42 +457,49 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                             
                             <div className="flex flex-col items-center w-full mt-[3%]">
 
-                                {/* <h1 className="text-amber-500 text-3xl mb-8">Scores</h1> */}
+                                <div className="flex flex-col w-[70%] h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
 
-                                <div className="flex flex-col w-full h-full py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#4f46e5] border-indigo-600">
+                                    <div className="max-w-[90%]">
+                                    
+                                        <div className="w-full mb-4">
+                                            <h1 className="text-slate-100 text-xl text-left mb-1">Score Table</h1>
+                                            <div className="w-full bg-indigo-600 h-[0.25rem]"/>
+                                        </div>
 
-                                    <div className="max-w-[80%]">
-                                        
-                                        {generateScoreTable('white', '#94a3b8')}
+                                        <div className="">
+                                            
+                                            {generateScoreTable('white', '#94a3b8')}
+
+                                        </div>
+
+                                        {/* <Table className="text-white">
+                                            <TableHeader className="text-center">
+
+                                                <TableRow className="">
+                                                <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
+                                                <TableHead className="text-center text-green-600">Score</TableHead>
+                                                <TableHead className="text-center  text-green-600">Good Hints</TableHead>
+                                                <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
+                                                </TableRow>
+
+                                            </TableHeader>
+                                            <TableBody className="text-center">
+                                                
+                                                {
+                                                    sortedScores.map((player, index) => {
+                                                    return (<TableRow key={index}>
+                                                        <TableCell className="font-medium">{player.playerName}</TableCell>
+                                                        <TableCell classList="font-extrabold">{player.score}</TableCell>
+                                                        <TableCell>{player.goodHints}</TableCell>
+                                                        <TableCell>{player.badHints}</TableCell>
+                                                        </TableRow>)
+                                                    })
+                                                }
+                                                
+                                            </TableBody>
+                                        </Table> */}
 
                                     </div>
-
-                                    {/* <Table className="text-white">
-                                        <TableHeader className="text-center">
-
-                                            <TableRow className="">
-                                            <TableHead className="w-[100px] text-center text-green-600">Player</TableHead>
-                                            <TableHead className="text-center text-green-600">Score</TableHead>
-                                            <TableHead className="text-center  text-green-600">Good Hints</TableHead>
-                                            <TableHead className="text-center  text-green-600">Bad Hints</TableHead>
-                                            </TableRow>
-
-                                        </TableHeader>
-                                        <TableBody className="text-center">
-                                            
-                                            {
-                                                sortedScores.map((player, index) => {
-                                                return (<TableRow key={index}>
-                                                    <TableCell className="font-medium">{player.playerName}</TableCell>
-                                                    <TableCell classList="font-extrabold">{player.score}</TableCell>
-                                                    <TableCell>{player.goodHints}</TableCell>
-                                                    <TableCell>{player.badHints}</TableCell>
-                                                    </TableRow>)
-                                                })
-                                            }
-                                            
-                                        </TableBody>
-                                    </Table> */}
 
                                 </div>
 
