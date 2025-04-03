@@ -574,7 +574,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                 </div>
                 <div>
                     <h1 className="text-2xl font-normal">Scoring</h1>
-                    <p className="mt-0 text-sm text-slate-100/70">If your team is keeping score, here's how you can earn some points!</p>
+                    <p className="mt-0 text-sm text-slate-100/70">If your team is keeping score, here's how you can score some points!</p>
                     <div className="mt-8 space-y-8">
                         <div>
                             <div className="flex flex-row flex-none items-center">

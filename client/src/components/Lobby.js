@@ -426,11 +426,14 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 						<div className="text-xs">
 
 							<h2 className="underline font-semibold mb-1">Game Settings</h2>
-							<p>Number of Guesses: <span className="font-semibold">{`${Number(gameInfo.numGuesses) !== 11 ? Number(gameInfo.numGuesses) : "Unlimited"}`}</span></p>
-							<p>Number of Rounds: <span className="font-semibold">{`${Number(gameInfo.numRounds) !== 11 ? Number(gameInfo.numRounds) : "Unlimited"}`}</span></p>
-							<p>Timer: <span className="font-semibold">{`${Number(gameInfo.timeLimit) !== 0 ? ((Math.floor(Number(gameInfo.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(gameInfo.timeLimit) / 60)) + "m ")) + ((Number(gameInfo.timeLimit) % 60) + "s") : "Off"}`}</span></p>
-							<p>Scoring: <span className="font-semibold">{`${gameInfo.keepScore ? "On" : "Off"}`}</span></p>
 
+							<div className="grid grid-cols-2">
+								<p>Number of Guesses: <span className="font-semibold">{`${Number(gameInfo.numGuesses) !== 11 ? Number(gameInfo.numGuesses) : "Unlimited"}`}</span></p>
+								<p>Number of Rounds: <span className="font-semibold">{`${Number(gameInfo.numRounds) !== 11 ? Number(gameInfo.numRounds) : "Unlimited"}`}</span></p>
+								<p>Timer: <span className="font-semibold">{`${Number(gameInfo.timeLimit) !== 0 ? ((Math.floor(Number(gameInfo.timeLimit) / 60)) === 0 ? "" : ((Math.floor(Number(gameInfo.timeLimit) / 60)) + "m ")) + ((Number(gameInfo.timeLimit) % 60) + "s") : "Off"}`}</span></p>
+								<p>Scoring: <span className="font-semibold">{`${gameInfo.keepScore ? "On" : "Off"}`}</span></p>
+							</div>
+							
 						</div>
 
 					</div>
