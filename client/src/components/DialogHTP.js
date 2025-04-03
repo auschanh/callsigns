@@ -8,7 +8,9 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
-import { Check, X, Trash2, RotateCcw } from "lucide-react";
+import { Check, X, Trash2, RotateCcw, User, Trophy } from "lucide-react";
+import { ReactComponent as TrophySVG } from "../assets/trophy.svg";
+import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
 import { stemmer } from "stemmer";
 import pluralize from "pluralize";
 
@@ -456,7 +458,6 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
     }, {
 
         content:
-            // defaultValue={["item-1", "item-2"]}
             <Accordion className="flex flex-none flex-col mx-12 text-slate-200" type="single" collapsible>
                 <AccordionItem className="w-full border-slate-400" value="item-1">
                     <AccordionTrigger>Good hints are usually:</AccordionTrigger>
@@ -562,6 +563,46 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                 Finally, all of the approved hints will be revealed to the Stranded Agent who must then use only these hints to successfully guess their callsign.
             </div>
 
+    }, {
+    
+        content: 
+            <div className="flex flex-row flex-none w-full h-full px-10 py-8 gap-9 text-slate-100 text-sm rounded-2xl bg-gradient-to-tr from-violet-950 from-30% via-purple-900 via-70% to-[#5e2cae] to-100%">
+                <div className="h-full flex flex-row flex-none ">
+                    {/* <Trophy className="flex flex-col self-top" color="#f1f5f9" size={50} strokeWidth={1} /> */}
+                    <TrophySVG className="h-12 fill-slate-50" />
+                    <div className="h-full w-[0.1rem] ml-9 bg-slate-50"></div>
+                </div>
+                <div>
+                    <h1 className="text-2xl font-normal">Scoring</h1>
+                    <p className="mt-0 text-sm text-slate-100/70">If your team is keeping score, here's how you can earn some points!</p>
+                    <div className="mt-8 space-y-8">
+                        <div>
+                            <div className="flex flex-row flex-none items-center">
+                                <div className="flex flex-row flex-none justify-center items-center bg-slate-100 rounded-lg w-8 aspect-square">
+                                    <User color="black" size={16}/>
+                                </div>
+                                <h2 className="italic text-slate-100/80 ml-4">As an agent:</h2>
+                            </div>
+                            <ul className="list-disc ml-16 text-sm/5">
+                                <li><p>You will score 1 point for every submitted hint that does not get eliminated.</p></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div className="flex flex-row flex-none items-center">
+                                <div className="flex flex-row flex-none justify-center items-center bg-slate-100 rounded-lg w-8 aspect-square">
+                                    <AgentIcon className="w-6 fill-slate-950"/>
+                                </div>
+                                <h2 className="italic text-slate-100/80 ml-4">As the Stranded Agent:</h2>
+                            </div>
+                            <ul className="list-disc ml-16 text-sm/5">
+                                <li><p>You will score 1 point if you guess your callsign correctly and an additional point for every eliminated hint.</p></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>,
+        footer: ''
+
     }];
 
     return (
@@ -602,10 +643,10 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
                         {rules.map((card, index) => {
 
-                            return (
+                            return index !== 6 ? (
 
                                 <Card key={index} className="flex-none flex-col w-full h-full border-slate-400 overflow-auto bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
-                                    <div className="grid grid-flow-row  grid-rows-12 h-full">
+                                    <div className="grid grid-flow-row grid-rows-12 h-full">
                                         <CardContent className="grid row-span-8 mt-6 py-0">
                                             {card.content}
                                         </CardContent>
@@ -613,6 +654,16 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                         {/* <CardFooter className="flex flex-col bg-slate-50 h-[55%] rounded-lg border border-slate-400 row-span-4 mt-4 mx-12 px-8 py-0 items-start justify-center"> */}
                                             {card.footer}
                                         </CardFooter>
+                                    </div>
+                                </Card>
+
+                            ) : (
+
+                                <Card key={index} className="flex-none flex-col w-full h-full border-slate-400 overflow-auto bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-slate-950 to-100%" style={{ marginRight: `${spaceBetweenSlides}rem` }}>
+                                    <div className="h-[80%]">
+                                        <CardContent className="h-full mt-6 py-0">
+                                            {card.content}
+                                        </CardContent>
                                     </div>
                                 </Card>
 
