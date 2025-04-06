@@ -1199,7 +1199,8 @@ function Game() {
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
-
+			
+			console.log("results, before votedOutResults: ", results)
 			if (currentIndex === 1) {
 
 				const votedOutResults = results.map((result) => {
@@ -1218,14 +1219,14 @@ function Game() {
 	
 				setResults(votedOutResults);
 	
-				console.log(votedOutResults.map(result => {
-					return result.visible === false ? result.playerName : null;
-				}));
+				// console.log(votedOutResults.map(result => {
+				// 	return result.visible === false ? result.playerName : null;
+				// }));
 	
 				const newScores = scores.map((player => {
 					console.log("Voted out Results:", votedOutResults);
 					if(votedOutResults.map(result => { // if hint was not removed and they are not the guesser
-						return result.beenRemoved === false ? result.playerName : null;}).includes(player.playerName)
+						return result.visible == true ? result.playerName : null;}).includes(player.playerName)
 						&& player.playerName !== guesser
 					){
 							console.log("CALCULATING A GOOD HINT");
@@ -1348,12 +1349,12 @@ function Game() {
 
 			// calculate number of hints eliminated
 			let numRemovedHints = 0;
-
 			let removedHints = [];
+			const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 			results.map(result => {
 
-				if (result.visible === false || result.beenRemoved) {
+				if (result.visible === false || result.count >= (Math.ceil(excludeGuesser.length / 2))) {
 
 					removedHints.push(result.hint);
 
