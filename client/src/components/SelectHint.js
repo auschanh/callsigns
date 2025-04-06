@@ -88,7 +88,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
             return;
 
         }
-
+        console.log("handleRemove function before setting results: ", results);
         console.log(results);
 
         setResults(
@@ -100,6 +100,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
             })
 
         );
+        console.log("results after handleRemove: ", results);
 
         setVoted(true);
 
@@ -114,8 +115,8 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
             return;
 
         }
-
-        console.log(results);
+        console.log("handleCancel function before setting results: ", results);
+        // console.log(results);
 
         setResults(
 
@@ -126,7 +127,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
             })
 
         );
-
+        console.log("results after handle cancel: ", results);
         setVoted(false);
 
         setIsVoteSubmitted(true);
