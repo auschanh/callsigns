@@ -622,7 +622,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                                             </div>
 
-                                                            <div className="w-full h-[0.1rem] bg-[#e5e7eb]" />
+                                                            <div className="w-full h-[1px] bg-[#e5e7eb]" />
 
                                                             <div className='mt-8 left-0'>
                                                                 <Button 

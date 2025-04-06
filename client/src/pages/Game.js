@@ -1198,9 +1198,10 @@ function Game() {
 		// removes guesser from pool, removes voted out hints, and calculates score
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
-		if (enterHint && excludeGuesser?.every((player) => { return player.voted === true })) {
+		if (enterHint && (excludeGuesser?.every((player) => { return player.voted === true }) || timeLimitReached)) {
 			
-			console.log("results, before votedOutResults: ", results)
+			console.log("results, before votedOutResults: ", results);
+
 			if (currentIndex === 1) {
 
 				const votedOutResults = results.map((result) => {
@@ -1226,7 +1227,7 @@ function Game() {
 				const newScores = scores.map((player => {
 					console.log("Voted out Results:", votedOutResults);
 					if(votedOutResults.map(result => { // if hint was not removed and they are not the guesser
-						return result.visible == true ? result.playerName : null;}).includes(player.playerName)
+						return result.hint && result.visible ? result.playerName : null;}).includes(player.playerName)
 						&& player.playerName !== guesser
 					){
 							console.log("CALCULATING A GOOD HINT");
@@ -1241,7 +1242,9 @@ function Game() {
 						return player;
 					}
 	
-				}))
+				}));
+
+				console.log(newScores);
 	
 				setScores(newScores);
 	
@@ -1251,7 +1254,7 @@ function Game() {
 			}
 			
 
-			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+			if (!timeLimitReached && ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser))) {
 
 				if (currentIndex === 1) {
 
@@ -1265,7 +1268,7 @@ function Game() {
 
 		}
 		
-	}, [isVoted]);
+	}, [isVoted, timeLimitReached]);
 
 	useEffect(() => {
 
@@ -1296,6 +1299,27 @@ function Game() {
 			setTimeLimitReached(false);
 
 			setSubmitted(true);
+
+			// host only, pick the next guesser
+			if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
+
+				(async () => {
+
+					try {
+
+						const joinOrder = inLobby.map((player) => { return player.playerName });
+		
+						await socket.emit("selectNextGuesser", roomDetails.roomID, selectedPlayers, joinOrder);
+		
+					} catch (error) {
+		
+						throw error;
+		
+					}
+		
+				})();
+
+			}
 
 		}
 
@@ -1349,20 +1373,22 @@ function Game() {
 
 			// calculate number of hints eliminated
 			let numRemovedHints = 0;
-			let removedHints = [];
-			const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
+			// let removedHints = [];
+			const excludeGuesser = isVoted.filter((player) => { return player.playerName !== guesser });
 
 			results.map(result => {
 
-				if (result.visible === false || result.count >= (Math.ceil(excludeGuesser.length / 2))) {
+				if (result.playerName !== guesser && (result.visible === false || result.count >= (Math.ceil(excludeGuesser.length / 2)) || !(result.hint))) {
 
-					removedHints.push(result.hint);
+					// removedHints.push(result.hint);
+					numRemovedHints++;
 
 				}
 
 			});
 
-			numRemovedHints = removedHints.length;
+			// numRemovedHints = removedHints.length;
+
 			// calculate guesser score
 			setTempScores(
 				scores.map((player) => {
@@ -1384,7 +1410,7 @@ function Game() {
 
 		return () => socket.removeAllListeners("receiveUpdateScore");
 
-	}, [socket, guesser, submitted, results, scores]);
+	}, [socket, guesser, submitted, results, scores, isVoted]);
 
 	useEffect(() => {
 
