@@ -573,7 +573,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                     <div className="h-full w-[0.1rem] ml-9 bg-slate-50"></div>
                 </div>
                 <div>
-                    <h1 className="text-2xl font-normal">Scoring</h1>
+                    <h1 className="text-2xl font-semibold">Scoring</h1>
                     <p className="mt-0 text-sm text-slate-100/70">If your team is keeping score, here's how you can score some points!</p>
                     <div className="mt-8 space-y-8">
                         <div>
@@ -595,7 +595,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
                                 <h2 className="italic text-slate-100/80 ml-4">As the Stranded Agent:</h2>
                             </div>
                             <ul className="list-disc ml-16 text-sm/5">
-                                <li><p>You will score 1 point if you guess your callsign correctly and an additional point for every eliminated hint.</p></li>
+                                <li><p>You will score 1 point if you guess your callsign correctly and an additional point for every hint that is either eliminated or not submitted by the other agents.</p></li>
                             </ul>
                         </div>
                     </div>

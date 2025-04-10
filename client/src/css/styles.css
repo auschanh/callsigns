@@ -1017,10 +1017,6 @@ video {
   height: 2.25rem;
 }
 
-.h-\[0\.1rem\] {
-  height: 0.1rem;
-}
-
 .h-\[0\.25rem\] {
   height: 0.25rem;
 }
@@ -1039,6 +1035,10 @@ video {
 
 .h-\[170\%\] {
   height: 170%;
+}
+
+.h-\[1px\] {
+  height: 1px;
 }
 
 .h-\[2\%\] {
@@ -1121,10 +1121,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[1px\] {
-  height: 1px;
 }
 
 .max-h-96 {

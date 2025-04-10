@@ -29,6 +29,10 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 	const [isRoomCreated, setIsRoomCreated] = roomCreated;
 
+	const [isNameValid, setIsNameValid] = useState(false);
+
+	const [isNumPlayersValid, setIsNumPlayersValid] = useState(false);
+
 	// Form Validation
 	const formSchema = z.object({
 
@@ -189,6 +193,16 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		const { name, value } = event.target;
 
+		if (value && !isNameValid) {
+
+			setIsNameValid(true);
+
+		} else if (!value) {
+
+			setIsNameValid(false);
+
+		}
+
 		// Update both input fields based on the changed input
 		form.setValue(name, value);
 
@@ -209,6 +223,12 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 	}
 
 	const handlePlayerCount = (players) => {
+
+		if (!isNumPlayersValid) {
+
+			setIsNumPlayersValid(true);
+
+		}
 
 		form.setValue("numPlayers", players);
 
@@ -249,7 +269,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 								name="username"
 								render={({ field }) => (
 									<FormItem className="mb-4">
-										<FormLabel>Username</FormLabel>
+										<FormLabel>Username *</FormLabel>
 										<FormControl>
 											<Input
 												autoFocus
@@ -270,7 +290,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 								name="roomName"
 								render={({ field }) => (
 									<FormItem className="mb-4">
-										<FormLabel>Room Name</FormLabel>
+										<FormLabel>Room Name *</FormLabel>
 										<FormControl>
 											<Input 
 												placeholder={"Enter Room Name"} 
@@ -291,7 +311,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 								name="numPlayers"
 								render={({ field }) => (
 									<FormItem className="mb-6">
-										<FormLabel>Number of Players</FormLabel>
+										<FormLabel>Number of Players *</FormLabel>
 										<FormControl>
 											<RadioGroup
 												onValueChange={field.onChange}
@@ -629,7 +649,13 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 						</TabsContent>
 
-						<Button className="flex w-48 self-center mt-auto mb-10" type="submit">Submit</Button>
+						<Button 
+							className="flex w-48 self-center mt-auto mb-10" 
+							type="submit"
+							disabled={!(isNameValid && isNumPlayersValid)}
+						>
+							Submit
+						</Button>
 
 					</form>
 
