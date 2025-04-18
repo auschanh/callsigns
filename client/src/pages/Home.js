@@ -53,11 +53,11 @@ function Home() {
 
 								</div>
 
-								<Accordion className="text-slate-300 space-y-4 pt-8 border-solid border-t border-slate-50 font-extralight" type="single" collapsible>
+								<Accordion className="2xl:text-lg text-slate-300 space-y-4 pt-8 border-solid border-t border-slate-50 font-extralight" type="single" collapsible>
 									<AccordionItem className="w-full border-slate-400" value="item-2">
 										<AccordionTrigger>Your mission:</AccordionTrigger>
 										<AccordionContent>
-											<div className="text-slate-300 space-y-4 py-8 border-solid border-t border-slate-400 font-extralight">
+											<div className="2xl:text-lg text-slate-300 space-y-4 py-8 border-solid border-t border-slate-400 font-extralight">
 												<p>
 													HQ is sending out the new callsigns for this week and this time you and your team are worried. You just found out that one of your agents is still alive but they’re too far behind enemy lines to reach. You and your team will need to somehow send them their <span className="font-semibold underline">callsign</span> so they can authenticate with HQ before it’s too late! 
 												</p>
