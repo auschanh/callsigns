@@ -29,7 +29,9 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 	const [isRoomCreated, setIsRoomCreated] = roomCreated;
 
-	const [isNameValid, setIsNameValid] = useState(false);
+	const [isUsernameValid, setIsUsernameValid] = useState(false);
+
+	const [isRoomNameValid, setIsRoomNameValid] = useState(false);
 
 	const [isNumPlayersValid, setIsNumPlayersValid] = useState(false);
 
@@ -123,6 +125,22 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 	useEffect(() => {
 
+		if ((!isUsernameValid || !isRoomNameValid || !isNumPlayersValid) && (gameInfo && (gameInfo.username && gameInfo.roomName && gameInfo.numPlayers))) {
+
+			console.log("replenish game info");
+
+			setIsUsernameValid(true);
+
+			setIsRoomNameValid(true);
+
+			setIsNumPlayersValid(true);
+			
+		}
+
+	}, [gameInfo]);
+
+	useEffect(() => {
+
 		if (gameInfo) {
 
 			if (!form.getValues("username")) {
@@ -193,13 +211,41 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		const { name, value } = event.target;
 
-		if (value && !isNameValid) {
+		if (value && (!isUsernameValid || !isRoomNameValid)) {
 
-			setIsNameValid(true);
+			console.log("check if inputs");
+
+			if (name === "username") {
+
+				console.log("username");
+
+				setIsUsernameValid(true);
+
+				if (form.getValues("roomName")) {
+
+					console.log("roomName");
+
+					setIsRoomNameValid(true);
+
+				}
+
+			} else if (name === "roomName") {
+
+				setIsRoomNameValid(true);
+
+			}
 
 		} else if (!value) {
 
-			setIsNameValid(false);
+			if (name === "username") {
+
+				setIsUsernameValid(false);
+
+			} else if (name === "roomName") {
+
+				setIsRoomNameValid(false);
+
+			}
 
 		}
 
@@ -652,7 +698,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 						<Button 
 							className="flex w-48 self-center mt-auto mb-10" 
 							type="submit"
-							disabled={!(isNameValid && isNumPlayersValid)}
+							disabled={!(isUsernameValid && isRoomNameValid && isNumPlayersValid)}
 						>
 							Submit
 						</Button>

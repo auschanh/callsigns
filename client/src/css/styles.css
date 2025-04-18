@@ -3932,6 +3932,11 @@ video {
   .\32xl\:w-\[60\%\] {
     width: 60%;
   }
+
+  .\32xl\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
 }
 
 .\[\&\:has\(\[role\=checkbox\]\)\]\:pr-0:has([role=checkbox]) {
