@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { X, Check, Ellipsis } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.svg";
+import { ReactComponent as WinnerIcon } from "../assets/noun-crown-6589105.svg";
 
 
 const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser, isDisconnectedTeam, notEnoughPlayers }) => {
@@ -43,6 +44,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [showEndGame, setShowEndGame] = showEndGameState;
     const [revealCallsign, setRevealCallsign] = revealCallsignState;
     const [prepRevCallsign, setPrepRevCallsign] = prepRevCallsignState;
+    const [winner, setWinner] = useState([]);
 
     const guessInputRef = useRef(null);
     const guessValidationRef = useRef(null);
@@ -197,6 +199,31 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
         }
 
     }, [submitted, validate, currentRound, playerName, guesser, prepRevCallsign]);
+
+    // triggers when last slide of last round happens
+    useEffect(() => {
+        console.log("got inside winner calculation useEffect")
+        console.log("isLastRound: ", isLastRound)
+        console.log("validate: ", validate)
+        console.log("submitted: ", submitted)
+
+        if(isLastRound && validate && !submitted) {
+
+            let topScore = sortedScores[0]["score"];
+            let winners = [];
+            // winners.push(sortedScores[0]["playerName"]);
+
+            sortedScores.map(player => {
+                if (player.score === topScore) {
+                    winners.push(player.playerName)
+                }
+            })
+
+            setWinner(winners);
+        }
+
+    }, [isLastRound])
+
 
     useEffect(() => {
 
@@ -486,6 +513,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4 mb-8'>
 
                                     {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
+                                    
 
                                     {readyNextRound?.map((playerObj, index) => {
 
@@ -501,8 +529,15 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                                 variant={`${playerObj.readyNext ? "green" : "grey"}`}
                                                                 // onClick={e => readyToggle(e, playerObj)}
                                                             >
+
                                                                 <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                    <AgentIcon className="aspect-square h-5" />
+                                                                        { winner.includes(playerObj.playerName) 
+                                                                        && <WinnerIcon className="aspect-square h-5" /> 
+                                                                        ||
+                                                                        <AgentIcon className="aspect-square h-5" /> 
+                                                                        }
+                                                                        
+                                                                        
                                                                 </div>
                                                                 <p className="text-xs">{playerObj.playerName}</p>
                                                             </Button>
@@ -544,9 +579,13 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                         {playerObj.readyNext && (
                                                             <Check className="text-slate-900" size={14} />
-                                                        ) || (
+                                                        ) ||  winner.includes(playerObj.playerName) &&
+                                                                ( <WinnerIcon className="aspect-square h-5" /> )
+                                                        
+                                                            || (
                                                             // <Ellipsis className="text-slate-900" size={14} />
                                                             <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
+
                                                         )}
                                                     </div>
                                                     <p className="text-xs">{playerObj.playerName}</p>
