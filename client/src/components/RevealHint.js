@@ -202,23 +202,15 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
     // triggers when last slide of last round happens
     useEffect(() => {
-        console.log("got inside winner calculation useEffect")
-        console.log("isLastRound: ", isLastRound)
-        console.log("validate: ", validate)
-        console.log("submitted: ", submitted)
-
         if(isLastRound && validate && !submitted) {
-
             let topScore = sortedScores[0]["score"];
             let winners = [];
-            // winners.push(sortedScores[0]["playerName"]);
 
             sortedScores.map(player => {
                 if (player.score === topScore) {
                     winners.push(player.playerName)
                 }
             })
-
             setWinner(winners);
         }
 
