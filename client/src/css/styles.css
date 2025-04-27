@@ -2911,10 +2911,6 @@ video {
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
-.running {
-  animation-play-state: running;
-}
-
 /* SLIDER */
 
 .steps-container {

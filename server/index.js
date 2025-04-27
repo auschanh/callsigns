@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
 
 		});
 
-		console.log(activeUsers);
+		// console.log(activeUsers);
 
 	};
 
@@ -179,7 +179,7 @@ io.on("connection", (socket) => {
 
 		getSocketInfo();
 
-		console.log(roomLookup);
+		// console.log(roomLookup);
 
 	});
 
@@ -199,7 +199,7 @@ io.on("connection", (socket) => {
 			
 		}
 
-		console.log(findRoom);
+		// console.log(findRoom);
 
 	});
 
@@ -223,7 +223,7 @@ io.on("connection", (socket) => {
 
 			});
 
-			console.log(guesserSocketID);
+			// console.log(guesserSocketID);
 
 			if (guesserSocketID !== undefined) {
 
@@ -267,9 +267,9 @@ io.on("connection", (socket) => {
 
 				const roomList = getPlayersInLobby(roomID);
 
-				console.log("players in " + findRoom.roomName + ": ");
+				// console.log("players in " + findRoom.roomName + ": ");
 
-				console.log(roomList);
+				// console.log(roomList);
 
 				if (!isHostExcluded) {
 
@@ -426,7 +426,7 @@ io.on("connection", (socket) => {
 
 				foundSocket.leave(socket.roomID);
 
-				console.log(getPlayersInLobby(socket.roomID));
+				// console.log(getPlayersInLobby(socket.roomID));
 
 				const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
 
@@ -438,7 +438,7 @@ io.on("connection", (socket) => {
 
 				}
 
-				console.log(findRoom);
+				// console.log(findRoom);
 
 				io.to(socket.roomID).emit("leftRoom", player);
 
@@ -468,7 +468,7 @@ io.on("connection", (socket) => {
 
 	socket.on("startGame", (selectedPlayers, joinOrder) => {
 
-		console.log(selectedPlayers);
+		// console.log(selectedPlayers);
 
 		const findRoom = roomLookup.find(({ roomID }) => { return roomID === socket.roomID });
 
@@ -512,7 +512,7 @@ io.on("connection", (socket) => {
 
 			console.log("none selected");
 
-			console.log(findRoom);
+			// console.log(findRoom);
 
 			const index = Math.floor(Math.random() * selectedPlayers.length);
 
@@ -525,7 +525,7 @@ io.on("connection", (socket) => {
 
 			console.log(findRoom.guesser + " selected");
 			
-			console.log(findRoom);
+			// console.log(findRoom);
 
 			findRoom.setGuesser = false;
 
@@ -701,7 +701,7 @@ io.on("connection", (socket) => {
 
 			console.log("next round: none selected");
 
-			console.log(findRoom);
+			// console.log(findRoom);
 
 			const index = Math.floor(Math.random() * selectedPlayers.length);
 
@@ -735,7 +735,7 @@ io.on("connection", (socket) => {
 
 			const prevGuesserIndex = selectedInOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-			console.log(prevGuesserIndex);
+			// console.log(prevGuesserIndex);
 
 			if (prevGuesserIndex !== -1) {
 
@@ -751,7 +751,7 @@ io.on("connection", (socket) => {
 
 					console.log("next round: current guesser: " + currentGuesser.username);
 
-					console.log(findRoom);
+					// console.log(findRoom);
 
 				} else {
 
@@ -772,7 +772,7 @@ io.on("connection", (socket) => {
 
 				const prevIndex = joinOrder.findIndex((playerName) => { return playerName === findRoom.guesser });
 
-				console.log(joinOrder, prevIndex);
+				// console.log(joinOrder, prevIndex);
 
 				let offset = 0;
 				let guesser = {};
@@ -783,11 +783,11 @@ io.on("connection", (socket) => {
 
 					guesser = usernames.find(({ username }) => { return username === joinOrder[(prevIndex + offset) % joinOrder.length] });
 
-					console.log(guesser);
+					// console.log(guesser);
 
 				} while (!guesser || !selectedPlayers.includes(guesser.username));
 
-				console.log(guesser, offset, selectedPlayers, usernames);
+				// console.log(guesser, offset, selectedPlayers, usernames);
 
 				findRoom.guesser = guesser.username;
 				findRoom.guesserID = guesser.socketID;
@@ -833,7 +833,7 @@ io.on("connection", (socket) => {
 
 		const leavingRooms = [...socket.rooms];
 
-		console.log(leavingRooms);
+		// console.log(leavingRooms);
 
 		leavingRooms.forEach((room) => {
 
@@ -849,7 +849,7 @@ io.on("connection", (socket) => {
 
 				} else {
 
-					console.log("I was the last one here but this was my own room that no one joined");
+					// console.log("I was the last one here but this was my own room that no one joined");
 
 				}
 
@@ -903,7 +903,7 @@ io.on("connection", (socket) => {
 
 	socket.on("disconnect", () => {
 
-		console.log(roomLookup);
+		// console.log(roomLookup);
 
 		console.log("User Disconnected: ", socket.id);
 
