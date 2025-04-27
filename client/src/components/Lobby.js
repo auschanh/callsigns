@@ -50,7 +50,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 				if (player.playerName === guesser) {
 
-					console.log("the guesser is not ready");
+					
 
 					try {
 
@@ -169,7 +169,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		if (player.isReady) {
 
-			console.log("sure " + player.playerName + " is ready");
+			
 
 			if (!selectedPlayers.includes(player.playerName)) {
 
@@ -197,7 +197,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 
 		} else {
 
-			console.log(player.playerName + " is not ready");
+			
 
 		}
 	};

@@ -156,7 +156,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
     
             );
     
-            console.log(example);
+            
 
         }
     }
@@ -188,7 +188,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         }
 
-        console.log(results);
+        
 
         setResults(
 
@@ -212,7 +212,7 @@ function DialogHTP({ tailwindStyles, isHTPOpen, htpToPlay }) {
 
         }
 
-        console.log(results);
+        
 
         setResults(
 

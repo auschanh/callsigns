@@ -141,7 +141,7 @@ function App() {
 
 						try {
 
-							console.log("host is excluded");
+							
 			
 							await socket.emit("roomCheck", roomID, true);
 			
@@ -214,7 +214,7 @@ function App() {
 
 		socket.on("receiveMessage", (messageData) => {
 
-            console.log(messageData);
+            
 
             setMessageList((list) => [...list, messageData]);
 
@@ -259,19 +259,19 @@ function App() {
 
 		socket.on("leftRoom", (user) => {
 
-			console.log(`${user} has left the lobby`);
+			
 
 			if (user !== guesser) {
 
 				if (user !== nextGuesser) {
 
-					console.log("not guesser", guesser, nextGuesser);
+					
 
 					setInLobby(prev => prev.filter(({playerName}) => { return playerName !== user }));
 
 				} else {
 
-					console.log("nextGuesser", user);
+					
 
 				}
 
@@ -283,7 +283,7 @@ function App() {
 
 				}
 
-				console.log("guesser", user);
+				
 
 			}
 

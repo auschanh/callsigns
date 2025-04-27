@@ -81,7 +81,7 @@ function DialogPlay({ tailwindStyles, triggerName, isOpen, propSlide = 0, isNewH
 
         socket.on("guesserSelected", (guesser) => {
 
-            console.log(`The guesser is ${guesser}`);
+            
 
             setGuesser(guesser);
 

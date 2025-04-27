@@ -274,7 +274,7 @@ function Game() {
 
 			setRoomDetails(false);
 
-			console.log(isClosedRoom);
+			
 
 			setIsClosedRoom(isClosedRoom);
 
@@ -339,7 +339,7 @@ function Game() {
 
 		if (roomDetails === undefined) {
 
-            console.log("checking room");
+            
 
 			setStartNumPlayers(selectedPlayers.length);
 
@@ -373,7 +373,7 @@ function Game() {
 
 				const playing = order.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
 
-				console.log(order);
+				
 
 				setInGame(playing);
 
@@ -493,7 +493,7 @@ function Game() {
 
 				setRoomDetails(false);
 
-				console.log(isClosedRoom);
+				
 
 				setIsClosedRoom(isClosedRoom);
 
@@ -582,7 +582,7 @@ function Game() {
 
 			);
 
-			console.log("just voted");
+			
 			
 		});
 
@@ -640,7 +640,7 @@ function Game() {
 
 			if (readyState.every((player) => { return player.readyNext })) {
 
-				console.log(inGame);
+				
 
 				if (inGame.includes(roomDetails.guesser)) {
 
@@ -652,7 +652,7 @@ function Game() {
 
 					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
-						console.log("TRIGGER NEXT ROUND");
+						
 		
 						(async () => {
 		
@@ -672,7 +672,7 @@ function Game() {
 
 				} else {
 
-					console.log("nextGuesser not here");
+					
 
 				}
 			}
@@ -742,7 +742,7 @@ function Game() {
 
 				if (!(currentIndex === 2 && !submitted && validate && notEnoughPlayers)) {
 
-					console.log("start fade");
+					
 
 					setStartFade(true);
 
@@ -784,7 +784,7 @@ function Game() {
 
 				} else {
 
-					console.log("skip animation");
+					
 
 				}
 
@@ -794,7 +794,7 @@ function Game() {
 
 					setReadyNextRound(prev => prev.map((player) => ({...player, readyNext: false})));
 
-					console.log("clear ready");
+					
 	
 				}
 
@@ -809,13 +809,13 @@ function Game() {
 
 						const joinOrder = inLobby.map((player) => { return player.playerName });
 
-						console.log(joinOrder);
+						
 
 						if (!returnedToLobby) {
 
 							setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
 
-							console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+							
 
 						}
 		
@@ -835,7 +835,7 @@ function Game() {
 
 					setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
 
-					console.log(inLobby.filter(({playerName}) => { return playerName !== guesser }));
+					
 
 				}
 
@@ -847,7 +847,7 @@ function Game() {
 
 			setRoomDetails(roomDetails);
 
-			console.log("The new host is " + roomDetails.host);
+			
 
 		});
 
@@ -934,7 +934,7 @@ function Game() {
 
 					setReadyNextRound(readyInGame);
 
-					console.log("skip animation");
+					
 
 				} else {
 
@@ -947,13 +947,13 @@ function Game() {
 
 							setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-							console.log("not enough players");
+							
 
 						} else {
 
 							setReadyNextRound(readyInGame);
 
-							console.log(readyInGame);
+							
 
 						}
 
@@ -970,13 +970,13 @@ function Game() {
 
 					setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-					console.log("not enough players");
+					
 
 				} else {
 
 					setReadyNextRound(readyInGame);
 
-					console.log(readyInGame);
+					
 
 				}
 
@@ -984,7 +984,7 @@ function Game() {
 
 			if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
 
-				console.log(inGame);
+				
 
 				if (inGame.includes(roomDetails.guesser)) {
 
@@ -996,7 +996,7 @@ function Game() {
 
 					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
 
-						console.log("TRIGGER NEXT ROUND");
+						
 
 						(async () => {
 
@@ -1015,7 +1015,7 @@ function Game() {
 
 				} else {
 
-					console.log("nextGuesser not here");
+					
 
 				}
 			}
@@ -1037,7 +1037,7 @@ function Game() {
 
 				if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
 
-					console.log("fade team disconnect");
+					
 
 					setStartFade(true);
 
@@ -1079,7 +1079,7 @@ function Game() {
 
 				} else {
 
-					console.log("skip animation");
+					
 
 				}
 
@@ -1096,7 +1096,7 @@ function Game() {
 
 		if (!isLoadingNextRound && inGame && !inGame.includes(guesser)) {
 
-			console.log(inGame, guesser);
+			
 
 			setStartFade(true);
 
@@ -1124,7 +1124,7 @@ function Game() {
 
 		if (inGame?.length === 1 && playerName === guesser) {
 
-			console.log("team disconnect");
+			
 
 			setStartFade(true);
 
@@ -1176,11 +1176,11 @@ function Game() {
 
 					const duplicatesSet = new Set(duplicates);
 
-					console.log([...duplicatesSet]);
+					
 
 					socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
 
-					console.log("HOST set current index: 1");
+					
 
 					handleNext();
 
@@ -1200,7 +1200,7 @@ function Game() {
 
 		if (enterHint && (excludeGuesser?.every((player) => { return player.voted === true }) || timeLimitReached)) {
 			
-			console.log("results, before votedOutResults: ", results);
+			
 
 			if (currentIndex === 1) {
 
@@ -1225,17 +1225,17 @@ function Game() {
 				// }));
 	
 				const newScores = scores.map((player => {
-					console.log("Voted out Results:", votedOutResults);
+					
 					if(votedOutResults.map(result => { // if hint was not removed and they are not the guesser
 						return result.hint && result.visible ? result.playerName : null;}).includes(player.playerName)
 						&& player.playerName !== guesser
 					){
-							console.log("CALCULATING A GOOD HINT");
+							
 							return {...player, score: player.score + 1, goodHints: player.goodHints + 1}
 	
 					} else if(player.playerName !== guesser) {
 						// if hint was removed
-						console.log("CALCULATING A BAD HINT");
+						
 						return {...player, badHints: player.badHints + 1};
 	
 					} else { // if guesser?
@@ -1244,7 +1244,7 @@ function Game() {
 	
 				}));
 
-				console.log(newScores);
+				
 	
 				setScores(newScores);
 	
@@ -1258,7 +1258,7 @@ function Game() {
 
 				if (currentIndex === 1) {
 
-					console.log("HOST set current index: 2");
+					
 	
 					handleNext();
 	
@@ -1280,7 +1280,7 @@ function Game() {
 
 				if (playerName === roomDetails.host) {
 
-					console.log("HOST will trigger new slide");
+					
 
 					handleNext();
 

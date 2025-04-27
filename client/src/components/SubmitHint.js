@@ -146,7 +146,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
             hintInputRef.current.classList.add("border-slate-400");
             hintValidationRef.current.innerText = "";
 
-			console.log(hint[0]);
+			
             
             setHint([hint[0], true]);
 

@@ -77,7 +77,7 @@ function JoinRoom() {
 
         if (roomDetails === undefined && !isClosedRoom && !beenRemoved) {
 
-            console.log("checking room");
+            
 
             (async () => {
 
@@ -99,7 +99,7 @@ function JoinRoom() {
 
             if (isFoundRoom) {
 
-                console.log("joining room");
+                
 
                 setIsFoundRoom(false);
 
@@ -124,7 +124,7 @@ function JoinRoom() {
             // if not already in lobby
             if (!inLobby.find(({playerName}) => { return playerName === username })) {
 
-                console.log("registering username");
+                
 
                 (async () => {
 
@@ -142,7 +142,7 @@ function JoinRoom() {
 
             } else {
 
-                console.log("not gonna try to join room");
+                
 
             }
 
@@ -158,7 +158,7 @@ function JoinRoom() {
 
                 setInLobby(othersInLobby);
 
-                console.log("roomExists", othersInLobby);
+                
 
                 setSessionUrl(sessionUrl);
 
@@ -174,7 +174,7 @@ function JoinRoom() {
 
                 if (inRoom) {
 
-                    console.log("i'm already in here");
+                    
 
                     setUsername(playerName);
 
@@ -225,7 +225,7 @@ function JoinRoom() {
 
                 } else {
 
-                    console.log(`could not join room ${roomID}`);
+                    
 
                     setSuccess();
 
@@ -252,7 +252,7 @@ function JoinRoom() {
 
                 } else {
 
-                    console.log(`could not join room ${roomID}`);
+                    
 
                 }
 
@@ -285,7 +285,7 @@ function JoinRoom() {
 
         socket.on("guesserSelected", (guesser) => {
 
-            console.log(`The guesser is ${guesser}`);
+            
 
             setGuesser(guesser);
 
@@ -353,7 +353,7 @@ function JoinRoom() {
 
 			setRoomDetails(roomDetails);
 
-			console.log("The new host is " + roomDetails.host);
+			
 
 		});
 
@@ -468,7 +468,7 @@ function JoinRoom() {
 
             invalidUsernameRef.current.innerText = "";
 
-            console.log(tempUsername);
+            
 
             setUsername(tempUsername);
 

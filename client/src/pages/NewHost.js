@@ -26,7 +26,7 @@ function NewHost() {
 
         if (roomDetails === undefined) {
 
-            console.log("checking room");
+            
 
             (async () => {
 
@@ -50,7 +50,7 @@ function NewHost() {
 
                 if (othersInLobby) {
 
-                    console.log("room loaded");
+                    
     
                     const prevGameInfo = {
 
@@ -69,7 +69,7 @@ function NewHost() {
                     
                     if (!roomDetails.newHostAssigned) {
 
-                        console.log("host has returned to lobby");
+                        
 
                         setAlertOpen(false);
 
@@ -101,7 +101,7 @@ function NewHost() {
     
                 } else {
     
-                    console.log("could not load room");
+                    
 
                     setRoomDetails(false);
     
@@ -109,7 +109,7 @@ function NewHost() {
 
             } else {
 
-                console.log("you cannot be the new host because you are not in the room");
+                
 
                 setRoomDetails(false);
 

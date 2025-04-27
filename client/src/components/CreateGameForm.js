@@ -103,7 +103,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		}
 
-		console.log(formattedValues);
+		
 
 		setGameInfo(formattedValues);
 
@@ -127,7 +127,7 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		if ((!isUsernameValid || !isRoomNameValid || !isNumPlayersValid) && (gameInfo && (gameInfo.username && gameInfo.roomName && gameInfo.numPlayers))) {
 
-			console.log("replenish game info");
+			
 
 			setIsUsernameValid(true);
 
@@ -213,17 +213,17 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		if (value && (!isUsernameValid || !isRoomNameValid)) {
 
-			console.log("check if inputs");
+			
 
 			if (name === "username") {
 
-				console.log("username");
+				
 
 				setIsUsernameValid(true);
 
 				if (form.getValues("roomName")) {
 
-					console.log("roomName");
+					
 
 					setIsRoomNameValid(true);
 

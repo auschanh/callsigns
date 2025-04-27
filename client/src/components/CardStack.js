@@ -22,7 +22,7 @@ function CardStack({ cards, currentIndex, handleNext, timeLimitReached, showErro
 
 				setShowError(prev => !prev);
 
-				console.log("running timeout animation");
+				
 	
 			}, 1000);
 

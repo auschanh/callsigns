@@ -52,7 +52,7 @@ function Timer({ timeLimit, setTimeLimitReached, setStartFade, slideIndex }) {
 
         } else {
 
-            console.log("stop timer" + slideIndex);
+            
 
             setTimeLimitReached(true);
 
@@ -94,7 +94,7 @@ function Timer({ timeLimit, setTimeLimitReached, setStartFade, slideIndex }) {
 
     useEffect(() => {
 
-        console.log("start timer" + slideIndex);
+        
 
         resetTimer(setTimer());
 

@@ -53,13 +53,9 @@ function WordGenerator() {
 			setErrMsg(true);
 		} else {
 			singularGuess = pluralize.singular(stemmedGuess);
-			console.log(
-				"Your guessed word after stemming and singulrize: ",
-				singularGuess
-			);
 		}
 		const checkWord = pluralize.singular(stemmer(word.toLowerCase().trim()));
-		console.log("Word in our dictionary: ", checkWord);
+		
 		if (singularGuess === checkWord) {
 			setGuess(checkGuess);
 			setCorrectGuess(true);
