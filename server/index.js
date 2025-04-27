@@ -10,7 +10,7 @@ import { Server as ioServer } from "socket.io";
 
 const io = new ioServer(server, {
 	cors: {
-		origin: "*",
+		origin: "https://callsigns-oulv.vercel.app/",
 		methods: ["GET", "POST"],
 	}
 });
