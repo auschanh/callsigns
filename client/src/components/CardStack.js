@@ -6,27 +6,6 @@ function CardStack({ cards, currentIndex, handleNext, timeLimitReached, showErro
 
 	const [showError, setShowError] = showErrorState;
 
-	// REMOVE FEATURE, ONLY FOR TESTING
-	useEffect(() => {
-
-		const listenForKeydown = (event) => {
-
-            if (event.key === "ArrowDown") {
-
-                event.preventDefault();
-
-                handleNext();
-
-            }
-
-        }
-
-        document.addEventListener("keydown", listenForKeydown);
-
-        return () => document.removeEventListener("keydown", listenForKeydown);
-
-	}, []);
-
 	useEffect(() => {
 
 		setShowError(false);
