@@ -18,7 +18,7 @@ function WordGenerator() {
 	const generateWord = async () => {
 		// get word from word bank in backend
 		setClicked(false);
-		const url = "http://localhost:3001/getMysteryWord";
+		const url = "https://callsigns.onrender.com/getMysteryWord";
 		try {
 			const response = await axios.get(url);
 			const retrievedWord = response.data;

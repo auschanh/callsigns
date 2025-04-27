@@ -59,7 +59,7 @@ function App() {
 
 	const generateWord = async () => {
 
-		const url = "http://localhost:3001/getMysteryWord";
+		const url = "https://callsigns.onrender.com/getMysteryWord";
 
 		try {
 
