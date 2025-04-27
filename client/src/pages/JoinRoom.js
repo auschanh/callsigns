@@ -164,6 +164,8 @@ function JoinRoom() {
 
                 setRoomDetails(roomDetails);
 
+                setIsClosedRoom(roomDetails.isClosedRoom);
+
                 if (roomDetails.setGuesser) {
 
                     setGuesser(roomDetails.guesser);
