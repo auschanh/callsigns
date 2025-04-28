@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" viewBox="0 0 16.933 21.167" xmlns="http://www.w3.org/2000/svg">
-<path d="m8.4646 2.6956a0.85947 0.85947 0 0 0-0.73938 0.41878l-2.861 4.8181-3.4602-2.8392a0.85947 0.85947 0 0 0-1.3831 0.85352l1.7188 7.622a0.85947 0.85947 0 0 0 0.83757 0.66888h11.775a0.85947 0.85947 0 0 0 0.84009-0.66888l1.7196-7.622a0.85947 0.85947 0 0 0-1.3864-0.85352l-3.4569 2.8392-2.8643-4.8181a0.85947 0.85947 0 0 0-0.73938-0.41878z" color="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-<text y="31.933334" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif" font-size="5px" font-weight="bold">Created by Larea</text>
-<text y="36.933334" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif" font-size="5px" font-weight="bold">from the Noun Project</text>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 26.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16.9 11.5" style="enable-background:new 0 0 16.9 11.5;" xml:space="preserve">
+<path d="M8.5,0C8.2,0,7.9,0.2,7.7,0.4L4.9,5.2L1.4,2.4C1,2.1,0.5,2.2,0.2,2.5C0,2.7,0,3,0,3.3l1.7,7.6c0.1,0.4,0.4,0.7,0.8,0.7h11.8
+	c0.4,0,0.8-0.3,0.8-0.7l1.7-7.6c0.1-0.5-0.2-0.9-0.6-1c-0.3-0.1-0.5,0-0.7,0.2l-3.5,2.8L9.2,0.4C9,0.2,8.8,0,8.5,0L8.5,0z"/>
 </svg>

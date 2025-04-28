@@ -207,11 +207,17 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
             let winners = [];
 
             sortedScores.map(player => {
-                if (player.score === topScore) {
+                if (player && player.score === topScore) {
                     winners.push(player.playerName)
                 }
             })
             setWinner(winners);
+        }
+
+        return () => {
+
+            setWinner([]);
+
         }
 
     }, [isLastRound])
@@ -517,20 +523,18 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger asChild>
                                                             <Button
-                                                                className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                                className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer ${playerObj.readyNext ? "" : winner.includes(playerObj.playerName) ? "bg-gradient-to-tr from-amber-700 from-30% via-amber-400 via-75% to-amber-600 to-100%" : ""}`}
                                                                 variant={`${playerObj.readyNext ? "green" : "grey"}`}
                                                                 // onClick={e => readyToggle(e, playerObj)}
                                                             >
-
                                                                 <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
-                                                                        { winner.includes(playerObj.playerName) 
-                                                                        && <WinnerIcon className="aspect-square h-5" /> 
-                                                                        ||
+                                                                    { (winner.includes(playerObj.playerName) && !playerObj.readyNext) && (
+                                                                        <WinnerIcon className="aspect-square h-[0.9rem] fill-amber-500" /> 
+                                                                    ) || (
                                                                         <AgentIcon className="aspect-square h-5" /> 
-                                                                        }
-                                                                        
-                                                                        
+                                                                    )}
                                                                 </div>
+
                                                                 <p className="text-xs">{playerObj.playerName}</p>
                                                             </Button>
                                                         </TooltipTrigger>
@@ -564,17 +568,16 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                 
                                                 <Button
                                                     key={index}
-                                                    className="flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer"
+                                                    className={`flex px-3 py-2 h-10 rounded-lg items-center cursor-pointer ${playerObj.readyNext ? "" : winner.includes(playerObj.playerName) ? "bg-gradient-to-tr from-amber-700 from-30% via-amber-400 via-75% to-amber-600 to-100%" : ""}`}
                                                     variant={`${playerObj.readyNext ? "green" : "grey"}`}
                                                     // onClick={e => readyToggle(e, playerObj)}
                                                 >
                                                     <div className="flex aspect-square h-full bg-white rounded-full items-center justify-center mr-3">
                                                         {playerObj.readyNext && (
                                                             <Check className="text-slate-900" size={14} />
-                                                        ) ||  winner.includes(playerObj.playerName) &&
-                                                                ( <WinnerIcon className="aspect-square h-5" /> )
-                                                        
-                                                            || (
+                                                        ) || winner.includes(playerObj.playerName) && (
+                                                            <WinnerIcon className="aspect-square h-[0.9rem] fill-amber-500" />
+                                                        ) || (
                                                             // <Ellipsis className="text-slate-900" size={14} />
                                                             <p className="text-slate-900 text-xs font-semibold">{playerObj.playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
 
@@ -621,7 +624,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                     </div>
 
-                                    <div className="flex gap-8">
+                                    <div className="flex gap-6">
 
                                         {roomDetails.keepScore && (
 
