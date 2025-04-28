@@ -8,13 +8,13 @@ import cors from "cors";
 
 import { Server as ioServer } from "socket.io";
 
-// const liveURL = 'https://callsigns-oulv.vercel.app';
-const liveURL = 'http://localhost:3000';
+const liveURL = 'https://callsigns-oulv.vercel.app';
+// const liveURL = 'http://localhost:3000';
 
 const io = new ioServer(server, {
 	cors: {
-		// origin: "https://callsigns-oulv.vercel.app",
-		origin: "*",
+		origin: "https://callsigns-oulv.vercel.app",
+		// origin: "*",
 		methods: ["GET", "POST"],
 	}
 });
