@@ -8,9 +8,13 @@ import cors from "cors";
 
 import { Server as ioServer } from "socket.io";
 
+// const liveURL = 'https://callsigns-oulv.vercel.app';
+const liveURL = 'http://localhost:3000';
+
 const io = new ioServer(server, {
 	cors: {
-		origin: "https://callsigns-oulv.vercel.app",
+		// origin: "https://callsigns-oulv.vercel.app",
+		origin: "*",
 		methods: ["GET", "POST"],
 	}
 });
@@ -146,7 +150,7 @@ io.on("connection", (socket) => {
 				newHostAssigned: false
 			});
 
-			socket.emit("getRoomInfo", `https://callsigns-oulv.vercel.app/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
+			socket.emit("getRoomInfo", `${liveURL}/lobby/${socket.roomID}`, [{ playerName: socket.username, isReady: socket.isReady }], socket.roomID);
 
 		} else {
 
@@ -171,7 +175,7 @@ io.on("connection", (socket) => {
 
 				}
 
-				io.to(socket.roomID).emit("updateRoomInfo", `https://callsigns-oulv.vercel.app/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
+				io.to(socket.roomID).emit("updateRoomInfo", `${liveURL}/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
 
 			}
 
@@ -273,7 +277,7 @@ io.on("connection", (socket) => {
 
 				if (!isHostExcluded) {
 
-					socket.emit("roomExists", roomList, `https://callsigns-oulv.vercel.app/lobby/${roomID}`, findRoom, inRoom);
+					socket.emit("roomExists", roomList, `${liveURL}/lobby/${roomID}`, findRoom, inRoom);
 
 				} else {
 
@@ -637,7 +641,7 @@ io.on("connection", (socket) => {
 
 			const roomList = getPlayersInLobby(socket.roomID);
 	
-			io.to(socket.roomID).emit("updateRoomInfo", `https://callsigns-oulv.vercel.app/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
+			io.to(socket.roomID).emit("updateRoomInfo", `${liveURL}/lobby/${socket.roomID}`, roomList, socket.roomID, findRoom);
 
 		} else {
 

@@ -820,7 +820,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                 {/* <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess ? "text-green-600" : "text-slate-800"}`}> */}
                                 <p className={`text-3xl font-light font-mono mt-10 mb-4 ${correctGuess === false ? "text-red-500" : "text-slate-800"} transition-colors duration-200`}>
-                                    {guess === "" ? '...' : guess}
+                                    {guess === "" ? '...' : guess.length > 30 ? `${guess.substring(0, 30)}...` : guess}
                                 </p>
                             </>
 
