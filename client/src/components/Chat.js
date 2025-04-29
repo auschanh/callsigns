@@ -231,7 +231,17 @@ function Chat({ username, roomName, roomID }) {
                                 )}
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
-                                    <p className={`leading-none text-sm break-words ${isGameStarted && (username === guesser) && (username !== messageContent.author) ? 'blur select-none' : ''}`}>{messageContent.message}</p>
+
+                                    {(isGameStarted && (username === guesser) && (username !== messageContent.author)) && (
+
+                                        <p className={`leading-none text-sm break-words blur select-none`}>{'-'.repeat(messageContent.message.length)}</p>
+
+                                    ) || (
+
+                                        <p className={`leading-none text-sm break-words`}>{messageContent.message}</p>
+
+                                    )}
+
                                 </div>
 
                                 {(messageContent.author !== messageList[index + 1]?.author) && (
