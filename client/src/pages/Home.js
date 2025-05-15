@@ -33,7 +33,7 @@ function Home() {
 						<div className="aspect-square h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500">
 
 							{/* Main Content Container */}
-							<div className="w-screen max-w-[75%] md:max-w-screen-md lg:max-w-screen-lg mx-auto">
+							<div className="w-screen max-w-[75%] md:max-w-screen-md lg:max-w-screen-[900px] 2xl:max-w-screen-xl mx-auto">
 
 								<div className="flex md:flex-row flex-col items-center md:items-end justify-between mb-8 gap-4 px-6">
 									<div className='flex flex-row gap-4'>
@@ -50,19 +50,19 @@ function Home() {
 									</div>
 								</div>
 
-								<div className="w-screen max-w-[75%] md:max-w-screen-md lg:max-w-screen-lg px-6 mx-auto">
+								<div className="w-screen max-w-[75%] md:max-w-screen-md lg:max-w-screen-[900px] 2xl:max-w-screen-xl px-6 mx-auto">
 								<Accordion className="2xl:text-lg text-base text-slate-300 space-y-4 pt-8 border-solid border-t border-slate-50 font-extralight" type="single" collapsible>
 									<AccordionItem className="border-slate-400" value="item-2">
 										<AccordionTrigger><span className="text-lg sm:text-xl 2xl:text-2xl">Your mission:</span></AccordionTrigger>
 										<AccordionContent>
 											<div className="2xl:text-lg text-slate-300 space-y-4 py-8 border-solid border-t border-slate-400 font-extralight">
-												<p className="text-sm sm:text-base lg:text-lg leading-relaxed">
+												<p>
 													HQ is sending out the new callsigns for this week and this time you and your team are worried. You just found out that one of your agents is still alive but they're too far behind enemy lines to reach. You and your team will need to somehow send them their <span className="font-semibold underline">callsign</span> so they can authenticate with HQ before it’s too late! 
 												</p>
-												<p className="text-sm sm:text-base lg:text-lg leading-relaxed">
+												<p>
 													It's far too risky to send the callsign itself out on the airwaves, if it gets intercepted, the whole team could be in danger! To stay under the radar, you and your team will need to send just <span className="font-semibold underline">one-word hints</span> out to your agent and hope that they will be able to figure out their callsign using just those hints before it’s too late. But be careful, the enemy is always listening! <span className="font-semibold underline">There can’t be any duplicate hints</span> or else the agency’s secret channels could be exposed! 
 												</p>
-												<p className="text-sm sm:text-base lg:text-lg leading-relaxed">
+												<p>
 													Will your agent be able to figure out their callsign before it's too late or will they be captured before they get the chance?
 												</p>
 											</div>
