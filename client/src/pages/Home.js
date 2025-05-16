@@ -27,10 +27,10 @@ function Home() {
 	return (
 
 		<div className="flex relative min-h-screen w-screen justify-center bg-black overflow-hidden">
-			<div className="aspect-square h-[170%] sm:h-[170%] md:h-[136%] lg:h-[160%] xl:h-[170%] absolute top-[-35%] sm:top-[-35%] md:top-[-18%] lg:top-[-30%] xl:top-[-35%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#040a14] to-[#030a14] shadow-inner shadow-red-700">
-				<div className="aspect-square h-[93%] sm:h-[93%] md:h-[90%] lg:h-[91%] xl:h-[93%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#020b1d] to-[#020811] shadow-inner shadow-red-600">
-					<div className="aspect-square h-[92%] sm:h-[92%] md:h-[89%] lg:h-[89%] xl:h-[92%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#061227] to-[#02060e] shadow-inner shadow-red-600">
-						<div className="aspect-square h-[91%] sm:h-[91%] md:h-[87%] lg:h-[87%] xl:h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500">
+			<div className="aspect-square h-[170%] sm:h-[170%] md:h-[150%] lg:h-[180%] xl:h-[170%] absolute top-[-35%] sm:top-[-35%] md:top-[-25%] lg:top-[-40%] xl:top-[-35%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#040a14] to-[#030a14] shadow-inner shadow-red-700">
+				<div className="aspect-square h-[93%] sm:h-[93%] md:h-[90%] lg:h-[92%] xl:h-[93%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#020b1d] to-[#020811] shadow-inner shadow-red-600">
+					<div className="aspect-square h-[92%] sm:h-[92%] md:h-[89%] lg:h-[91%] xl:h-[92%] flex items-center justify-center rounded-full bg-gradient-to-bl from-[#061227] to-[#02060e] shadow-inner shadow-red-600">
+						<div className="aspect-square h-[91%] sm:h-[91%] md:h-[87%] lg:h-[90%] xl:h-[91%] flex items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 from-30% via-slate-800 via-75% to-red-700 to-100% shadow-inner shadow-red-500">
 
 							{/* Main Content Container */}
 							<div className="w-screen max-w-[75%] md:max-w-[576px] lg:max-w-[900px] 2xl:max-w-[900px] mx-auto">
