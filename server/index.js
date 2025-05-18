@@ -106,7 +106,8 @@ io.on("connection", (socket) => {
 			return {
 
 				playerName: foundSocket.username,
-				isReady: foundSocket.isReady
+				isReady: foundSocket.isReady,
+				socketID: socketID
 
 			};
 
@@ -815,11 +816,15 @@ io.on("connection", (socket) => {
 
 	// host only
 	socket.on("sendNextCallsign", (callsign, generatedWords) => {
+		const roomList = getPlayersInLobby(socket.roomID);
+		const findRoom = roomLookup.find((room) => { return room.roomID === socket.roomID });
 
-		socket.to(socket.roomID).emit("receiveNextCallsign", callsign, generatedWords, false);
-
-		socket.emit("receiveNextCallsign", callsign, generatedWords, true);
-
+		roomList.foreach((player) => {
+			if (player.socketID === findRoom.guesserID)
+				io.to(player.socketID).emit("receiveNextCallsign", "REDACTED", generatedWords.map(word => word === callsign ? "REDACTED" : word), player.socketID === findRoom.hostID);
+			else
+				io.to(player.socketID).emit("receiveNextCallsign", callsign, generatedWords, player.socketID === findRoom.hostID);
+		})
 	});
 
 	// host only
