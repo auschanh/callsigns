@@ -103,8 +103,6 @@ function CreateGameForm({ gameInfoState, nextSlide, roomCreated, inLobby }) {
 
 		}
 
-		
-
 		setGameInfo(formattedValues);
 
 		try {

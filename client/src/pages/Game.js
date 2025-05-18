@@ -244,7 +244,7 @@ function Game() {
 
 			setInLobby(othersInLobby);
 
-			if (currentRound === roomDetails.numRounds) {
+			if (currentRound !== 11 && currentRound === roomDetails.numRounds) {
 
 				setScores( 
 
@@ -835,8 +835,6 @@ function Game() {
 
 					setInLobby(inLobby.filter(({playerName}) => { return playerName !== guesser }));
 
-					
-
 				}
 
 			}
@@ -846,8 +844,6 @@ function Game() {
 		socket.on("receiveNewHost", (roomDetails) => {
 
 			setRoomDetails(roomDetails);
-
-			
 
 		});
 
@@ -1122,8 +1118,6 @@ function Game() {
 
 		if (inGame?.length === 1 && playerName === guesser) {
 
-			
-
 			setStartFade(true);
 
 			setTimeout(() => {
@@ -1145,7 +1139,6 @@ function Game() {
 				}, 500);
 
 			}, 1000);
-
 
 		}
 
@@ -1175,8 +1168,6 @@ function Game() {
 					const duplicatesSet = new Set(duplicates);
 
 					socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
-
-					
 
 					handleNext();
 
@@ -1249,8 +1240,6 @@ function Game() {
 			if (!timeLimitReached && ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser))) {
 
 				if (currentIndex === 1) {
-
-					
 	
 					handleNext();
 	
@@ -1457,8 +1446,8 @@ function Game() {
 		</Table>;
 		
 		return table;
-	}
 
+	}
 
 	const cards = [
 

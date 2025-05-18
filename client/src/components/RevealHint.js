@@ -134,7 +134,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             setPrepRevCallsign(false);
 
-            if (currentRound === roomDetails.numRounds) {
+            if (currentRound !== 11 && currentRound === roomDetails.numRounds) {
 
                 setTimeout(() => {
 
