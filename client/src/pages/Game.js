@@ -1096,8 +1096,6 @@ function Game() {
 
 		if (!isLoadingNextRound && inGame && !inGame.includes(guesser)) {
 
-			
-
 			setStartFade(true);
 
 			setTimeout(() => {
@@ -1170,13 +1168,11 @@ function Game() {
 
 					const duplicates = tempHintArray.filter((currHint, index) => {
 						return tempHintArray.some((hint, i) => {
-							return hint === currHint && index !== i 
+							return hint.toString().toLowerCase() === currHint.toString().toLowerCase() && index !== i 
 						})
 					});
 
 					const duplicatesSet = new Set(duplicates);
-
-					
 
 					socket.emit("sendHintArray", roomDetails.roomID, [...duplicatesSet]);
 
@@ -1199,8 +1195,6 @@ function Game() {
 		const excludeGuesser = isVoted?.filter((player) => { return player.playerName !== guesser });
 
 		if (enterHint && (excludeGuesser?.every((player) => { return player.voted === true }) || timeLimitReached)) {
-			
-			
 
 			if (currentIndex === 1) {
 
@@ -1244,8 +1238,6 @@ function Game() {
 	
 				}));
 
-				
-	
 				setScores(newScores);
 	
 				const sorted = [...newScores].sort((a,b) => b.score - a.score);
@@ -1279,8 +1271,6 @@ function Game() {
 				setTimeLimitReached(undefined);
 
 				if (playerName === roomDetails.host) {
-
-					
 
 					handleNext();
 
