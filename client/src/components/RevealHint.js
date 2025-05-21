@@ -17,13 +17,14 @@ import { ReactComponent as AgentIcon } from "../assets/noun-anonymous-5647770.sv
 import { ReactComponent as WinnerIcon } from "../assets/noun-crown-6589105.svg";
 
 
-const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, setStartFade, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, tempScoresState, isDisconnectedGuesser, isDisconnectedTeam, notEnoughPlayers }) => {
+const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, validateState, validateWord, stemmerWord, singularizeWord, currentIndex, setTimeLimitReached, startFadeState, correctGuessState, numGuessesState, scoresState, readyNextRoundState, menuScoreState, sortedScoresState, generateScoreTable, encryptedCallsign, currentRound, isLastRoundState, showEndGameState, revealCallsignState, prepRevCallsignState, showScoreState, showHintsState, tempScoresState, isDisconnectedGuesser, isDisconnectedTeam, notEnoughPlayers }) => {
 
     const [socket, setSocket] = useSocketContext();
     const [playerName, callsign, generatedWords, [selectedPlayers, setSelectedPlayers], [inGame, setInGame], [isPlayerWaiting, setIsPlayerWaiting], [isGameStarted, setIsGameStarted], [guesser, setGuesser], [nextGuesser, setNextGuesser]] = useGameInfoContext();
     const [[inLobby, setInLobby], regPlayerCount] = useLobbyContext();
     const [readyNextRound, setReadyNextRound] = readyNextRoundState;
     const [results, setResults] = resultsState;
+    const [resultsCopy, setResultsCopy] = useState([]);
     const [guess, setGuess] = guessState;
     const [correctGuess, setCorrectGuess] = correctGuessState;
     const [remainingGuesses, setRemainingGuesses] = numGuessesState;
@@ -35,7 +36,9 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
     const [submissionText4, setSubmissionText4] = useState(false);
     const [submissionText5, setSubmissionText5] = useState(false);
     const [showReadyState, setShowReadyState] = useState(false);
+    const [startFade, setStartFade] = startFadeState;
     const [showScore, setShowScore] = showScoreState;
+    const [showHints, setShowHints] = showHintsState;
     const [scores, setScores] = scoresState;
     const [sortedScores, setSortedScores] = sortedScoresState;
     const [tempScores, setTempScores] = tempScoresState;
@@ -136,6 +139,12 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
             if (currentRound !== 11 && currentRound === roomDetails.numRounds) {
 
+                setResultsCopy(
+                    
+                    results.filter((result) => { return result.playerName !== guesser })
+
+                );
+
                 setTimeout(() => {
 
                     setIsLastRound(true);
@@ -161,6 +170,12 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                 }, 3000);
 
             } else {
+
+                setResultsCopy(
+                    
+                    results.filter((result) => { return result.playerName !== guesser })
+
+                );
 
                 setTimeout(() => {
 
@@ -623,7 +638,106 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                     </div>
 
-                                    <div className="flex gap-6">
+                                    <div className={`flex gap-6`}>
+
+                                        <Dialog open={showHints} onOpenChange={setShowHints}>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="blue" 
+                                                    className={`w-36`}
+                                                    onClick={() => {setShowHints(prev => !prev)}}
+                                                >
+                                                    View Hints
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent hideClose={true} className={`flex flex-col h-fit lg:w-[50vw] lg:left-[25vw] lg:mt-[22vh] 2xl:w-[40vw] 2xl:left-[30vw] 2xl:mt-[23vh] border-none bg-black`}>
+
+                                                <div className="flex flex-col items-center w-full h-full">
+
+                                                    <div className="flex flex-col w-full h-full px-12 py-8 items-center rounded-lg border shadow-[0rem_0rem_2rem_0.1rem_#2563eb] border-blue-600">
+
+                                                        <div className="w-full mb-4">
+                                                            <h1 className="text-slate-100 text-xl text-left mb-1">Hints</h1>
+                                                            <div className="w-full bg-blue-600 h-[0.25rem]"/>
+                                                        </div>
+
+                                                        <div className={`flex flex-row flex-wrap justify-center items-center gap-x-8 h-[25vh] ${resultsCopy.length < 4 ? "lg:w-full 2xl:w-full" : resultsCopy.length < 5 ? "lg:w-[75%] 2xl:w-[74%]" : "lg:w-[76%] 2xl:w-[93%]" }`}>
+
+                                                            {resultsCopy.some((result) => { return result.hint !== "" }) && (
+                                                            
+                                                                resultsCopy.map((result, index) => {
+
+                                                                    if (result.hint !== "") {
+
+                                                                        return (
+
+                                                                            <div key={index} className="flex flex-col min-w-36 items-center gap-2">
+
+                                                                                <Label className="text-sm text-slate-100">{result.playerName.length > 20 ? `${result.playerName.substring(0, 20)}...` : result.playerName}</Label>
+
+                                                                                <div className="w-full relative">
+
+                                                                                    <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-700 border border-black z-10 ${result.beenRemoved || result.count ? "" : "invisible" }`}>
+                                                                                        <h3 className={`text-xs text-slate-50 font-normal`}>{result.count ? result.count : <X size={12} /> }</h3>
+                                                                                    </div>
+                                            
+                                                                                    {result.visible && (
+                                                                                    
+                                                                                        <Button 
+                                                                                            variant="green" 
+                                                                                            className="flex p-2 w-full max-w-sm justify-center" 
+                                                                                        >
+                                                                                            {result.hint.length > 30 ? `${result.hint.substring(0, 30)}...` : result.hint}
+                                                
+                                                                                        </Button>
+                                                                                    
+                                                                                    ) || (
+                                                
+                                                                                        <Button className="flex p-2 w-full max-w-sm justify-center" variant="red">
+                                                                                            <p>{result.hint.length > 30 ? `${result.hint.substring(0, 30)}...` : result.hint}</p>                                                    
+                                                                                        </Button>
+
+                                                                                    )}
+
+                                                                                </div>
+                                            
+                                                                            </div>
+                                            
+                                                                        );
+
+                                                                    }
+
+                                                                })
+
+                                                            ) || (
+
+                                                                <h1 className="mt-6 text-lg text-center font-mono text-red-600">
+                                                                    ERROR: No valid hints were transmitted in time!
+                                                                </h1>
+
+                                                            )}
+            
+                                                        </div>
+
+                                                        <div className="w-full h-[1px] bg-[#e5e7eb] mt-8" />
+
+                                                        <div className='mt-8 left-0'>
+                                                            <Button
+                                                                variant="black" 
+                                                                className={`w-36`}
+                                                                onClick={() => {setShowHints(prev => !prev)}}
+                                                            >
+                                                                Close
+                                                            </Button>
+                                                        </div>
+
+                                                    </div>
+                                                        
+                                                </div>
+
+                                            </DialogContent>
+
+                                        </Dialog>
 
                                         {roomDetails.keepScore && (
 

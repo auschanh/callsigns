@@ -233,7 +233,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
                                                         <User size={16} />
 
-                                                        <p className="break-all mx-2">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
+                                                        <p className="break-all mx-2">{player?.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 
                                                         <div className={`ml-auto mr-3 py-2 px-4 rounded-lg ${player.isReady ? "bg-green-100 text-green-600" : "bg-slate-200 text-black opacity-50"}`}>
                                                             <p>{`${player.isReady ? "Ready" : "Not Ready"}`}</p>

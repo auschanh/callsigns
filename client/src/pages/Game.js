@@ -101,6 +101,8 @@ function Game() {
 
 	const [showScore, setShowScore] = useState(false);
 
+	const [showHints, setShowHints] = useState(false);
+
 	const [fadeBorder, setFadeBorder] = useState(false);
 
 	const [hintArray, setHintArray] = useState([]);
@@ -372,8 +374,6 @@ function Game() {
 				const order = inLobby.map(({playerName}) => playerName).filter(player => selectedPlayers.includes(player));
 
 				const playing = order.filter((player) => { return othersInLobby.find(({ playerName }) => { return playerName === player }) });
-
-				
 
 				setInGame(playing);
 
@@ -682,13 +682,15 @@ function Game() {
 
 			resetRound(othersInLobby, roomDetails);
 
+			setShowScore(false);
+
+			setShowHints(false);
+
 			setStartFade(true);
 
 			setFadeBorder(true);
 
 			setTimeout(() => {
-
-				setShowScore(false);
 
 				setValidate(false);
 
@@ -742,8 +744,6 @@ function Game() {
 
 				if (!(currentIndex === 2 && !submitted && validate && notEnoughPlayers)) {
 
-					
-
 					setStartFade(true);
 
 					setTimeout(() => {
@@ -753,6 +753,8 @@ function Game() {
 						setPrepRevCallsign(true);
 
 						setShowScore(false);
+
+						setShowHints(false);
 
 						if (currentIndex === 2 && !submitted && validate) {
 
@@ -930,8 +932,6 @@ function Game() {
 
 					setReadyNextRound(readyInGame);
 
-					
-
 				} else {
 
 					setTimeout(() => {
@@ -943,13 +943,9 @@ function Game() {
 
 							setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-							
-
 						} else {
 
 							setReadyNextRound(readyInGame);
-
-							
 
 						}
 
@@ -966,21 +962,15 @@ function Game() {
 
 					setReadyNextRound(readyInGame.map((player) => { return { ...player, readyNext: false } } ));
 
-					
-
 				} else {
 
 					setReadyNextRound(readyInGame);
-
-					
 
 				}
 
 			}
 
 			if (!isLoadingNextRound && readyInGame?.length >= 3 && readyInGame.every((player) => { return player.readyNext })) {
-
-				
 
 				if (inGame.includes(roomDetails.guesser)) {
 
@@ -991,8 +981,6 @@ function Game() {
 					setRevealCallsign([false, false, false]);
 
 					if ((inGame.includes(roomDetails.host) && playerName === roomDetails.host) || (!inGame.includes(roomDetails.host) && playerName === guesser)) {
-
-						
 
 						(async () => {
 
@@ -1009,11 +997,8 @@ function Game() {
 						})();
 					}
 
-				} else {
+				} 
 
-					
-
-				}
 			}
 
 			// remove disconnected players from score table
@@ -1033,8 +1018,6 @@ function Game() {
 
 				if (!(currentIndex === 2 && !submitted && validate && inGame.length < 2)) {
 
-					
-
 					setStartFade(true);
 
 					setTimeout(() => {
@@ -1044,6 +1027,8 @@ function Game() {
 						setPrepRevCallsign(true);
 
 						setShowScore(false);
+
+						setShowHints(false);
 
 						if (currentIndex === 2 && !submitted && validate) {
 
@@ -1072,10 +1057,6 @@ function Game() {
 						}
 
 					}, 1000);
-
-				} else {
-
-					
 
 				}
 
@@ -1526,7 +1507,7 @@ function Game() {
 					singularizeWord={singularizeWord} 
 					currentIndex={currentIndex}
 					setTimeLimitReached={setTimeLimitReached}
-					setStartFade={setStartFade}
+					startFadeState={[startFade, setStartFade]}
 					correctGuessState={[correctGuess, setCorrectGuess]}
 					numGuessesState={[remainingGuesses, setRemainingGuesses]}
 					scoresState={[scores, setScores]}
@@ -1541,6 +1522,7 @@ function Game() {
 					revealCallsignState={[revealCallsign, setRevealCallsign]}
 					prepRevCallsignState={[prepRevCallsign, setPrepRevCallsign]}
 					showScoreState={[showScore, setShowScore]}
+					showHintsState={[showHints, setShowHints]}
 					tempScoresState={[tempScores, setTempScores]}
 					isDisconnectedGuesser={isDisconnectedGuesser}
 					isDisconnectedTeam={isDisconnectedTeam}
@@ -1695,7 +1677,7 @@ function Game() {
 							<div className="flex mt-1 py-1 px-4 w-48 justify-center rounded-md bg-green-500 hover:bg-green-500/80 text-slate-900 dark:bg-slate-950 transition-colors ease-in-out duration-300">
 								<p className="text-sm text-center">
 
-									{guesser.length > 20 && (
+									{guesser?.length > 20 && (
 
 										`${guesser.substring(0, 20)}...`
 
