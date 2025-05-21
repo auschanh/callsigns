@@ -446,7 +446,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                         )}
                         { submissionText2 && (
                             <>
-                                <p>{`% Signalling friendly agents:${inLobby.map(({playerName}) => playerName).filter((player) => selectedPlayers.includes(player)).map((player) => { return ` ${player}`})}`}</p>
+                                <p>{`% Signalling friendly agents:${inLobby.map(({playerName}) => playerName).filter((player) => selectedPlayers.includes(player)).map((player) => { return ` ${player.length > 20 ? `${player.substring(0, 20)}...` : player}`})}`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -511,7 +511,6 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                 <div className='flex flex-row flex-none flex-wrap justify-center w-full gap-4 mb-8'>
 
                                     {/* SELECT NEXT GUESSER FROM END ROUND SCREEN */}
-                                    
 
                                     {readyNextRound?.map((playerObj, index) => {
 
@@ -535,7 +534,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                                     )}
                                                                 </div>
 
-                                                                <p className="text-xs">{playerObj.playerName}</p>
+                                                                <p className="text-xs">{playerObj.playerName.length > 20 ? `${playerObj.playerName.substring(0, 20)}...` : playerObj.playerName}</p>
                                                             </Button>
                                                         </TooltipTrigger>
                                                         <TooltipContent sideOffset={12}>
@@ -550,7 +549,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                             ) || (
                                                             
                                                                 <p>
-                                                                    <span className="font-semibold">{playerObj.playerName}</span>
+                                                                    <span className="font-semibold">{playerObj.playerName.length > 20 ? `${playerObj.playerName.substring(0, 20)}...` : playerObj.playerName}</span>
                                                                     {` is the next Stranded Agent!`}
                                                                 </p>
                                                             
@@ -583,7 +582,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                                         )}
                                                     </div>
-                                                    <p className="text-xs">{playerObj.playerName}</p>
+                                                    <p className="text-xs">{playerObj.playerName.length > 20 ? `${playerObj.playerName.substring(0, 20)}...` : playerObj.playerName}</p>
                                                 </Button>
 
                                             )
@@ -734,7 +733,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                             return (
 
                                                 <div key={index} className="flex flex-col min-w-36 items-center gap-2">
-                                                    <Label className="text-sm">{result.playerName}</Label>
+                                                    <Label className="text-sm">{result.playerName.length > 20 ? `${result.playerName.substring(0, 20)}...` : result.playerName}</Label>
                 
                                                     {result.visible && (
                                                     
@@ -742,7 +741,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                             variant="green" 
                                                             className="flex p-2 w-full max-w-sm justify-center" 
                                                         >
-                                                            {result.hint}
+                                                            {result.hint.length > 30 ? `${result.hint.substring(0, 30)}...` : result.hint}
                 
                                                         </Button>
                                                     
@@ -756,7 +755,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
                                                                 </Button>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
-                                                                <p>{result.hint}</p>
+                                                                <p>{result.hint.length > 30 ? `${result.hint.substring(0, 30)}...` : result.hint}</p>
                                                             </TooltipContent>
                                                         </Tooltip>
                 
@@ -795,23 +794,23 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                                     {remainingGuesses === 11 && (
 
-                                        <>Now it's up to <span className="font-bold">{guesser}</span> to figure out their callsign!</>
+                                        <>Now it's up to <span className="font-bold">{guesser.length > 20 ? `${guesser.substring(0, 20)}...` : guesser}</span> to figure out their callsign!</>
 
                                     ) || remainingGuesses === roomDetails.numGuesses && remainingGuesses !== 1 && (
 
-                                        <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances to figure out their callsign:</>
+                                        <><span className="font-bold">{guesser.length > 20 ? `${guesser.substring(0, 20)}...` : guesser}</span> has {remainingGuesses} chances to figure out their callsign:</>
 
                                     ) || roomDetails.numGuesses === 1 && (
 
-                                        <><span className="font-bold">{guesser}</span> has just 1 chance to figure out their callsign:</>
+                                        <><span className="font-bold">{guesser.length > 20 ? `${guesser.substring(0, 20)}...` : guesser}</span> has just 1 chance to figure out their callsign:</>
 
                                     ) || remainingGuesses > 1 && (
 
-                                        <><span className="font-bold">{guesser}</span> has {remainingGuesses} chances remaining to figure out their callsign:</>
+                                        <><span className="font-bold">{guesser.length > 20 ? `${guesser.substring(0, 20)}...` : guesser}</span> has {remainingGuesses} chances remaining to figure out their callsign:</>
 
                                     ) || remainingGuesses <= 1 && (
 
-                                        <><span className="font-bold">{guesser}</span> has 1 last chance to figure out their callsign:</>
+                                        <><span className="font-bold">{guesser.length > 20 ? `${guesser.substring(0, 20)}...` : guesser}</span> has 1 last chance to figure out their callsign:</>
 
                                     // ) || remainingGuesses <= 0 && (
 

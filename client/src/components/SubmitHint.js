@@ -191,7 +191,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
                         {intro1 && (
 
                             <>
-                                <p>{`% Secure link established: ${roomDetails.roomName} ...`}</p>
+                                <p>{`% Secure link established: ${roomDetails.roomName.length > 20 ? `${roomDetails.roomName.substring(0, 20)}...` : roomDetails.roomName} ...`}</p>
                                 <p>{`% [REDACTED]`}</p>
                                 <p>{`% [REDACTED]`}</p>
                             </>
@@ -207,7 +207,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
 
                                 ) || (
 
-                                    <p>{`% Connecting to remote terminal: ${roomDetails.guesser} ...`}</p>
+                                    <p>{`% Connecting to remote terminal: ${roomDetails.guesser.length > 20 ? `${roomDetails.guesser.substring(0, 20)}...` : roomDetails.guesser} ...`}</p>
 
                                 )}
                                 
@@ -379,7 +379,7 @@ const SubmitHint = ({ enterHintState, roomDetails, hintState, resultsState, vali
         
                                                 </div>
         
-                                                <p className="text-xs">{result.playerName}</p>
+                                                <p className="text-xs">{result.playerName.length > 20 ? `${result.playerName.substring(0, 20)}...` : result.playerName}</p>
                                                 
                                             </Button>
         

@@ -1433,7 +1433,7 @@ function Game() {
 					sortedScores.map((player, index) => {
 						return (<TableRow key={index} className={`${cellColour === "white" ? "hover:bg-gradient-to-r from-black from-10% via-slate-900 via-50% to-black to-90%" : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"}`}>
 						<TableCell className={`absolute -left-2 w-0 font-medium`} style={{ fill: agentColour }}>{player.playerName === guesser ? <AgentIcon className={`aspect-square h-5`}/> : ''}</TableCell>
-						<TableCell className="w-24 font-medium">{player.playerName}</TableCell>
+						<TableCell className="w-24 font-medium">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</TableCell>
 						<TableCell className="w-24 font-extrabold">{player.score}</TableCell>
 						<TableCell className="w-24">{player.correctGuesses}</TableCell>
 						<TableCell className="w-24">{player.goodHints}</TableCell>

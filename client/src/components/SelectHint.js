@@ -215,7 +215,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                                     )}
                                                 </div>
 
-                                                <p className="text-xs">{player.playerName}</p>
+                                                <p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 
                                             </Button>
                                         );
@@ -269,7 +269,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                             return (
 
                                                 <div key={index} className="flex flex-col min-w-36 items-center gap-2">
-                                                    <Label className="text-sm">{result.playerName}</Label>
+                                                    <Label className="text-sm">{result.playerName.length > 20 ? `${result.playerName.substring(0, 20)}...` : result.playerName}</Label>
                                                     <div className="w-full relative">
         
                                                         <div className={`absolute -top-2 -right-2 flex flex-none justify-center items-center aspect-square h-5 rounded-full bg-red-600 z-10 ${result.beenRemoved || result.count ? "" : "invisible" }`}>
@@ -282,7 +282,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                                             className={`flex p-2 w-full max-w-sm justify-center transition-all ease-in-out duration-150 ${result.beenRemoved ? "line-through bg-red-600" : ""}`} 
                                                             disabled={voted || result.beenRemoved}
                                                         >
-                                                            {result.hint}
+                                                            {result.hint.length > 30 ? `${result.hint.substring(0, 30)}...` : result.hint}
                                                         </Button>
                                                     </div>
                                                 </div>
@@ -407,7 +407,7 @@ const SelectHint = ({ resultsState, votedState, submissions, roomDetails, isVote
                                                     )}
                                                 </div>
 
-                                                <p className="text-xs">{player.playerName}</p>
+                                                <p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 
                                             </Button>
                                         );

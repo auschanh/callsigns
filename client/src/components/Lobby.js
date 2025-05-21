@@ -368,7 +368,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 					</div>
 
 					<h1 className="font-semibold text-lg mb-6 border border-b-slate-900">
-						{gameInfo.roomName}
+						{gameInfo.roomName.length > 20 ? `${gameInfo.roomName.substring(0, 20)}...` : gameInfo.roomName}
 					</h1>
 
 					{gameInfo && (
@@ -382,7 +382,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												className="font-normal hover:underline hover:cursor-pointer"
 												onClick={previousSlide}
 											>
-												{gameInfo.username}
+												{gameInfo.username.length > 20 ? `${gameInfo.username.substring(0, 20)}...` : gameInfo.username}
 											</span>
 										</TooltipTrigger>
 										<TooltipContent>
@@ -521,7 +521,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																	)}
 																	
 																</div>
-																<p className="text-xs">{player.playerName}</p>
+																<p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 															</Button>
 														</TooltipTrigger>
 														<TooltipContent>
@@ -608,7 +608,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 																		)}
 
 																	</div>
-																	<p className="text-xs">{player.playerName}</p>
+																	<p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 																</Button>
 															</TooltipTrigger>
 	
@@ -835,7 +835,7 @@ function Lobby({ gameInfo, sessionUrl, previousSlide, prevClosedRoom, prevAiPlay
 												)}
 
 											</div>
-											<p className="text-xs">{player}</p>
+											<p className="text-xs">{player.length > 20 ? `${player.substring(0, 20)}...` : player}</p>
 										</Button>
 										
 									);

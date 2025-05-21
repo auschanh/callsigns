@@ -139,7 +139,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
                         <p className="text-slate-50 text-xl">{playerName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()}</p>
                     </div>
 
-                    <h3 className="text-lg text-slate-900 px-6 break-all">{playerName}</h3>
+                    <h3 className="text-lg text-slate-900 px-6 break-all">{playerName.length > 8 ? `${playerName.substring(0, 8)}...` : playerName}</h3>
 
                     <AlertDialog>
 
@@ -188,7 +188,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
                                                 <User size={16} />
 
-                                                <p className={`break-all ${player === playerName ? "underline" : ""}`}>{player}</p>
+                                                <p className={`break-all ${player === playerName ? "underline" : ""}`}>{player.length > 20 ? `${player.substring(0, 20)}...` : player}</p>
 
                                             </div>
 
@@ -233,7 +233,7 @@ function GameMenu({ roomDetails, isClosedRoomState, sessionUrl }) {
 
                                                         <User size={16} />
 
-                                                        <p className="break-all mx-2">{player.playerName}</p>
+                                                        <p className="break-all mx-2">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
 
                                                         <div className={`ml-auto mr-3 py-2 px-4 rounded-lg ${player.isReady ? "bg-green-100 text-green-600" : "bg-slate-200 text-black opacity-50"}`}>
                                                             <p>{`${player.isReady ? "Ready" : "Not Ready"}`}</p>

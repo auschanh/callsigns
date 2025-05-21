@@ -180,7 +180,7 @@ function Chat({ username, roomName, roomID }) {
                     </Tooltip>
                 </TooltipProvider>
 
-                <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{roomName}</h2>
+                <h2 className={`text-sm pr-2 whitespace-nowrap transition-all ease-in-out duration-1000 ${chatExpanded ? "" : "invisible opacity-20"}`}>{roomName.length > 20 ? `${roomName.substring(0, 20)}...` : roomName}</h2>
 
                 <DropdownMenu className="relative">
                     <DropdownMenuTrigger asChild className="aspect-square h-full ml-auto border border-solid border-slate-400">
@@ -197,7 +197,7 @@ function Chat({ username, roomName, roomID }) {
 
                                     <DropdownMenuItem key={index} className="flex flex-row flex-none">
                                         <User className="flex flex-none mr-2 h-4 w-4" />
-                                        <h2 className="flex break-all">{playerName}</h2>
+                                        <h2 className="flex break-all">{playerName?.length > 20 ? `${playerName.substring(0, 20)}...` : playerName}</h2>
                                     </DropdownMenuItem>
 
                                 );
@@ -224,7 +224,7 @@ function Chat({ username, roomName, roomID }) {
                                     
                                     <div className="mr-1">
 
-                                        <p className="leading-none text-xs">{messageContent.author}</p>
+                                        <p className="leading-none text-xs">{messageContent.author.length > 20 ? `${messageContent.author.substring(0, 20)}...` : messageContent.author}</p>
 
                                     </div>
                                 

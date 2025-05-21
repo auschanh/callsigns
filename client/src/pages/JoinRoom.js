@@ -77,8 +77,6 @@ function JoinRoom() {
 
         if (roomDetails === undefined && !isClosedRoom && !beenRemoved) {
 
-            
-
             (async () => {
 
                 try {
@@ -98,8 +96,6 @@ function JoinRoom() {
         if (!username) {
 
             if (isFoundRoom) {
-
-                
 
                 setIsFoundRoom(false);
 
@@ -124,8 +120,6 @@ function JoinRoom() {
             // if not already in lobby
             if (!inLobby.find(({playerName}) => { return playerName === username })) {
 
-                
-
                 (async () => {
 
                     try {
@@ -139,10 +133,6 @@ function JoinRoom() {
                     }
 
                 })();
-
-            } else {
-
-                
 
             }
 
@@ -158,8 +148,6 @@ function JoinRoom() {
 
                 setInLobby(othersInLobby);
 
-                
-
                 setSessionUrl(sessionUrl);
 
                 setRoomDetails(roomDetails);
@@ -173,8 +161,6 @@ function JoinRoom() {
                 }
 
                 if (inRoom) {
-
-                    
 
                     setUsername(playerName);
 
@@ -225,8 +211,6 @@ function JoinRoom() {
 
                 } else {
 
-                    
-
                     setSuccess();
 
                 }
@@ -249,10 +233,6 @@ function JoinRoom() {
                     setUsername();
 
                     setIsClosedRoom(true);
-
-                } else {
-
-                    
 
                 }
 
@@ -540,7 +520,7 @@ function JoinRoom() {
 
                                 <div className="flex flex-row items-end w-full">
 
-                                    <h1 className="font-semibold text-xl underline">{roomDetails.roomName}</h1>
+                                    <h1 className="font-semibold text-xl underline">{roomDetails.roomName.length > 20 ? `${roomDetails.roomName.substring(0, 20)}...` : roomDetails.roomName}</h1>
 
                                     <Button className="flex justify-end mb-4 ml-auto gap-x-2 relative" variant="border" onClick={handleChatExpansion}>
                                         <h2 className="text-xs leading-none m-0 p-0">Chat</h2>
@@ -557,7 +537,7 @@ function JoinRoom() {
                                             <div className="py-2 w-fit">
                                                 <h1 className="text-xl font-extralight">{`Welcome `}
                                                     <TooltipTrigger asChild>
-                                                        <span className="font-normal hover:underline hover:cursor-pointer" onClick={() => {setOpen(true)}}>{username}</span>
+                                                        <span className="font-normal hover:underline hover:cursor-pointer" onClick={() => {setOpen(true)}}>{username.length > 20 ? `${username.substring(0, 20)}...` : username}</span>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
                                                         <p className="font-semibold">{`Change Username`}</p>
@@ -619,11 +599,11 @@ function JoinRoom() {
                                             
                                             {inGame && (
 
-                                                `${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for the next round:`
+                                                `${roomDetails.host.length > 20 ? `${roomDetails.host.substring(0, 20)}...` : roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for the next round:`
 
                                             ) || (
 
-                                                `${roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`
+                                                `${roomDetails.host.length > 20 ? `${roomDetails.host.substring(0, 20)}...` : roomDetails.host} will be selecting ${roomDetails.numPlayers} ${roomDetails.numPlayers === 1 ? "player" : "players"} for this round:`
 
                                             )}
                                         
@@ -665,7 +645,7 @@ function JoinRoom() {
                                                                                 )}
 
                                                                             </div>
-                                                                            <p className="text-xs">{player.playerName}</p>
+                                                                            <p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
                                                                         </Button>
                                                                     </TooltipTrigger>
                                                                     <TooltipContent>
@@ -713,7 +693,7 @@ function JoinRoom() {
                                                                                 )}
 
                                                                             </div>
-                                                                            <p className="text-xs">{player.playerName}</p>
+                                                                            <p className="text-xs">{player.playerName.length > 20 ? `${player.playerName.substring(0, 20)}...` : player.playerName}</p>
                                                                         </Button>
                                                                     </TooltipTrigger>
     
@@ -819,7 +799,7 @@ function JoinRoom() {
                                                                 )}
 
                                                             </div>
-                                                            <p className="text-xs">{player}</p>
+                                                            <p className="text-xs">{player.length > 20 ? `${player.substring(0, 20)}...` : player}</p>
                                                         </Button>
                                                         
                                                     );
@@ -882,11 +862,11 @@ function JoinRoom() {
 
                                     {!username && (
                                     
-                                        <>You'll be joining {roomDetails.roomName}</>
+                                        <>You'll be joining {roomDetails.roomName.length > 20 ? `${roomDetails.roomName.substring(0, 20)}...` : roomDetails.roomName}</>
                                     
                                     ) || (
 
-                                        <>You're currently in {roomDetails.roomName}</>
+                                        <>You're currently in {roomDetails.roomName.length > 20 ? `${roomDetails.roomName.substring(0, 20)}...` : roomDetails.roomName}</>
 
                                     )}
                                     
