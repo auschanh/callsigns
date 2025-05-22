@@ -35,25 +35,21 @@ function Chat({ username, roomName, roomID, revealCallsignState = [null, null] }
 
     }
 
+    const shortTime = new Intl.DateTimeFormat('en-US', {
+        hour: "numeric",
+        minute:"numeric",
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
     const sendMessage = async () => {
 
         if (message !== "") {
-
-            const today = new Date();
-
-            const ampm = today.getHours() >= 12 ? 'pm' : 'am';
-
-            const hours = (today.getHours() % 12) === 0 ? 12 : (today.getHours() % 12);
-
-            const minutes = ("0" + today.getMinutes()).slice(-2);
-
-            let currentTime = hours + ":" + minutes + " " + ampm;
 
             const messageData = {
 
                 author: username,
                 message: message,
-                time: currentTime
+                time: Date.now(),
 
             };
 
@@ -67,7 +63,7 @@ function Chat({ username, roomName, roomID, revealCallsignState = [null, null] }
 
             }
 
-            setMessageList((list) => [...list, messageData]);
+            setMessageList((list) => [...list, {...messageData, time: shortTime.format(messageData.time)}]);
 
             setMessage('');
 

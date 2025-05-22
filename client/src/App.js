@@ -86,6 +86,12 @@ function App() {
 
 	}
 
+	const shortTime = new Intl.DateTimeFormat('en-US', {
+        hour: "numeric",
+        minute:"numeric",
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
 	useEffect(() => {
 
 		socket.on("redirectGame", (roomID, playerName, selectedPlayers, callsign, isHost) => {
@@ -215,7 +221,7 @@ function App() {
 
 		socket.on("receiveMessage", (messageData) => {
 
-            setMessageList((list) => [...list, messageData]);
+            setMessageList((list) => [...list, {...messageData, time: shortTime.format(messageData.time)}]);
 
             if (!chatExpanded) {
 
