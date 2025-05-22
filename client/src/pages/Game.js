@@ -1631,7 +1631,7 @@ function Game() {
 
 									<div className="w-full h-[96%]">
 
-										<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} />
+										<Chat username={playerName} roomName={roomDetails.roomName} roomID={roomID} revealCallsignState={[revealCallsign, setRevealCallsign]} />
 
 									</div>
 
@@ -1665,7 +1665,6 @@ function Game() {
 								) || (
 
 									<HiddenIcon className={`aspect-square w-5 transition-opacity ease-in-out duration-500 ${revealCallsign[0] ? "opacity-0" : ""}`} />
-									// <p className="text-sm text-center">?</p>
 
 								)}
 								

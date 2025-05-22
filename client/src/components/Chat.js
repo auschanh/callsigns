@@ -9,7 +9,7 @@ import { useMessageContext } from "../contexts/MessageContext";
 import { useLobbyContext } from "../contexts/LobbyContext";
 import { useGameInfoContext } from "../contexts/GameInfoContext";
 
-function Chat({ username, roomName, roomID }) {
+function Chat({ username, roomName, roomID, revealCallsignState = [null, null] }) {
 
     const [socket, setSocket] = useSocketContext();
 
@@ -22,6 +22,8 @@ function Chat({ username, roomName, roomID }) {
     const [message, setMessage] = useState('');
 
     const [currentUsername, setCurrentUsername] = useState('');
+
+    const [revealCallsign, setRevealCallsign] = revealCallsignState;
 
     const lastMessageRef = useRef(null);
 
@@ -232,9 +234,17 @@ function Chat({ username, roomName, roomID }) {
 
                                 <div className={`max-w-40 break-words p-3 rounded-lg overflow-hidden ${username === messageContent.author ? "bg-sky-500 text-white" : "bg-slate-200"}`}>
 
-                                    {(isGameStarted && (username === guesser) && (username !== messageContent.author)) && (
+                                    {(isGameStarted && (username === guesser) && (username !== messageContent.author) && revealCallsign) && (
+                                        
+                                        (!revealCallsign[1]) && (
+                                        
+                                            <p className={`leading-none text-sm break-words blur select-none transition-opacity ease-in-out duration-500 ${revealCallsign[0] ? "opacity-0" : ""}`}>{'-'.repeat(messageContent.message.length)}</p>
 
-                                        <p className={`leading-none text-sm break-words blur select-none`}>{'-'.repeat(messageContent.message.length)}</p>
+                                        ) || (
+
+                                            <p className={`leading-none text-sm break-words transition-opacity ease-in-out duration-500 ${revealCallsign[2] ? "" : "opacity-0"}`}>{messageContent.message}</p>
+
+                                        )
 
                                     ) || (
 
