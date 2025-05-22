@@ -141,7 +141,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                 setResultsCopy(
                     
-                    results.filter((result) => { return result.playerName !== guesser })
+                    results.filter((result) => { return result.playerName !== guesser && result.hint !== "" })
 
                 );
 
@@ -173,7 +173,7 @@ const RevealHint = ({ resultsState, roomDetails, guessState, submittedState, val
 
                 setResultsCopy(
                     
-                    results.filter((result) => { return result.playerName !== guesser })
+                    results.filter((result) => { return result.playerName !== guesser && result.hint !== "" })
 
                 );
 
